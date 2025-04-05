@@ -62,10 +62,12 @@ model Match {
   loserTeamId  Int?
   team1Note    String? // チーム1に関する注釈
   team2Note    String? // チーム2に関する注釈
+  locationId   Int?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  event Event @relation(fields: [eventId], references: [id])
+  event    Event     @relation(fields: [eventId], references: [id])
+  location Location? @relation(fields: [locationId], references: [id])
 }
 
 model Score {
@@ -79,4 +81,13 @@ model Score {
 
   event Event @relation(fields: [eventId], references: [id])
   team  Team  @relation(fields: [teamId], references: [id])
+}
+
+model Location {
+  id          Int      @id @default(autoincrement())
+  name        String
+  coordinates Json
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  matches     Match[]
 }
