@@ -23,8 +23,8 @@ model ScheduleImage {
   id              Int           @id @default(autoincrement())
   dayNumber       Int
   description     String
-  startTime       String // hh:mm形式
-  endTime         String // hh:mm形式
+  startTime       DateTime
+  endTime         DateTime
   fileName        String // スケジュールのファイル名を格納するフィールド
   eventScheduleId Int
   eventSchedule   EventSchedule @relation(fields: [eventScheduleId], references: [id])
@@ -33,6 +33,7 @@ model ScheduleImage {
 model Team {
   id     Int     @id @default(autoincrement())
   name   String
+  color  String? // #000000形式
   scores Score[]
 }
 
@@ -40,38 +41,108 @@ model Event {
   id          Int     @id @default(autoincrement())
   name        String
   description String?
-  matches     Match[]
-  scores      Score[]
-  rankings    Json? // 順位を保持するフィールド
+
+  teamData Json[] // [予選, 本選]のように分けて保持する。予選は予選の順位、本選は本選の順位を保持する。
+  // ブロックの情報もここから参照できる。
+  // 形式や種目に応じて柔軟に保持。
+  // 例 予選はリーグ, 本選はトーナメントの場合
+  // [
+  //   {
+  //     "type": "league",
+  //     "blocks": {
+  //       "A": [
+  //         { "teamId": 1 },
+  //         { "teamId": 2 }
+  //        ],
+  //       "B": [
+  //         { "teamId": 3 },
+  //         { "teamId": 4 }
+  //        ]
+  //     }
+  //   },
+  //  {
+  //     "type": "tournament",
+  //     "teams": {
+  //       {"teamId": 1 },
+  //       {"teamId": 3 },
+  //       {"teamId": 2 },
+  //   }
+  // ]
+  // 最終的な順位はこの配列の-1番目のオブジェクトの値を参照すればよい。
+  // 予選本選の区別がない場合は1つのオブジェクトを持つ配列を保持する。
+  // 例　トーナメントのみ
+  // [
+  //   {
+  //     "type": "tournament",
+  //     "teams": {
+  //       {"teamId": 1 },
+  //       {"teamId": 3 },
+  //       {"teamId": 2 },
+  //     }
+  //   }
+  // ]
+
+  // ここにteamIdの他に勝利数等を記録しても良い
+
+  matches MatchPlan[]
+  scores  Score[]
 }
 
-model Match {
-  id           Int       @id @default(autoincrement())
-  eventId      Int
-  team1Id      Int?
-  team2Id      Int?
-  matchDate    DateTime
-  startTime    String // hh:mm形式
-  endTime      String // hh:mm形式
-  winnerTeamId Int?
-  loserTeamId  Int?
-  team1Note    String? // チーム1に関する注釈
-  team2Note    String? // チーム2に関する注釈
-  locationId   Int?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime? @updatedAt
-  isCanceled   Boolean   @default(false)
+model MatchPlan {
+  id      Int @id @default(autoincrement())
+  eventId Int
 
-  event    Event     @relation(fields: [eventId], references: [id])
-  location Location? @relation(fields: [locationId], references: [id])
+  matchName       String? // 試合の名前
+  matchNote       String? // 試合の備考
+  matchSecretNote String? // 内部伝達用の試合の備考 (多分使わない)
+
+  teamIds  String[] // チームIDの配列。もし依存にするなら<T(ournament)-[matchId]-[W|L] | L(eague)-[blockName]-[rank]> のように指定する。Wは勝利チーム、Lは敗北チームを意味する。 例: T-1-W, T-20-L, L-A-1, L-B-2
+  // 1vs1じゃないところで敗北チームは指定しないでほしい(願望)
+  teamNote String[] // チームの備考. インデックスで判断するので空文字で埋めても良い。
+
+  // teamIdがnullでない場合はteamIdを表示する。
+  // teamIdがnullの場合はteamNoteを表示する。
+
+  scheduledStartTime DateTime
+  scheduledEndTime   DateTime
+  locationId         Int?
+  updatedAt          DateTime?     @updatedAt
+  event              Event         @relation(fields: [eventId], references: [id])
+  location           Location?     @relation(fields: [locationId], references: [id])
+  MatchResult        MatchResult[]
+}
+
+model MatchResult {
+  id      Int @id @default(autoincrement())
+  matchId Int
+
+  resultNote       String? // 試合結果の備考。公開する。例えば引き分けになったのでじゃんけんで決定した等
+  resultSecretNote String? // 内部伝達用の試合結果の備考 (多分使わない)
+
+  teamIds     String[] // チームIDの配列。実際に対戦したチームを入力。
+  matchScores String[] // チームのスコア. インデックスで判断するので空文字で埋めても良い。
+
+  winnerTeamId Int // ただ一つ 
+  loserTeamId  Int // 1vs1じゃないところで敗北チームは指定しないでほしい(願望)
+
+  startedAt  DateTime?
+  endedAt    DateTime?
+  isCanceled Boolean   @default(false)
+  cancelNote String? // 試合がキャンセルされた理由
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  match MatchPlan @relation(fields: [matchId], references: [id])
 }
 
 model Score {
-  id        Int       @id @default(autoincrement())
-  eventId   Int
-  teamId    Int
-  score     Int
-  note      String    @default("")
+  id      Int    @id @default(autoincrement())
+  eventId Int
+  teamId  Int
+  score   Int
+  note    String @default("")
+
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
 
@@ -80,10 +151,10 @@ model Score {
 }
 
 model Location {
-  id          Int       @id @default(autoincrement())
+  id          Int         @id @default(autoincrement())
   name        String
   coordinates Json
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime? @updatedAt
-  matches     Match[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime?   @updatedAt
+  matches     MatchPlan[]
 }

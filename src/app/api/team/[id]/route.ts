@@ -3,9 +3,8 @@ import {NextRequest} from "next/server";
 import {Team} from "@prisma/client";
 
 export async function GET() {
-    // todoテーブルから全件取得
-    const todos: Team[] = await prisma.team.findMany()
-    return Response.json(todos)
+    const teams: Team[] = await prisma.team.findMany()
+    return Response.json(teams)
 }
 
 export async function POST(request: Request) {

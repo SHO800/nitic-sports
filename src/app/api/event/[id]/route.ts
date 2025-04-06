@@ -3,16 +3,16 @@ import {NextRequest} from "next/server";
 import {Event} from "@prisma/client";
 
 export async function GET() {
-    // todoテーブルから全件取得
-    const todos: Event[] = await prisma.event.findMany()
-    return Response.json(todos)
+    const events: Event[] = await prisma.event.findMany()
+    return Response.json(events)
 }
 
 export async function POST(request: Request) {
-    const {name}: { name: string } = await request.json()
+    const {name, description}: { name: string, description?: string } = await request.json()
     const response = await prisma.event.create({
         data: {
             name,
+            description,
         },
     })
     return Response.json(response)
@@ -24,14 +24,14 @@ export async function PATCH(
     {params}: { params: { id: string } }
 ) {
     const id = Number(params.id)
-    const {name}: { name: string } = await request.json()
-    // リクエストのidを元にcompletedを反転させる
+    const {name, description}: { name: string, description?: string } = await request.json()
     const response = await prisma.event.update({
         where: {
             id,
         },
         data: {
-            name: name
+            name,
+            description,
         },
     })
     return Response.json(response)
