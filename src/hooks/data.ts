@@ -67,37 +67,37 @@ export const useData = () => {
         }
         getMatchPlan()
         
-        const getMatchResult = async () => {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/match-result/-1`)
-            const matchResults = await response.json()
-            setMatchResults(matchResults)
-        }
-        getMatchResult()
-        
-        const getEventSchedule = async () => {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/event-schedule/-1`)
-            const eventSchedules = await response.json()
-            setEventSchedules(eventSchedules)
-        }
-        getEventSchedule()
-        const getSchedule = async () => {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/schedule/-1`)
-            const schedules = await response.json()
-            setSchedules(schedules)
-        }
-        getSchedule()
+        // const getMatchResult = async () => {
+        //     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/match-result/-1`)
+        //     const matchResults = await response.json()
+        //     setMatchResults(matchResults)
+        // }
+        // getMatchResult()
+        //
+        // const getEventSchedule = async () => {
+        //     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/event-schedule/-1`)
+        //     const eventSchedules = await response.json()
+        //     setEventSchedules(eventSchedules)
+        // }
+        // getEventSchedule()
+        // const getSchedule = async () => {
+        //     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/schedule/-1`)
+        //     const schedules = await response.json()
+        //     setSchedules(schedules)
+        // }
+        // getSchedule()
         const getLocation = async () => {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/location/-1`)
             const locations = await response.json()
             setLocations(locations)
         }
         getLocation()
-        const getScore = async () => {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/score/-1`)
-            const scores = await response.json()
-            setScores(scores)
-        }
-        getScore()
+        // const getScore = async () => {
+        //     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/score/-1`)
+        //     const scores = await response.json()
+        //     setScores(scores)
+        // }
+        // getScore()
         
         
     }, [])

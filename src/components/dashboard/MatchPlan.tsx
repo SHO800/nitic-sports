@@ -229,11 +229,10 @@ const MatchPlan = () => {
                                                     setIsVisibleClassSelector(false)
                                                 }}
                                             />
-                                            <div className={"fixed top-0 right-0 w-[360] h-fit z-50"}>
+                                            <div className={"fixed top-0 right-0 w-[400px] h-[400px] z-50"}>
                                                 <ClassSelector
                                                     groupedData={groupedTeams}
                                                     callback={(id: number, name: string) => {
-                                                        console.log(id, name)
                                                         const input = document.getElementById(`team${index + 1}Id`) as HTMLInputElement;
                                                         input.value = id.toString()
                                                         const span = document.getElementById(`team${index + 1}Name`) as HTMLSpanElement;

@@ -153,6 +153,7 @@ model Score {
 model Location {
   id          Int         @id @default(autoincrement())
   name        String
+  description String?
   coordinates Json
   createdAt   DateTime    @default(now())
   updatedAt   DateTime?   @updatedAt
