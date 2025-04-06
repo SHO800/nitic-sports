@@ -62,11 +62,11 @@ model Event {
   //   },
   //  {
   //     "type": "tournament",
-  //     "teams": {
+  //     "teams": [
   //       {"teamId": 1 },
   //       {"teamId": 3 },
   //       {"teamId": 2 },
-  //   }
+  //   ]
   // ]
   // 最終的な順位はこの配列の-1番目のオブジェクトの値を参照すればよい。
   // 予選本選の区別がない場合は1つのオブジェクトを持つ配列を保持する。
@@ -74,11 +74,11 @@ model Event {
   // [
   //   {
   //     "type": "tournament",
-  //     "teams": {
+  //     "teams": [
   //       {"teamId": 1 },
   //       {"teamId": 3 },
   //       {"teamId": 2 },
-  //     }
+  //     ]
   //   }
   // ]
 
@@ -96,26 +96,26 @@ model MatchPlan {
   matchNote       String? // 試合の備考
   matchSecretNote String? // 内部伝達用の試合の備考 (多分使わない)
 
-  teamIds  String[] // チームIDの配列。もし依存にするなら<T(ournament)-[matchId]-[W|L] | L(eague)-[blockName]-[rank]> のように指定する。Wは勝利チーム、Lは敗北チームを意味する。 例: T-1-W, T-20-L, L-A-1, L-B-2
+  teamIds   String[] // チームIDの配列。もし依存にするなら$<T(ournament)-[matchId]-[W|L] | L(eague)-[eventId]-[teamDataでのindex(0なら予選, 1なら本選)]-[blockName]-[rank]> のように指定する。Wは勝利チーム、Lは敗北チームを意味する。 例: $T-1-W, $T-20-L, $L-1-0-A-1, $L-3-0-B-2
   // 1vs1じゃないところで敗北チームは指定しないでほしい(願望)
-  teamNote String[] // チームの備考. インデックスで判断するので空文字で埋めても良い。
+  teamNotes String[] // チームの備考. インデックスで判断するので空文字で埋めても良い。
 
   // teamIdがnullでない場合はteamIdを表示する。
-  // teamIdがnullの場合はteamNoteを表示する。
+  // teamIdがnullの場合はteamNotesを表示する。
 
   scheduledStartTime DateTime
   scheduledEndTime   DateTime
   locationId         Int?
-  updatedAt          DateTime?     @updatedAt
-  event              Event         @relation(fields: [eventId], references: [id])
-  location           Location?     @relation(fields: [locationId], references: [id])
-  MatchResult        MatchResult[]
+  updatedAt          DateTime?    @updatedAt
+  event              Event        @relation(fields: [eventId], references: [id])
+  location           Location?    @relation(fields: [locationId], references: [id])
+  matchResultId      Int?
+  matchResult        MatchResult?
 }
 
 model MatchResult {
-  id      Int @id @default(autoincrement())
-  matchId Int
-
+  id               Int     @id @default(autoincrement())
+  matchId          Int     @unique
   resultNote       String? // 試合結果の備考。公開する。例えば引き分けになったのでじゃんけんで決定した等
   resultSecretNote String? // 内部伝達用の試合結果の備考 (多分使わない)
 
@@ -133,7 +133,7 @@ model MatchResult {
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
 
-  match MatchPlan @relation(fields: [matchId], references: [id])
+  matchPlan MatchPlan @relation(fields: [matchId], references: [id])
 }
 
 model Score {

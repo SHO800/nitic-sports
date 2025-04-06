@@ -12,9 +12,9 @@ const Teams = () => {
                 >
                     <div className='flex items-center'>
                         <p className={`text-black `}>
-                            {team.name}
+                            {team.id} {team.name}
                         </p>
-                    </div>
+                     </div>
                     <button
                         onClick={async (e) => {
                             e.preventDefault()

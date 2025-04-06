@@ -1,5 +1,4 @@
 "use client"
-import {Event} from "@prisma/client";
 import {useData} from "@/hooks/data";
 import {useState} from "react";
 
@@ -7,10 +6,13 @@ import {useState} from "react";
 const Events = () => {
     const {events, setEvents} = useData()
     const [isTwoStageCompetition, setIsTwoStageCompetition] = useState(false)
-    const [eventType1, setEventType1] = useState<string | null>("T");
+    const [eventType1, setEventType1] = useState<string | null>("tournament");
     const [eventType2, setEventType2] = useState<string | null>(null);
-    
-    const [teamDataJsonDraft, setTeamDataJsonDraft] = useState<object>({})
+
+    const [teamDataJsonDraft, setTeamDataJsonDraft] = useState<TeamData[]>([{
+        type: "tournament",
+        teams: [],
+    }]) // 初期値
 
     // 例 予選はリーグ, 本選はトーナメントの場合
     // [
@@ -29,11 +31,11 @@ const Events = () => {
     //   },
     //  {
     //     "type": "tournament",
-    //     "teams": {
+    //     "teams": [
     //       {"teamId": 1 },
     //       {"teamId": 3 },
     //       {"teamId": 2 },
-    //   }
+    //   ]
     // ]
     // 最終的な順位はこの配列の-1番目のオブジェクトの値を参照すればよい。
     // 予選本選の区別がない場合は1つのオブジェクトを持つ配列を保持する。
@@ -41,16 +43,15 @@ const Events = () => {
     // [
     //   {
     //     "type": "tournament",
-    //     "teams": {
+    //     "teams": [
     //       {"teamId": 1 },
     //       {"teamId": 3 },
     //       {"teamId": 2 },
-    //     }
+    //     ]
     //   }
     // ]
 
-    // ここにteamIdの他に勝利数等を記録しても良い
-    
+
     return (
         <>
             {events.map((event) => (
@@ -103,7 +104,8 @@ const Events = () => {
                             body: JSON.stringify({
                                 name: (document.getElementById('eventName') as HTMLInputElement).value,
                                 description: (document.getElementById('eventDescription') as HTMLInputElement).value,
-                            } as Event),
+                                teamData: JSON.stringify(teamDataJsonDraft),
+                            }),
                         }
                     )
                     const newEvent = await response.json()
@@ -124,12 +126,32 @@ const Events = () => {
                     </div>
                     <div>
                         <input
+                            type='text'
+                            id='eventDescription'
+                            name='eventDescription'
+                            className='border border-gray-400 px-4 py-2 mr-2 rounded text-white'
+                            placeholder='種目の説明を入力してください'
+                        />
+                    </div>
+
+                    <div>
+                        <input
                             name={"isTwoStageCompetition"}
                             id={"isTwoStageCompetition"}
                             type="checkbox"
                             onChange={(e) => {
                                 setIsTwoStageCompetition(e.target.checked)
-                                setEventType2(e.target.checked ? "T" : null)
+                                setEventType2(e.target.checked ? "tournament" : null)
+                                // teamDataJsonDraft[1]を初期値にする
+                                if (e.target.checked)
+                                    setTeamDataJsonDraft((prevState) => {
+                                        const newState = [...prevState]
+                                        newState[1] = {
+                                            type: "tournament",
+                                            teams: []
+                                        }
+                                        return newState
+                                    })
                             }}
                             checked={isTwoStageCompetition}
                             className='border border-gray-400 px-4 py-2 mr-2 rounded text-white'
@@ -147,11 +169,20 @@ const Events = () => {
                             type={"radio"}
                             name={"eventType1"}
                             id={"eventType1Tournament"}
-                            value={"T"}
+                            value={"tournament"}
                             className='border border-gray-400 px-4 py-2 mr-2 rounded text-white'
                             defaultChecked
                             onChange={(e) => {
                                 setEventType1(e.target.value)
+                                // teamDataJsonDraft[0]を初期値にする
+                                setTeamDataJsonDraft((prevState) => {
+                                    const newState = {...prevState}
+                                    newState[0] = {
+                                        type: e.target.value,
+                                        teams: []
+                                    }
+                                    return newState
+                                })
                             }}
                         />
                         <label
@@ -162,41 +193,118 @@ const Events = () => {
                             type={"radio"}
                             name={"eventType1"}
                             id={"eventType1League"}
-                            value={"R"}
+                            value={"league"}
                             className='border border-gray-400 px-4 py-2 mr-2 rounded text-white'
                             onChange={(e) => {
                                 setEventType1(e.target.value)
+                                // teamDataJsonDraft[0]を初期値にする
+                                setTeamDataJsonDraft((prevState) => {
+                                    const newState = {...prevState}
+                                    newState[0] = {
+                                        type: e.target.value,
+                                        blocks: {},
+                                    }
+                                    return newState
+                                })
                             }}
                         />
                         <label
                             htmlFor={"eventType1League"}
                             className='text-white mr-2'
                         >リーグ戦</label>
-                        
-                        
                         <div>
                             <p>チーム入力</p>
                             {
-                                eventType1 === "T" ?
-                                    <p>トーナメントはチーム数を2の累乗にしてください</p>
+                                eventType1 === "tournament" ?
+                                    <>
+                                        {teamDataJsonDraft[0].teams!.map((key, index) => (
+                                            <div key={"teamDataJsonDraft[0]TournamentDiv"+index} className={"flex flex-col"}>
+                                                <input
+                                                    type="text"
+                                                    name={`team${index}`}
+                                                    id={`team${index}`}
+                                                    className='border border-gray-400 px-4 py-2 mr-2 rounded text-white'
+                                                    placeholder='チーム名を入力してください'
+                                                    onChange={(e) => {
+                                                        const newTeamData = {...teamDataJsonDraft}
+                                                        newTeamData[0].teams![index] = { // トグル切替時にteamsの存在を保証
+                                                            teamId: Number(e.target.value),
+                                                            rank: 0,
+                                                        }
+                                                        setTeamDataJsonDraft(newTeamData)
+                                                    }}
+                                                />
+                                            </div>
+                                        ))}
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                const newTeamData = {...teamDataJsonDraft}
+                                                newTeamData[0].teams!.push({
+                                                    teamId: 0,
+                                                })
+                                                setTeamDataJsonDraft(newTeamData)
+                                            }}
+                                            className='bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded'
+                                        >
+                                            チーム追加
+                                        </button>
+                                    </>
                                     :
-                                    <p>リーグ戦はチーム数を3以上にしてください</p>
+                                    <>
+                                        {
+                                            Object.keys(teamDataJsonDraft[0].blocks!).map((key, index) => (
+                                                <div key={"teamDataJsonDraft[0]LeagueDiv"+index} className={"flex flex-col"}>
+                                                    <p>{key}</p>
+                                                    {teamDataJsonDraft[0].blocks![key].map((team, teamIndex) => (
+                                                        <input
+                                                            key={"teamDataJsonDraft[0]LeagueInput"+index+teamIndex}
+                                                            type="text"
+                                                            name={`team${index}-${teamIndex}`}
+                                                            id={`team${index}-${teamIndex}`}
+                                                            className='border border-gray-400 px-4 py-2 mr-2 rounded text-white'
+                                                            placeholder='IDを入力してください'
+
+                                                            onChange={(e) => {
+                                                                const newTeamData = {...teamDataJsonDraft}
+                                                                newTeamData[0].blocks![key][teamIndex] = {
+                                                                    teamId: Number(e.target.value),
+                                                                }
+                                                                setTeamDataJsonDraft(newTeamData)
+                                                            }}
+                                                        />
+                                                    ))}
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            const newTeamData = {...teamDataJsonDraft}
+                                                            newTeamData[0].blocks![key].push({
+                                                                teamId: 0,
+                                                            })
+                                                            setTeamDataJsonDraft(newTeamData)
+                                                        }}
+                                                        className='bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded'
+                                                    >
+                                                        チーム追加
+                                                    </button>
+
+                                                </div>
+                                            ))
+                                        }
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                const newTeamData = {...teamDataJsonDraft}
+                                                const blockName = String.fromCharCode(65 + Object.keys(newTeamData[0].blocks!).length)
+                                                newTeamData[0].blocks![blockName] = []
+                                                setTeamDataJsonDraft(newTeamData)
+                                            }}
+                                            className='bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded'
+                                        >
+                                            ブロック追加
+                                        </button>
+                                    </>
                             }
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    const newKey = `team${Object.keys(teamDataJsonDraft).length + 1}`
-                                    setTeamDataJsonDraft({
-                                        ...teamDataJsonDraft,
-                                        [newKey]: "",
-                                    })
-                                }}
-                                className='bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded'
-                            >
-                                チーム追加
-                            </button>
-                            
-                            
                         </div>
                     </div>
                     {isTwoStageCompetition && <>
@@ -206,11 +314,20 @@ const Events = () => {
                                 type={"radio"}
                                 name={"eventType2"}
                                 id={"eventType2Tournament"}
-                                value={"T"}
+                                value={"tournament"}
                                 className='border border-gray-400 px-4 py-2 mr-2 rounded text-white'
                                 defaultChecked
                                 onChange={(e) => {
                                     setEventType2(e.target.value)
+                                    // teamDataJsonDraft[1]を初期値にする
+                                    setTeamDataJsonDraft((prevState) => {
+                                        const newState = {...prevState}
+                                        newState[1] = {
+                                            type: e.target.value,
+                                            teams: []
+                                        }
+                                        return newState
+                                    })
                                 }}
                             />
                             <label
@@ -221,30 +338,132 @@ const Events = () => {
                                 type={"radio"}
                                 name={"eventType2"}
                                 id={"eventType2League"}
-                                value={"R"}
+                                value={"league"}
                                 className='border border-gray-400 px-4 py-2 mr-2 rounded text-white'
                                 onChange={(e) => {
                                     setEventType2(e.target.value)
+                                    // teamDataJsonDraft[1]を初期値にする
+                                    setTeamDataJsonDraft((prevState) => {
+                                        const newState = {...prevState}
+                                        newState[1] = {
+                                            type: e.target.value,
+                                            blocks: {},
+                                        }
+                                        return newState
+                                    })
                                 }}
                             />
                             <label
                                 htmlFor={"eventType2League"}
                                 className='text-white mr-2'
                             >リーグ戦</label>
+                            <div>
+                                <p>チーム入力</p>
+                                {
+                                    eventType2 === "tournament" ?
+                                        <>
+                                            {teamDataJsonDraft[1].teams!.map((key, index) => (
+                                                <div key={"teamDataJsonDraft[1]TournamentDiv"+index} className={"flex flex-col"}>
+                                                    <input
+                                                        type="text"
+                                                        name={`team${index}`}
+                                                        id={`team${index}`}
+                                                        className='border border-gray-400 px-4 py-2 mr-2 rounded text-white'
+                                                        placeholder='チーム名を入力してください'
+                                                        onChange={(e) => {
+                                                            const newTeamData = {...teamDataJsonDraft}
+                                                            newTeamData[1].teams![index] = { // トグル切替時にteamsの存在を保証
+                                                                teamId: Number(e.target.value),
+                                                                rank: 0,
+                                                            }
+                                                            setTeamDataJsonDraft(newTeamData)
+                                                        }
+                                                        }
+                                                    />
+                                                </div>
+                                            ))}
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const newTeamData = {...teamDataJsonDraft}
+                                                    newTeamData[1].teams!.push({
+                                                        teamId: 0,
+                                                    })
+                                                    setTeamDataJsonDraft(newTeamData)
+                                                }}
+                                                className='bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded'
+                                            >
+                                                チーム追加
+                                            </button>
+                                        </>
+                                        :
+                                        <>
+                                            {
+                                                Object.keys(teamDataJsonDraft[1].blocks!).map((key, index) => (
+                                                    <div key={"teamDataJsonDraft[1]LeagueDiv"+index} className={"flex flex-col"}>
+                                                        <p>{key}</p>
+                                                        {teamDataJsonDraft[1].blocks![key].map((team, teamIndex) => (
+                                                            <input
+                                                                key={"teamDataJsonDraft[1]LeagueInput"+index+teamIndex}
+                                                                type="text"
+                                                                name={`team${index}-${teamIndex}`}
+                                                                id={`team${index}-${teamIndex}`}
+                                                                className='border border-gray-400 px-4 py-2 mr-2 rounded text-white'
+                                                                placeholder='IDを入力してください'
+
+                                                                onChange={(e) => {
+                                                                    const newTeamData = {...teamDataJsonDraft}
+                                                                    newTeamData[1].blocks![key][teamIndex] = {
+                                                                        teamId: Number(e.target.value),
+                                                                    }
+                                                                    setTeamDataJsonDraft(newTeamData)
+                                                                }}
+                                                            />
+                                                        ))}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                const newTeamData = {...teamDataJsonDraft}
+                                                                newTeamData[1].blocks![key].push({
+                                                                    teamId: 0,
+                                                                })
+                                                                setTeamDataJsonDraft(newTeamData)
+                                                            }}
+                                                            className='bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded'
+                                                        >
+                                                            チーム追加
+                                                        </button>
+
+                                                    </div>
+                                                ))
+                                            }
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const newTeamData = {...teamDataJsonDraft}
+                                                    const blockName = String.fromCharCode(65 + Object.keys(newTeamData[1].blocks!).length)
+                                                    newTeamData[1].blocks![blockName] = []
+                                                    setTeamDataJsonDraft(newTeamData)
+                                                }}
+                                                className='bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded'
+                                            >
+                                                ブロック追加
+                                            </button>
+                                        </>
+                                }
+                            </div>
+
                         </div>
                     </>
                     }
-                    <div>
 
-                    </div>
 
                     <button
                         type='submit'
-                        className='bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded'
+                        className='bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded'
                     >
                         追加
                     </button>
-
                 </div>
             </form>
             {/*    編集用*/}
@@ -259,15 +478,24 @@ const Events = () => {
                                 'Content-Type': 'application/json',
                             },
                             body: JSON.stringify({
-                                id: Number((document.getElementById('id') as HTMLInputElement).value),
                                 name: (document.getElementById('eventName') as HTMLInputElement).value,
                                 description: (document.getElementById('eventDescription') as HTMLInputElement).value,
-                            } as Event),
+                                teamData: JSON.stringify(teamDataJsonDraft),
+                            }),
+
                         }
                     )
                     const newEvent = await response.json()
-
-                    setEvents([...events, newEvent])
+                    
+                    setEvents(prevState => {
+                        const newState = [...prevState]
+                        const index = newState.findIndex((event) => event.id === newEvent.id)
+                        if (index !== -1) {
+                            newState[index] = newEvent
+                        }
+                        return newState
+                    })
+                    
                 }}
                 className='flex items-center mt-4'
             >
