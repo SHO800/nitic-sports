@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url       = env("POSTGRES_URL")
+  url       = env("POSTGRES_PRISMA_URL")
   directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
@@ -15,7 +15,7 @@ model EventSchedule {
   isRainySchedule Boolean
   scheduleDate    DateTime
   createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
+  updatedAt       DateTime?       @updatedAt
   scheduleImages  ScheduleImage[]
 }
 
@@ -31,26 +31,22 @@ model ScheduleImage {
 }
 
 model Team {
-  id        Int      @id @default(autoincrement())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  scores    Score[]
+  id     Int     @id @default(autoincrement())
+  name   String
+  scores Score[]
 }
 
 model Event {
-  id          Int      @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   name        String
   description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
   matches     Match[]
   scores      Score[]
-  rankings    Json // 順位を保持するフィールド
+  rankings    Json? // 順位を保持するフィールド
 }
 
 model Match {
-  id           Int      @id @default(autoincrement())
+  id           Int       @id @default(autoincrement())
   eventId      Int
   team1Id      Int?
   team2Id      Int?
@@ -62,31 +58,32 @@ model Match {
   team1Note    String? // チーム1に関する注釈
   team2Note    String? // チーム2に関する注釈
   locationId   Int?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime? @updatedAt
+  isCanceled   Boolean   @default(false)
 
   event    Event     @relation(fields: [eventId], references: [id])
   location Location? @relation(fields: [locationId], references: [id])
 }
 
 model Score {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   eventId   Int
   teamId    Int
   score     Int
-  note      String   @default("")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  note      String    @default("")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
 
   event Event @relation(fields: [eventId], references: [id])
   team  Team  @relation(fields: [teamId], references: [id])
 }
 
 model Location {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   name        String
   coordinates Json
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime? @updatedAt
   matches     Match[]
 }

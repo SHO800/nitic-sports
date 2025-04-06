@@ -1,7 +1,14 @@
-import Schedule from "@/components/schedule/Schedule";
+import Link from "next/link";
 
-export default function Home() {
+export default async function Home() {
     return (
-        <Schedule/>
+        <div>
+            <Link
+                href={"/schedule"}
+                className={"absolute top-0 left-0 z-10 p-4 text-white bg-black rounded-full"}
+            >
+                スケジュール
+            </Link>
+        </div>
     );
 }

@@ -1,7 +1,14 @@
+"use server"
 import Image from "next/image";
 import TimeLine from "@/components/schedule/TimeLine";
 
-const Schedule = () => {
+const Schedule = async () => {
+    
+    // ここに試合情報をgetするやつ
+    
+    
+    
+    
     return (
         <div className={"relative h-[1024px] w-auto aspect-[0.7072135785] mx-auto"}>
             <Image
@@ -13,9 +20,10 @@ const Schedule = () => {
                 quality={100}
                 className="object-cover aspect-[0.7072135785] !h-full !w-auto"
             />
+            
             <div className={"absolute top-0 left-0 w-full h-full pt-[100px] pb-[77px]"}>
-
                 {/*もしstartTime < 今 < endTimeなら*/}
+                
                 <TimeLine startTime={"2025/04/05 08:25"} endTime={"2025/04/05 17:35"}/>
                 {/*<TimeLine startTime={new Date(Date.now())} endTime={new Date(Date.now() + 360000)}/>*/}
             </div>
