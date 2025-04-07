@@ -1,7 +1,6 @@
 import {prisma} from '@/../lib/prisma';
 import {NextRequest} from "next/server";
 import {Event} from "@prisma/client";
-import {TeamData} from "@/types/team";
 
 
 export async function GET() {

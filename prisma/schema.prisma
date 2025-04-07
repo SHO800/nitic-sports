@@ -123,7 +123,7 @@ model MatchResult {
   matchScores String[] // チームのスコア. インデックスで判断するので空文字で埋めても良い。
 
   winnerTeamId Int // ただ一つ 
-  loserTeamId  Int // 1vs1じゃないところで敗北チームは指定しないでほしい(願望)
+  loserTeamId  Int? // 1vs1じゃないところで敗北チームは指定しないでほしい(願望)
 
   startedAt  DateTime?
   endedAt    DateTime?

@@ -136,7 +136,7 @@ const MatchPlan = () => {
                                 eventId: Number((document.getElementById('eventId') as HTMLInputElement).value),
                                 matchName: (document.getElementById('matchName') as HTMLInputElement).value,
                                 teamIds: (Array.from({length: teamCount}).map((_, index) => {
-                                    return Number((document.getElementById(`team${index + 1}Id`) as HTMLInputElement).value)
+                                    return (document.getElementById(`team${index + 1}Id`) as HTMLInputElement).value
                                 })),
                                 teamNotes: (Array.from({length: teamCount}).map((_, index) => {
                                     return (document.getElementById(`team${index + 1}Note`) as HTMLInputElement).value
