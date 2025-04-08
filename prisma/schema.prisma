@@ -109,17 +109,15 @@ model MatchPlan {
   updatedAt          DateTime?    @updatedAt
   event              Event        @relation(fields: [eventId], references: [id])
   location           Location?    @relation(fields: [locationId], references: [id])
-  matchResultId      Int?
   matchResult        MatchResult?
 }
 
 model MatchResult {
-  id               Int     @id @default(autoincrement())
-  matchId          Int     @unique
+  matchId          Int     @id @unique
   resultNote       String? // 試合結果の備考。公開する。例えば引き分けになったのでじゃんけんで決定した等
   resultSecretNote String? // 内部伝達用の試合結果の備考 (多分使わない)
 
-  teamIds     String[] // チームIDの配列。実際に対戦したチームを入力。
+  teamIds     Int[] // チームIDの配列。実際に対戦したチームを入力。
   matchScores String[] // チームのスコア. インデックスで判断するので空文字で埋めても良い。
 
   winnerTeamId Int // ただ一つ 

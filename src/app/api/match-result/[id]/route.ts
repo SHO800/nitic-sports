@@ -4,65 +4,23 @@ import {MatchResult} from "@prisma/client";
 
 export async function GET() {
     const matchResults: MatchResult[] = await prisma.matchResult.findMany()
-    return Response.json(matchResults)
-}
-
-
-export async function POST(request: Request) {
-    const {
-        matchId,
-        resultNote,
-        resultSecretNote,
-        teamIds,
-        matchScores,
-        winnerTeamId,
-        loserTeamId,
-        startedAt,
-        endedAt,
-        isCanceled,
-        cancelNote
-
-    }: {
-        matchId: number,
-        resultNote?: string,
-        resultSecretNote?: string,
-        teamIds: string[] | number[],
-        matchScores: string[],
-        winnerTeamId: number,
-        loserTeamId?: number,
-        startedAt: Date,
-        endedAt: Date,
-        isCanceled: boolean,
-        cancelNote?: string,
-        
-    } = await request.json()
-
-    const response = await prisma.matchResult.create({
-        data: {
-            matchId,
-            resultNote,
-            resultSecretNote,
-            teamIds: teamIds.map((teamId) => teamId.toString()),
-            matchScores,
-            winnerTeamId,
-            loserTeamId,
-            startedAt,
-            endedAt,
-            isCanceled,
-            cancelNote
-        },
+    
+    // <matchId>: {}の形にする
+    const matchResultsMap: Record<string, MatchResult> = {}
+    matchResults.forEach((matchResult) => {
+        matchResultsMap[matchResult.matchId.toString()] = matchResult
     })
-    return Response.json(response)
+    return Response.json(matchResultsMap)
 }
 
-
-export async function PATCH(
+export async function POST(
     request: NextRequest,
     {params}: { params: { id: string } }
 ) {
-    const id = Number(params.id)
+    const matchId = Number(params.id)
+
+    // リクエストボディから値を取得
     const {
-        matchId,
         resultNote,
         resultSecretNote,
         teamIds,
@@ -75,10 +33,9 @@ export async function PATCH(
         cancelNote
 
     }: {
-        matchId: number,
         resultNote?: string,
         resultSecretNote?: string,
-        teamIds: string[] | number[],
+        teamIds: number[],
         matchScores: string[],
         winnerTeamId: number,
         loserTeamId?: number,
@@ -88,24 +45,52 @@ export async function PATCH(
         cancelNote?: string,
     } = await request.json()
     
-    const response = await prisma.matchResult.update({
+    if (!matchId || isNaN(matchId)) {
+        return new Response('Invalid match ID', { status: 400 })
+    }
+    
+    let response;
+    
+    if (await prisma.matchResult.findUnique({
         where: {
-            id,
-        },
-        data: {
             matchId,
-            resultNote,
-            resultSecretNote,
-            teamIds: teamIds.map((teamId) => teamId.toString()),
-            matchScores,
-            winnerTeamId,
-            loserTeamId,
-            startedAt,
-            endedAt,
-            isCanceled,
-            cancelNote
         },
-    })
+    })) {
+         response = await prisma.matchResult.update({
+            where: {
+                matchId,
+            },
+            data: {
+                resultNote,
+                resultSecretNote,
+                teamIds,
+                matchScores,
+                winnerTeamId,
+                loserTeamId,
+                startedAt,
+                endedAt,
+                isCanceled,
+                cancelNote
+            },
+        })
+    }
+    else {
+        response = await prisma.matchResult.create({
+            data: {
+                matchId,
+                resultNote,
+                resultSecretNote,
+                teamIds,
+                matchScores,
+                winnerTeamId,
+                loserTeamId,
+                startedAt,
+                endedAt,
+                isCanceled,
+                cancelNote
+            },
+        })
+    }
     return Response.json(response)
 }
 
@@ -113,11 +98,11 @@ export async function DELETE(
     request: NextRequest,
     {params}: { params: { id: string } }
 ) {
-    const id = Number(params.id)
+    const matchId = Number(params.id)
     // リクエストのidを元に削除
     const response = await prisma.matchResult.delete({
         where: {
-            id,
+            matchId,
         },
     })
     return Response.json(response)
