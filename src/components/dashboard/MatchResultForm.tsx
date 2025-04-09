@@ -1,16 +1,16 @@
 import {MatchPlan, MatchResult} from "@prisma/client";
 import {useData} from "@/hooks/data";
 import {useEffect, useState} from "react";
+import analyzeVariableTeamId from "@/utils/analyzeVariableTeamId";
 
 export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan, matchResult?: MatchResult }) => {
     const {
         matchPlans,
-        setMatchPlans,
+        pullMatchPlan,
         matchResults,
-        setMatchResults,
         pullMatchResult,
         getMatchDisplayStr,
-
+        getLeagueDataByVariableId,
         isFixedMatchResultOrBlockRankByVariableId
     } = useData()
 
@@ -30,6 +30,7 @@ export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan
     const [canInput, setCanInput] = useState<boolean>(true);
 
     useEffect(() => {
+        if (matchPlans.length < 1) return;
         if (!matchPlan) return;
 
         // 他の試合結果に依存するチームがないか検索
@@ -39,19 +40,46 @@ export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan
         if (variableTeamIds.length > 0) {
             // すべての依存試合の結果が確定していなければこの試合結果を入力できないようにする
             setCanInput(variableTeamIds.every(id => isFixedMatchResultOrBlockRankByVariableId(id)))
+            
         }
         // 最初からactualTeamIdsに当初予定されていたteamIdsをいれる処理
-        const defaultTeamIds = matchPlan.teamIds.map((teamId) => {
+        const defaultTeamIds = matchPlan.teamIds.map((teamId): number => {
             if (!teamId.startsWith("$")) {
                 return Number(teamId)
             } else { // もし他の試合結果依存だった場合
                 // その結果が確定していたならその結果を代入
-                if (isFixedMatchResultOrBlockRankByVariableId(teamId)) return matchResults[matchPlan.id].winnerTeamId
+                if (isFixedMatchResultOrBlockRankByVariableId(teamId)) {
+                    // 依存している試合の結果を取得
+                    const analyzedTeamId = analyzeVariableTeamId(teamId)
+                    if (analyzedTeamId === null) return -1;
+                    if (analyzedTeamId.type === "T") {
+                        if (analyzedTeamId.condition === "W") 
+                            return matchResults[analyzedTeamId.matchId]?.winnerTeamId ?? -1
+                        else 
+                            return matchResults[analyzedTeamId.matchId]?.loserTeamId ?? -1
+                    } else if (analyzedTeamId.type === "L") {
+                        // もしリーグ戦の結果だった場合
+                        // 該当するリーグ戦の結果を取得
+                        const leagueData = getLeagueDataByVariableId(teamId)
+                        if (leagueData) {
+                            // 該当する順位のチームを取得
+                            if (!leagueData.teams) return -1;
+                            const team = leagueData.teams.find((team) => team.rank === analyzedTeamId.expectedRank)
+                            if (team) {
+                                return team.teamId
+                            } else {
+                                // 該当する順位のチームが見つからなかった場合
+                                return -1;
+                            }
+                        }
+                    }
+                    return -1;
+                }
                 else return -1; // 別の箇所でそもそも入力不可にする処理が走るので空でok
             }
         })
         setActualTeamIds(defaultTeamIds);
-    }, []);
+    }, [matchPlans]);
 
     return (
         <div>
@@ -82,7 +110,9 @@ export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan
                             }
                         )
                         const newMatchResult = await response.json()
-                        pullMatchResult(newMatchResult)
+                        await pullMatchResult(newMatchResult)
+                        await pullMatchPlan()
+                        alert("試合結果を更新しました！ 反映には再読み込みが必要なことがあります。")
                     }
                     }
                 >
@@ -111,6 +141,7 @@ export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan
                                        onChange={(e) => {
                                            setActualWinnerTeamId(Number(e.target.value))
                                        }}
+                                        checked={actualWinnerTeamId === Number(teamId)}
                                 />
                             </div>
                         ))

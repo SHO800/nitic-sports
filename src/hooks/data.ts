@@ -211,7 +211,10 @@ export const useData = () => {
 
         if (variableTeamIdData.type === "T") { // 対象試合がトーナメント
             const matchId = variableTeamIdData.matchId
+            console.log("matchId", matchId)
             const matchPlan = matchPlans.find((matchPlan) => matchPlan.id === matchId)
+            console.log(matchPlans)
+            console.log("matchPlan", matchPlan)
             if (!matchPlan) return false
             const matchResult = matchResults[matchId]
             return !!matchResult && matchResult.winnerTeamId !== null;
@@ -249,6 +252,17 @@ export const useData = () => {
         if (matchPlan) return matchPlan
         return null;
     }
+    
+    const getLeagueDataByVariableId = (variableId: string): TeamData | null => {
+        const variableTeamIdData = analyzeVariableTeamId(variableId);
+        if (!variableTeamIdData) return null;
+        if (variableTeamIdData.type !== "L") return null;
+        const event = events.find((event) => event.id === variableTeamIdData.eventId)
+        if (!event) return null;
+        const jsonData = event.teamData[variableTeamIdData.teamDataIndex];
+        if (!jsonData) return null;
+        return jsonData as unknown as TeamData
+    }
 
     const getMatchResultByMatchId = (matchId: string | number): MatchResult | null => {
         if (typeof matchId === "string" && matchId.startsWith("$")) return null;
@@ -285,6 +299,7 @@ export const useData = () => {
         isFixedMatchResultOrBlockRankByVariableId,
         searchMatchPlanByVariableId,
         getMatchResultByMatchId,
+        getLeagueDataByVariableId,
 
     }
 }
