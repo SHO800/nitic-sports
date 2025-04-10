@@ -473,7 +473,7 @@ const Events = () => {
                     const response = await fetch(
                         `${process.env.NEXT_PUBLIC_API_URL}/event/${(document.getElementById('editEventId') as HTMLInputElement).value}`,
                         {
-                            method: 'PATCH',
+                            method: 'PUT',
                             headers: {
                                 'Content-Type': 'application/json',
                             },

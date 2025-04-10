@@ -34,7 +34,7 @@ export async function POST(request: Request) {
 }
 
 
-export async function PATCH(
+export async function PUT(
     request: NextRequest,
     {params}: { params: { id: string } }
 ) {

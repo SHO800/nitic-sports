@@ -78,7 +78,7 @@ export const useData = () => {
 
     const pullMatchPlan = async (newResponse: any = undefined) => {
         if (newResponse) {
-            setMatchPlans(newResponse)
+            setMatchPlans(prevState => [...prevState, newResponse])
         } else {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/match-plan/-1`)
             const matchPlans = await response.json()
@@ -211,10 +211,7 @@ export const useData = () => {
 
         if (variableTeamIdData.type === "T") { // 対象試合がトーナメント
             const matchId = variableTeamIdData.matchId
-            console.log("matchId", matchId)
             const matchPlan = matchPlans.find((matchPlan) => matchPlan.id === matchId)
-            console.log(matchPlans)
-            console.log("matchPlan", matchPlan)
             if (!matchPlan) return false
             const matchResult = matchResults[matchId]
             return !!matchResult && matchResult.winnerTeamId !== null;

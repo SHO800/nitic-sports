@@ -81,6 +81,18 @@ export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan
         setActualTeamIds(defaultTeamIds);
     }, [matchPlans]);
 
+    useEffect(() => {
+        if (matchPlan && matchPlan.teamIds.length > 0) {
+            const defaultMatchScores = Array(matchPlan.teamIds.length).fill("")
+            setActualMatchScores(defaultMatchScores)
+        }
+    }, [matchPlan])
+    useEffect(() => {
+        if (matchResult) {
+            setActualMatchScores(matchResult.matchScores)
+        }
+    }, [matchResult])
+
     return (
         <div>
             <div className={`flex items-center ${canInput ? '' : 'opacity-50 pointer-events-none'}`}>

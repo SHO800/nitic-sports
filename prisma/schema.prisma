@@ -105,11 +105,25 @@ model MatchPlan {
 
   scheduledStartTime DateTime
   scheduledEndTime   DateTime
-  locationId         Int?
-  updatedAt          DateTime?    @updatedAt
-  event              Event        @relation(fields: [eventId], references: [id])
-  location           Location?    @relation(fields: [locationId], references: [id])
-  matchResult        MatchResult?
+
+  status    Status    @default(Waiting) // 進行状況を示す文字列。例えば"waiting"や"playing"など
+  startedAt DateTime?
+  endedAt   DateTime?
+
+  locationId  Int?
+  updatedAt   DateTime?    @updatedAt
+  event       Event        @relation(fields: [eventId], references: [id])
+  location    Location?    @relation(fields: [locationId], references: [id])
+  matchResult MatchResult?
+}
+
+enum Status {
+  Waiting // 待機中
+  Preparing // 準備中
+  Playing // 試合中
+  Finished // 終了 (結果入力待ち)
+  Completed // 完了
+  Cancelled // 中止 (雨等でもこれ)
 }
 
 model MatchResult {
@@ -122,11 +136,6 @@ model MatchResult {
 
   winnerTeamId Int // ただ一つ 
   loserTeamId  Int? // 1vs1じゃないところで敗北チームは指定しないでほしい(願望)
-
-  startedAt  DateTime?
-  endedAt    DateTime?
-  isCanceled Boolean   @default(false)
-  cancelNote String? // 試合がキャンセルされた理由
 
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt

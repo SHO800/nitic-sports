@@ -1,6 +1,7 @@
 import {useData} from "@/hooks/data";
 import {MatchResultForm} from "@/components/dashboard/MatchResultForm";
 import AddMatchPlanForm from "@/components/dashboard/AddMatchPlanForm";
+import {useEffect} from "react";
 
 const MatchPlan = () => {
     const {
@@ -8,13 +9,16 @@ const MatchPlan = () => {
         locations,
         setMatchPlans,
         matchResults,
-        getMatchResultByMatchId,
         getMatchDisplayStr
     } = useData()
 
-
+    useEffect(() => {
+        console.log("plans changed" + matchPlans);
+    }, [matchPlans]);
+    
     return (
         <>
+            <div>{JSON.stringify(matchPlans)}</div>
             {matchPlans.map((matchPlan) => (
                 <div
                     key={matchPlan.id}
@@ -60,28 +64,36 @@ const MatchPlan = () => {
                             削除
                         </button>
                     </div>
-                    <details className={"text-black pl-4"}>
-                        <summary>試合結果</summary>
-                        {/*    表示*/}
-                        {matchResults[matchPlan.id] ? (
-                            <div>
+                    {/*時間*/}
+                    <div>
+                        
+                        
+                    </div>
+                    {/*    表示*/}
+                    {matchResults[matchPlan.id] ? (
+                        <div>
 
-                                <p className={`text-black `}>
-                                    終了: {matchResults[matchPlan.id]!.teamIds.map((teamId, index) => {
-                                    return `${getMatchDisplayStr(teamId)}: ${matchResults[matchPlan.id]!.matchScores[index]}`
-                                })}
-                                </p>
-                                <MatchResultForm matchPlan={matchPlan} matchResult={matchResults[matchPlan.id]}/>
+                            <div className={`text-black `}>
+                                終了: {matchResults[matchPlan.id]!.teamIds.map((teamId, index) => {
+                                return (
+                                    <p key={"score" + index} className={`text-black ml-2 `}>
+                                        {`${getMatchDisplayStr(teamId)}:${matchResults[matchPlan.id]!.matchScores[index]}`}
+                                    </p>
+                                )
+                            })}
                             </div>
-                        ) : (
-                            <div>
-                                
+                        </div>
+                    ) : (
+                        <div>
+
                             <p className={`text-black `}>
                                 試合結果はまだ登録されていません
                             </p>
-                                <MatchResultForm matchPlan={matchPlan}/>
-                            </div>
-                        )}
+                        </div>
+                    )}
+                    <details className={"text-black pl-4"}>
+                        <summary>試合結果入力</summary>
+                        <MatchResultForm matchPlan={matchPlan} matchResult={matchResults[matchPlan.id]}/>
                     </details>
                 </div>
             ))}

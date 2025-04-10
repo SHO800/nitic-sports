@@ -7,7 +7,7 @@ import {useData} from "@/hooks/data";
 const AddMatchPlanForm = () => {
 
     const [teamCount, setTeamCount] = useState(2);
-    const {events, matchPlans, groupedTeams, setMatchPlans} = useData()
+    const {events, matchPlans, groupedTeams, setMatchPlans, pullMatchPlan} = useData()
     const [isVisibleClassSelector, setIsVisibleClassSelector] = useState(false);
     
     return (
@@ -40,8 +40,8 @@ const AddMatchPlanForm = () => {
                         }
                     )
                     const newMatchPlan = await response.json()
-
-                    setMatchPlans([...matchPlans, newMatchPlan])
+                    console.log(newMatchPlan)
+                    await pullMatchPlan(newMatchPlan) 
                 }}
                 className='flex items-center mt-4'
             >
@@ -199,7 +199,7 @@ const AddMatchPlanForm = () => {
                     const response = await fetch(
                         `${process.env.NEXT_PUBLIC_API_URL}/match-plan/${(document.getElementById('editMatchId') as HTMLInputElement).value}`,
                         {
-                            method: 'PATCH',
+                            method: 'PUT',
                             headers: {
                                 'Content-Type': 'application/json',
                             },

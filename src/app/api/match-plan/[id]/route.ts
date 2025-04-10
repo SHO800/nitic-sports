@@ -43,7 +43,7 @@ export async function POST(request: Request) {
 }
 
 
-export async function PATCH(
+export async function PUT(
     request: NextRequest,
     {params}: { params: { id: string } }
 ) {
@@ -82,6 +82,34 @@ export async function PATCH(
     })
     return Response.json(response)
 }
+
+// export async function PATCH (
+//     request: NextRequest,
+//     {params}: { params: { id: string } }
+// ) {
+//     const id = Number(params.id)
+//     const {
+//        
+//     }: {
+//         status: 
+//     } = await request.json()
+//
+//     const response = await prisma.matchPlan.update({
+//         where: {
+//             id,
+//         },
+//         data: {
+//             matchName,
+//             teamIds: teamIds.map((teamId) => teamId.toString()),
+//             teamNotes: teamNotes,
+//             scheduledStartTime,
+//             scheduledEndTime,
+//             locationId,
+//         },
+//     })
+//     return Response.json(response)
+// }
+
 
 export async function DELETE(
     request: NextRequest,
