@@ -7,7 +7,7 @@ import {useData} from "@/hooks/data";
 const AddMatchPlanForm = () => {
 
     const [teamCount, setTeamCount] = useState(2);
-    const {events, matchPlans, groupedTeams, setMatchPlans, pullMatchPlan} = useData()
+    const {events, groupedTeams, mutateMatchPlans} = useData()
     const [isVisibleClassSelector, setIsVisibleClassSelector] = useState(false);
     
     return (
@@ -39,9 +39,8 @@ const AddMatchPlanForm = () => {
                             } as unknown as MatchPlanSchema),
                         }
                     )
-                    const newMatchPlan = await response.json()
-                    console.log("addmatchPlans", newMatchPlan)
-                    await pullMatchPlan(newMatchPlan)  
+                    console.log(response)
+                    await mutateMatchPlans();
                 }}
                 className='flex items-center mt-4'
             >
@@ -49,16 +48,16 @@ const AddMatchPlanForm = () => {
                 <div className={"flex flex-col justify-start items-start"}>
                     {/*種目IDの入力内容に対応する種目名を表示*/}
                     <div className={"mr-auto"}>
-                        <label className='text-white mr-2'
+                        <label className='text-black mr-2'
                                htmlFor="eventId"
                         >種目*</label>
                         <select
                             name="eventId"
                             id="eventId"
-                            className='border border-gray-400 px-4 py-2 mr-2 rounded text-white'
+                            className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
                             required
                         >
-                            {events.map((event) => (
+                            {events?.map((event) => (
                                 <option key={event.id} value={event.id} className={"text-black"}>
                                     {event.name}
                                 </option>
@@ -66,14 +65,14 @@ const AddMatchPlanForm = () => {
                         </select>
                     </div>
                     <div>
-                        <label className='text-white mr-2'
+                        <label className='text-black mr-2'
                                htmlFor="matchName"
                         >試合名</label>
                         <input
                             type='text'
                             name="matchName"
                             id="matchName"
-                            className='border border-gray-400 px-4 py-2 mr-2 rounded text-white'
+                            className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
                             placeholder='試合名'
                         />
                     </div>
@@ -83,32 +82,32 @@ const AddMatchPlanForm = () => {
                             type="number"
                             id="teamCount"
                             name="teamCount"
-                            className='border border-gray-400 px-4 py-2 mr-2 rounded text-white'
+                            className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
                             value={teamCount}
                             onChange={(e) => {
                                 setTeamCount(Number(e.target.value))
                             }}
                         />
-                        <label className='text-white mr-2'
+                        <label className='text-black mr-2'
                                htmlFor="teamCount"
                         >チーム数</label>
 
                         {
                             [...Array(teamCount)].map((_, index) => (
                                 <div key={"matchTeamEditorDiv" + index} className="flex items-center">
-                                    <label className='text-white mr-2'
+                                    <label className='text-black mr-2'
                                            htmlFor={`team${index + 1}Id`}
                                     >チーム{index + 1}</label>
                                     <input
                                         type='text'
                                         name={`team${index + 1}Id`}
                                         id={`team${index + 1}Id`}
-                                        className='border border-gray-400 mr-2 rounded text-white w-8'
+                                        className='border border-gray-400 mr-2 rounded text-black w-8'
                                         onFocus={() => {
                                             setIsVisibleClassSelector(true)
                                         }}
                                     />
-                                    <span id={`team${index + 1}Name`} className='text-white mr-2'></span>
+                                    <span id={`team${index + 1}Name`} className='text-black mr-2'></span>
 
                                     {/*もしinputがアクティブなら*/}
                                     {
@@ -139,7 +138,7 @@ const AddMatchPlanForm = () => {
                                         type='text'
                                         name={`team${index + 1}Note`}
                                         id={`team${index + 1}Note`}
-                                        className='border border-gray-400 px-4 py-2 mr-2 rounded text-white'
+                                        className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
                                         placeholder='備考'
                                     />
 
@@ -148,44 +147,44 @@ const AddMatchPlanForm = () => {
                         }
                     </div>
                     <div>
-                        <label className='text-white mr-2'
+                        <label className='text-black mr-2'
                                htmlFor="scheduledStartTime"
                         >開始時間*</label>
                         <input
                             type='datetime-local'
                             name="scheduledStartTime"
                             id="scheduledStartTime"
-                            className='border border-gray-400 px-4 py-2 mr-2 rounded text-white'
+                            className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
                             placeholder='開始時間'
                             required
                         />
-                        <label className='text-white mr-2'
+                        <label className='text-black mr-2'
                                htmlFor="scheduledEndTime"
                         >終了時間*</label>
                         <input
                             type='datetime-local'
                             name="scheduledEndTime"
                             id="scheduledEndTime"
-                            className='border border-gray-400 px-4 py-2 mr-2 rounded text-white'
+                            className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
                             placeholder='終了時間'
                             required
                         />
                     </div>
                     <div>
-                        <label className='text-white mr-2'
+                        <label className='text-black mr-2'
                                htmlFor="locationId"
                         >場所</label>
                         <input
                             type='text'
                             name="locationId"
                             id="locationId"
-                            className='border border-gray-400 px-4 py-2 mr-2 rounded text-white'
+                            className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
                             placeholder='場所'
                         />
                     </div>
                     <button
                         type='submit'
-                        className='bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded'
+                        className='bg-green-500 hover:bg-green-600 text-black px-4 py-2 rounded'
                     >
                         追加
                     </button>
@@ -220,9 +219,8 @@ const AddMatchPlanForm = () => {
                             } as unknown as MatchPlanSchema),
                         }
                     )
-                    const newMatchPlan = await response.json()
-
-                    setMatchPlans([...matchPlans, newMatchPlan])
+                    console.log(response)
+                    await mutateMatchPlans();
                 }}
                 className='flex items-center mt-4'
             >
@@ -231,12 +229,12 @@ const AddMatchPlanForm = () => {
                         type='text'
                         name="editMatchId"
                         id="editMatchId"
-                        className='border border-gray-400 px-4 py-2 mr-2 rounded text-white'
+                        className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
                         placeholder='ID'
                     />
                     <button
                         type='submit'
-                        className='bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded'
+                        className='bg-green-500 hover:bg-green-600 text-black px-4 py-2 rounded'
                     >
                         編集
                     </button>

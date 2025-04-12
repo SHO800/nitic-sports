@@ -14,7 +14,11 @@ export async function POST(request: Request) {
             name,
         },
     })
-    return Response.json(response)
+    if (!response) {
+        return new Response('Event not found', {status: 404})
+    }else {
+        return new Response('Event created', {status: 200})
+    }
 }
 
 
@@ -33,7 +37,11 @@ export async function PUT(
             name: name
         },
     })
-    return Response.json(response)
+    if (!response) {
+        return new Response('Event not found', {status: 404})
+    }else {
+        return new Response('Event created', {status: 200})
+    }
 }
 
 export async function DELETE(
@@ -47,5 +55,9 @@ export async function DELETE(
             id,
         },
     })
-    return Response.json(response)
+    if (!response) {
+        return new Response('Event not found', {status: 404})
+    }else {
+        return new Response('Event created', {status: 200})
+    }
 }

@@ -27,10 +27,6 @@ export async function POST(
         matchScores,
         winnerTeamId,
         loserTeamId,
-        startedAt,
-        endedAt,
-        isCanceled,
-        cancelNote
 
     }: {
         resultNote?: string,
@@ -39,10 +35,6 @@ export async function POST(
         matchScores: string[],
         winnerTeamId: number,
         loserTeamId?: number,
-        startedAt: Date,
-        endedAt: Date,
-        isCanceled: boolean,
-        cancelNote?: string,
     } = await request.json()
     
     if (!matchId || isNaN(matchId)) {
@@ -67,10 +59,6 @@ export async function POST(
                 matchScores,
                 winnerTeamId,
                 loserTeamId,
-                startedAt,
-                endedAt,
-                isCanceled,
-                cancelNote
             },
         })
     }
@@ -84,14 +72,14 @@ export async function POST(
                 matchScores,
                 winnerTeamId,
                 loserTeamId,
-                startedAt,
-                endedAt,
-                isCanceled,
-                cancelNote
             },
         })
     }
-    return Response.json(response)
+    if (!response) {
+        return new Response('Event not found', {status: 404})
+    }else {
+        return new Response('Event created', {status: 200})
+    }
 }
 
 export async function DELETE(
@@ -105,5 +93,9 @@ export async function DELETE(
             matchId,
         },
     })
-    return Response.json(response)
+    if (!response) {
+        return new Response('Event not found', {status: 404})
+    }else {
+        return new Response('Event created', {status: 200})
+    }
 }

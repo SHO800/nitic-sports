@@ -2,10 +2,10 @@
 import {useData} from "@/hooks/data";
 
 const Location = () => {
-    const {locations, setLocations} = useData()
+    const {locations, mutateLocations} = useData()
     return (
         <>
-            {locations.map((location) => (
+            {locations?.map((location) => (
                 <div
                     key={location.id}
                     className='flex items-center justify-between bg-gray-200 p-2 rounded mb-2'
@@ -24,10 +24,10 @@ const Location = () => {
                                     method: 'DELETE',
                                 }
                             )
-                            const deleteTeam = await response.json()
-                            setLocations(locations.filter((locations) => locations.id !== deleteTeam.id))
+                            console.log(response)
+                            await mutateLocations();
                         }}
-                        className='bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded'
+                        className='bg-red-500 hover:bg-red-600 text-black px-4 py-2 rounded'
                     >
                         削除
                     </button>
@@ -48,9 +48,8 @@ const Location = () => {
                             }),
                         }
                     )
-                    const newTeam = await response.json()
-
-                    setLocations([...locations, newTeam])
+                    console.log(response)
+                    await mutateLocations();
                 }}
                 className='flex items-center mt-4'
             >
@@ -58,12 +57,12 @@ const Location = () => {
                     type='text'
                     id='locationName'
                     name='locationName'
-                    className='border border-gray-400 px-4 py-2 mr-2 rounded text-white'
+                    className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
                     placeholder='会場名を入力してください'
                 />
                 <button
                     type='submit'
-                    className='bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded'
+                    className='bg-green-500 hover:bg-green-600 text-black px-4 py-2 rounded'
                 >
                     追加
                 </button>

@@ -1,152 +1,62 @@
 import {useEffect, useState} from "react";
-import {Event, EventSchedule, Location, MatchPlan, MatchResult, ScheduleImage, Score, Team} from "@prisma/client";
+import {Event, Location, MatchPlan, MatchResult, Score, Team} from "@prisma/client";
 import analyzeVariableTeamId from "@/utils/analyzeVariableTeamId";
+import useSWR from "swr";
+import fetcher from "@/utils/fetcher";
+import groupTeams from "@/utils/groupTeams";
 
 export const useData = () => {
-    const [teams, setTeams] = useState<Team[]>([])
+    // const [teams, setTeamsx] = useState<Team[]>([])
+    const {
+        data: teams,
+        error: teamError,
+        isLoading: teamLoading,
+        mutate: mutateTeams
+    } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/team/-1`, fetcher<Team[]>)
+    const {
+        data: locations,
+        error: locationError,
+        isLoading: locationLoading,
+        mutate: mutateLocations
+    } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/location/-1`, fetcher<Location[]>)
+    const {
+        data: events,
+        error: eventError,
+        isLoading: eventLoading,
+        mutate: mutateEvents
+    } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/event/-1`, fetcher<Event[]>)
+    const {
+        data: matchPlans,
+        error: matchPlanError,
+        isLoading: matchPlanLoading,
+        mutate: mutateMatchPlans
+    } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/match-plan/-1`, fetcher<MatchPlan[]>)
+    const {
+        data: matchResults,
+        error: matchResultError,
+        isLoading: matchResultLoading,
+        mutate: mutateMatchResults
+    } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/match-result/-1`, fetcher<{ [key: string]: MatchResult }>)
+    const {
+        data: scores,
+        error: scoreError,
+        isLoading: scoreLoading,
+        mutate: mutateScores
+    } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/score/-1`, fetcher<Score[]>)
+    // const {data: schedules, error: scheduleError, isLoading: scheduleLoading} = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/schedule/-1`, fetcher<ScheduleImage[]>)
+    // const {data: eventSchedules, error: eventScheduleError, isLoading: eventScheduleLoading} = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/event-schedule/-1`, fetcher<EventSchedule[]>)
+
     const [groupedTeams, setGroupedTeams] = useState<Record<string, Team[]>>({})
 
-    const [events, setEvents] = useState<Event[]>([])
-    const [eventSchedules, setEventSchedules] = useState<EventSchedule[]>([])
-    const [matchPlans, setMatchPlans] = useState<MatchPlan[]>([])
-    const [matchResults, setMatchResults] = useState<{ [key: string]: MatchResult }>({})
-    const [schedules, setSchedules] = useState<ScheduleImage[]>([])
-    const [locations, setLocations] = useState<Location[]>([])
-    const [scores, setScores] = useState<Score[]>([])
-
-
     useEffect(() => {
-        // nameの最初の1文字目でグルーピング
-        setGroupedTeams(() => {
-                const tmp = teams.reduce((acc: Record<string, Team[]>, team: Team) => {
-                    const firstLetter = team.name.charAt(0).toUpperCase();
-                    if (!acc[firstLetter]) {
-                        acc[firstLetter] = [];
-                    }
-                    acc[firstLetter].push(team);
-                    return acc;
-                }, {})
-                // 要素数が1つのグループはtmp["他"]にまとめる
-                const otherGroups: Team[] = []
-                for (const key in tmp) {
-                    if (tmp[key].length === 1) {
-                        otherGroups.push(tmp[key][0])
-                        delete tmp[key]
-                    }
-                }
-                if (otherGroups.length > 0) {
-                    tmp['他'] = otherGroups
-                }
-
-                return {
-                    ...tmp,
-                }
-            }
-        )
-    }, [teams])
-
-
-    useEffect(() => {
-
-        pullTeam()
-        pullEvent()
-        pullMatchPlan()
-        pullMatchResult()
-        pullLocation()
-
-    }, [])
-
-    const pullTeam = async (newResponse: any = undefined) => {
-        if (newResponse) {
-            setTeams(newResponse)
-        } else {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/team/-1`)
-            const teams = await response.json()
-            setTeams(teams)
+        if (teams) {
+            const grouped = groupTeams(teams)
+            setGroupedTeams(grouped)
         }
-    }
-
-    const pullEvent = async (newResponse: any = undefined) => {
-        if (newResponse) {
-            setEvents(newResponse)
-        } else {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/event/-1`)
-            const events = await response.json()
-            setEvents(events)
-        }
-    }
-
-    const pullMatchPlan = async (newResponse: any = undefined) => {
-        if (newResponse) {
-            setMatchPlans(prevState =>
-            {
-                const a = [...prevState, newResponse]
-                console.log(Object.is(prevState, a))
-                return a;
-                
-            }    
-            )
-        } else {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/match-plan/-1`)
-            const matchPlans = await response.json()
-            setMatchPlans(matchPlans)
-        }
-    }
-
-    const pullMatchResult = async (newResponse: any = undefined) => {
-        if (newResponse) {
-            setMatchResults(newResponse)
-        } else {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/match-result/-1`)
-            const matchResults = await response.json()
-            setMatchResults(matchResults)
-        }
-    }
-
-
-    // const pullEventSchedule = async (newResponse: any = undefined) => {
-    //     if (newResponse) {
-    //         setEventSchedulesnewResponse)
-    //     } else {
-    //         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/event-schedule/-1`)
-    //         const eventSchedules = await response.json()
-    //         setEventSchedules(eventSchedules)
-    //     }
-    // }
-    // getEventSchedule()
-    // const pullSchedule = async (newResponse: any = undefined) => {
-    //     if (newResponse) {
-    //         setSchedules(newResponse)
-    //     } else {
-    //         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/schedule/-1`)
-    //         const schedules = await response.json()
-    //         setSchedules(schedules)
-    //     }
-    // }
-    // getSchedule()
-    const pullLocation = async (newResponse: any = undefined) => {
-        if (newResponse) {
-            setLocations(newResponse)
-        } else {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/location/-1`)
-            const locations = await response.json()
-            setLocations(locations)
-        }
-    }
-
-    // const pullScore = async (newResponse: any = undefined) => {
-    //     if (newResponse) {
-    //         setScores(newResponse)
-    //     } else {
-    //         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/score/-1`)
-    //         const scores = await response.json()
-    //         setScores(scores)
-    //     }
-    // }
-    // getScore()
-
+    }, [teams]);
 
     const getMatchDisplayStr = (teamId: string | number): string => {
+        if (!matchPlans || !matchResults || !teams || !events) return ''
 
         // これが試合名取得処理
         if (typeof teamId === "string" && teamId.startsWith("$")) { // 特殊IDなら
@@ -191,9 +101,7 @@ export const useData = () => {
                 const team = teams.find((team) => team.id === teamId)
                 if (!team) return ''
                 return `${team.name} `
-
             }
-
             return ''
 
         }
@@ -206,12 +114,16 @@ export const useData = () => {
     }
 
     const isFixedMatchResultByMatchId = (matchId: string): boolean => {
+        if (!matchPlans || !matchResults || !teams || !events) return false
+
         const matchResult = matchResults[matchId]
         return !!matchResult && matchResult.winnerTeamId !== null;
 
     }
 
     const isFixedMatchResultOrBlockRankByVariableId = (variableId: string): boolean => {
+        if (!matchPlans || !matchResults || !teams || !events) return false
+
         if (!variableId.startsWith("$")) return false;
         const variableTeamIdData = analyzeVariableTeamId(variableId);
         if (variableTeamIdData === null) return false;
@@ -246,6 +158,8 @@ export const useData = () => {
 
 
     const searchMatchPlanByVariableId = (variableId: string): MatchPlan | null => {
+        if (!matchPlans || !matchResults || !teams || !events) return null;
+
         const variableTeamIdData = analyzeVariableTeamId(variableId);
         if (!variableTeamIdData) return null;
         const matchType = variableTeamIdData.type
@@ -256,8 +170,10 @@ export const useData = () => {
         if (matchPlan) return matchPlan
         return null;
     }
-    
+
     const getLeagueDataByVariableId = (variableId: string): TeamData | null => {
+        if (!matchPlans || !matchResults || !teams || !events) return null;
+
         const variableTeamIdData = analyzeVariableTeamId(variableId);
         if (!variableTeamIdData) return null;
         if (variableTeamIdData.type !== "L") return null;
@@ -269,39 +185,44 @@ export const useData = () => {
     }
 
     const getMatchResultByMatchId = (matchId: string | number): MatchResult | null => {
+        if (!matchPlans || !matchResults || !teams || !events) return null;
+
         if (typeof matchId === "string" && matchId.startsWith("$")) return null;
         const matchResult = matchResults[matchId]
         if (matchResult) return matchResult
         return null;
     }
 
-    useEffect(() => {
-        console.log("matchPlans changed in data:",  matchPlans.length);
-    }, [matchPlans]);
-    
+
     return {
-        pullTeam,
-        pullEvent,
-        pullMatchPlan,
-        pullMatchResult,
-        pullLocation,
         teams,
-        setTeams,
+        teamLoading,
+        mutateTeams,
         groupedTeams,
         events,
-        setEvents,
-        eventSchedules,
-        setEventSchedules,
+        eventLoading,
+        mutateEvents,
         matchPlans,
-        setMatchPlans,
+        matchPlanLoading,
+        mutateMatchPlans,
         matchResults,
-        setMatchResults,
-        schedules,
-        setSchedules,
+        matchResultLoading,
+        mutateMatchResults,
         locations,
-        setLocations,
+        locationLoading,
+        mutateLocations,
         scores,
-        setScores,
+        scoreLoading,
+        mutateScores,
+        // schedules,
+        // scheduleLoading,
+        // mutateSchedules,
+        // eventSchedules,
+        // eventScheduleLoading,
+        // mutateEventSchedules,
+        // setEventSchedules: setEventSchedulesx,
+        // schedules,
+        // setSchedules: setSchedulesx,
         getMatchDisplayStr,
         isFixedMatchResult: isFixedMatchResultByMatchId,
         isFixedMatchResultOrBlockRankByVariableId,

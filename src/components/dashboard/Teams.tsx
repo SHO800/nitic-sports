@@ -2,10 +2,10 @@
 import {useData} from "@/hooks/data";
 
 const Teams = () => {
-    const {teams, setTeams} = useData()
+    const {teams, mutateTeams} = useData()
     return (
         <>
-            {teams.map((team) => (
+            {teams?.map((team) => (
                 <div
                     key={team.id}
                     className='flex items-center justify-between bg-gray-200 p-2 rounded mb-2'
@@ -24,10 +24,9 @@ const Teams = () => {
                                     method: 'DELETE',
                                 }
                             )
-                            const deleteTeam = await response.json()
-                            setTeams(teams.filter((team) => team.id !== deleteTeam.id))
+                            console.log(response)
                         }}
-                        className='bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded'
+                        className='bg-red-500 hover:bg-red-600 text-black px-4 py-2 rounded'
                     >
                         削除
                     </button>
@@ -48,9 +47,8 @@ const Teams = () => {
                             }),
                         }
                     )
-                    const newTeam = await response.json()
-
-                    setTeams([...teams, newTeam])
+                    console.log(response)
+                    await mutateTeams();
                 }}
                 className='flex items-center mt-4'
             >
@@ -58,12 +56,12 @@ const Teams = () => {
                     type='text'
                     id='teamName'
                     name='teamName'
-                    className='border border-gray-400 px-4 py-2 mr-2 rounded text-white'
+                    className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
                     placeholder='Teamを入力してください'
                 />
                 <button
                     type='submit'
-                    className='bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded'
+                    className='bg-green-500 hover:bg-green-600 text-black px-4 py-2 rounded'
                 >
                     追加
                 </button>

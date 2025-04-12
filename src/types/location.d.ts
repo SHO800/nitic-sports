@@ -8,3 +8,5 @@ interface Location {
     name: string;
     coordinates: Coordinates;
 }
+
+export default Location;

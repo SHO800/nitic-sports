@@ -14,7 +14,7 @@ const ClassSelector = ({groupedData, callback}: ClassSelectorProps) => {
                         <tbody>
                         {Object.keys(groupedData).map((key) => (
                             <tr key={key} className={"border-y-[1px] border-white"}>
-                                <td className="text-center text-2xl font-bold pr-2">{key}</td>
+                                <td className="text-center text-2xl font-bold pr-2 text-white">{key}</td>
                                 {
                                     groupedData[key].map((data) => (
                                         <td key={data.id} className="text-center text-lg font-bold">

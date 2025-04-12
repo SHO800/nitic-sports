@@ -6,9 +6,8 @@ import analyzeVariableTeamId from "@/utils/analyzeVariableTeamId";
 export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan, matchResult?: MatchResult }) => {
     const {
         matchPlans,
-        pullMatchPlan,
         matchResults,
-        pullMatchResult,
+        mutateMatchResults,
         getMatchDisplayStr,
         getLeagueDataByVariableId,
         isFixedMatchResultOrBlockRankByVariableId
@@ -22,15 +21,11 @@ export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan
     const [actualLoserTeamId, setActualLoserTeamId] = useState<number | null>(matchResult? matchResult.loserTeamId : null); // 複数対戦の場合はそもそも表示しない
     const [actualResultNote, setActualResultNote] = useState<string>(matchResult?.resultNote ? matchResult.resultNote : "");
     const [actualResultSecretNote, setActualResultSecretNote] = useState<string>(matchResult?.resultSecretNote ? matchResult.resultSecretNote : "");
-    const [actualStartedAt, setActualStartedAt] = useState<Date>(matchResult?.startedAt ? matchResult.startedAt : new Date());
-    const [actualEndedAt, setActualEndedAt] = useState<Date>(matchResult?.endedAt ? matchResult.endedAt : new Date());
-    const [actualIsCanceled, setActualIsCanceled] = useState<boolean>(matchResult? matchResult.isCanceled : false);
-    const [actualCancelNote, setActualCancelNote] = useState<string>(matchResult?.cancelNote ? matchResult.cancelNote : "");
 
     const [canInput, setCanInput] = useState<boolean>(true);
 
     useEffect(() => {
-        if (matchPlans.length < 1) return;
+        if (!matchPlans || matchPlans.length < 1) return;
         if (!matchPlan) return;
 
         // 他の試合結果に依存するチームがないか検索
@@ -53,6 +48,7 @@ export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan
                     const analyzedTeamId = analyzeVariableTeamId(teamId)
                     if (analyzedTeamId === null) return -1;
                     if (analyzedTeamId.type === "T") {
+                        if (!matchResults) return -1;
                         if (analyzedTeamId.condition === "W") 
                             return matchResults[analyzedTeamId.matchId]?.winnerTeamId ?? -1
                         else 
@@ -110,10 +106,6 @@ export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan
                                     matchPlanId: matchPlan.id,
                                     resultNote: actualResultNote,
                                     secretNote: actualResultSecretNote,
-                                    startedAt: actualStartedAt,
-                                    endedAt: actualEndedAt,
-                                    isCanceled: actualIsCanceled,
-                                    cancelNote: actualCancelNote,
                                     matchScores: actualMatchScores,
                                     winnerTeamId: actualWinnerTeamId,
                                     loserTeamId: actualLoserTeamId,
@@ -121,9 +113,8 @@ export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan
                                 }),
                             }
                         )
-                        const newMatchResult = await response.json()
-                        await pullMatchResult(newMatchResult)
-                        await pullMatchPlan()
+                        console.log(response)
+                        await mutateMatchResults();
                         alert("試合結果を更新しました！ 反映には再読み込みが必要なことがあります。")
                     }
                     }
@@ -161,7 +152,7 @@ export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan
                     }
                     <button
                         type='submit'
-                        className='bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded'
+                        className='bg-green-500 hover:bg-green-600 text-black px-4 py-2 rounded'
                         disabled={!canInput}
                     >
                         更新

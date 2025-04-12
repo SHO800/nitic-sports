@@ -15,7 +15,7 @@ export async function POST(request: Request) {
         teamData: string
     } = await request.json()
 
-
+    
     const response = await prisma.event.create({
         data: {
             name,
@@ -30,7 +30,11 @@ export async function POST(request: Request) {
 
         },
     })
-    return Response.json(response)
+    if (!response) {
+        return new Response('Event not found', {status: 404})
+    }else {
+        return new Response('Event created', {status: 200})
+    }
 }
 
 
@@ -61,7 +65,11 @@ export async function PUT(
             }),
         },
     })
-    return Response.json(response)
+    if (!response) {
+        return new Response('Event not found', {status: 404})
+    }else {
+        return new Response('Event created', {status: 200})
+    }
 }
 
 export async function DELETE(
@@ -75,5 +83,9 @@ export async function DELETE(
             id,
         },
     })
-    return Response.json(response)
+    if (!response) {
+        return new Response('Event not found', {status: 404})
+    }else {
+        return new Response('Event created', {status: 200})
+    }
 }

@@ -2,35 +2,19 @@
 import {useData} from "@/hooks/data";
 import {MatchResultForm} from "@/components/dashboard/MatchResultForm";
 import AddMatchPlanForm from "@/components/dashboard/AddMatchPlanForm";
-import {useCallback, useEffect, useLayoutEffect, useRef} from "react";
 
 const MatchPlan = () => {
     const {
         matchPlans,
         locations,
-        setMatchPlans,
         matchResults,
+        mutateMatchPlans,
         getMatchDisplayStr
     } = useData()
-    
-    useEffect(() => {
-        console.log("plans changed: " , matchPlans.length);
-    }, [matchPlans]);
-    
-    
-    function reloadMatchPlans() {
-        // setStateで強制再読込する
-        setMatchPlans([...matchPlans]);
-    }
-    
-    
+
     return (
         <>
-            <div>{JSON.stringify(matchPlans)}</div>
-            <button onClick={reloadMatchPlans} className='bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded'>
-                Reload Match Plans
-            </button>
-            {matchPlans.map((matchPlan) => (
+            {matchPlans?.map((matchPlan) => (
                 <div
                     key={matchPlan.id}
                     className='flex flex-col justify-start items-start bg-gray-200 p-2 rounded mb-2 w-full'
@@ -51,7 +35,7 @@ const MatchPlan = () => {
                                 minute: '2-digit',
                             })}
                                 {matchPlan.teamNotes}
-                                {matchPlan.locationId && locations.find((location) => location.id === matchPlan.locationId)?.name},
+                                {matchPlan.locationId && locations?.find((location) => location.id === matchPlan.locationId)?.name},
                                 {matchPlan.matchName},
 
                             </p>
@@ -67,21 +51,21 @@ const MatchPlan = () => {
                                         method: 'DELETE',
                                     }
                                 )
-                                const deleteMatchPlan = await response.json()
-                                setMatchPlans(matchPlans.filter((matchPlan) => matchPlan.id !== deleteMatchPlan.id))
+                                console.log(response)
+                                await mutateMatchPlans();
                             }}
-                            className='bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded'
+                            className='bg-red-500 hover:bg-red-600 text-black px-4 py-2 rounded'
                         >
                             削除
                         </button>
                     </div>
                     {/*時間*/}
                     <div>
-                        
-                        
+
+
                     </div>
                     {/*    表示*/}
-                    {matchResults[matchPlan.id] ? (
+                    {matchResults && matchResults[matchPlan.id] ? (
                         <div>
 
                             <div className={`text-black `}>
@@ -104,7 +88,7 @@ const MatchPlan = () => {
                     )}
                     <details className={"text-black pl-4"}>
                         <summary>試合結果入力</summary>
-                        <MatchResultForm matchPlan={matchPlan} matchResult={matchResults[matchPlan.id]}/>
+                        <MatchResultForm matchPlan={matchPlan} matchResult={matchResults ? matchResults[matchPlan.id] : undefined}/>
                     </details>
                 </div>
             ))}
