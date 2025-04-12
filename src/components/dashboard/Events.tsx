@@ -1,10 +1,11 @@
 "use client"
 import {useData} from "@/hooks/data";
-import {useState} from "react";
+import {useCallback, useState} from "react";
+import LeagueTable from "@/components/common/LeagueTable";
 
 
 const Events = () => {
-    const {events, mutateEvents} = useData()
+    const {events, mutateEvents, matchPlans, getMatchDisplayStr} = useData()
     const [isTwoStageCompetition, setIsTwoStageCompetition] = useState(false)
     const [eventType1, setEventType1] = useState<string | null>("tournament");
     const [eventType2, setEventType2] = useState<string | null>(null);
@@ -13,6 +14,28 @@ const Events = () => {
         type: "tournament",
         teams: [],
     }]) // 初期値
+
+
+    const addTournamentTeamsFromPlans = useCallback((teamDataIndex: number) => {
+        const eventId = Number((document.getElementById('editEventId') as HTMLInputElement).value)
+        if (!eventId) console.error("eventId is required")
+        const minPlanId = document.getElementById("minPlanId") as HTMLInputElement
+        if (!minPlanId) console.error("minPlanId is required")
+        const plans = matchPlans?.filter((plan) => plan.eventId === eventId && plan.id >= Number(minPlanId.value))
+        if (!plans) return
+        const teamIds = plans.map((plan) => plan.teamIds).flat()
+        const teams = teamIds.map((teamId) => {
+            return {
+                teamId: teamId,
+            }
+        })
+        setTeamDataJsonDraft((prevState) => {
+            const newState = [...prevState]
+            newState[teamDataIndex].teams = teams
+            return newState
+        })
+    }, [matchPlans])
+
 
     // 例 予選はリーグ, 本選はトーナメントの場合
     // [
@@ -84,11 +107,26 @@ const Events = () => {
                             削除
                         </button>
                     </div>
-                    <div>
+                    {event.teamData.length > 0 && event.teamData.map((teamData, index) => {
+                        return (
+                            <div
+                                key={"eventListDetails" + event.id + "-" + index}
+                                className='flex items-center justify-between bg-gray-200 p-2 rounded mb-2'
+                            >
+                                <div className='flex items-center'>
+                                    <div className={`text-black w-full`}>
+                                        {(teamData as unknown as TeamData).type === "tournament" ? null : Object.keys((teamData as unknown as TeamData).blocks!).map((block, index) => (
+                                            
+                                            <LeagueTable key={event.id.toString()+block+index} i_key={"i_"+event.id.toString()+block+index} blockName={block} block={(teamData as unknown as TeamData).blocks![block]}/>
+                                            )
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )
+                    })}
 
-                    </div>
                 </div>
-
             ))}
 
             <form
@@ -217,22 +255,27 @@ const Events = () => {
                                 eventType1 === "tournament" ?
                                     <>
                                         {teamDataJsonDraft[0].teams!.map((key, index) => (
-                                            <div key={"teamDataJsonDraft[0]TournamentDiv"+index} className={"flex flex-col"}>
+                                            <div key={"teamDataJsonDraft[0]TournamentDiv" + index}
+                                                 className={""}>
                                                 <input
                                                     type="text"
                                                     name={`team${index}`}
                                                     id={`team${index}`}
                                                     className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
                                                     placeholder='チーム名を入力してください'
+                                                    value={key.teamId}
                                                     onChange={(e) => {
                                                         const newTeamData = {...teamDataJsonDraft}
                                                         newTeamData[0].teams![index] = { // トグル切替時にteamsの存在を保証
-                                                            teamId: Number(e.target.value),
-                                                            rank: 0,
+                                                            teamId: e.target.value,
                                                         }
                                                         setTeamDataJsonDraft(newTeamData)
                                                     }}
                                                 />
+                                                <span
+                                                    className={`text-black `}>
+                                                    {getMatchDisplayStr(key.teamId)}
+                                                </span>
                                             </div>
                                         ))}
                                         <button
@@ -240,7 +283,7 @@ const Events = () => {
                                             onClick={() => {
                                                 const newTeamData = {...teamDataJsonDraft}
                                                 newTeamData[0].teams!.push({
-                                                    teamId: 0,
+                                                    teamId: "0",
                                                 })
                                                 setTeamDataJsonDraft(newTeamData)
                                             }}
@@ -248,16 +291,25 @@ const Events = () => {
                                         >
                                             チーム追加
                                         </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => addTournamentTeamsFromPlans(0)}
+                                            className='bg-blue-500 hover:bg-blue-600 text-black px-4 py-2 rounded'
+                                        >
+                                            試合プランからチームを追加
+                                        </button>
+
                                     </>
                                     :
                                     <>
                                         {
                                             Object.keys(teamDataJsonDraft[0].blocks!).map((key, index) => (
-                                                <div key={"teamDataJsonDraft[0]LeagueDiv"+index} className={"flex flex-col"}>
+                                                <div key={"teamDataJsonDraft[0]LeagueDiv" + index}
+                                                     className={"flex flex-col"}>
                                                     <p>{key}</p>
                                                     {teamDataJsonDraft[0].blocks![key].map((team, teamIndex) => (
                                                         <input
-                                                            key={"teamDataJsonDraft[0]LeagueInput"+index+teamIndex}
+                                                            key={"teamDataJsonDraft[0]LeagueInput" + index + teamIndex}
                                                             type="text"
                                                             name={`team${index}-${teamIndex}`}
                                                             id={`team${index}-${teamIndex}`}
@@ -267,7 +319,7 @@ const Events = () => {
                                                             onChange={(e) => {
                                                                 const newTeamData = {...teamDataJsonDraft}
                                                                 newTeamData[0].blocks![key][teamIndex] = {
-                                                                    teamId: Number(e.target.value),
+                                                                    teamId: e.target.value,
                                                                 }
                                                                 setTeamDataJsonDraft(newTeamData)
                                                             }}
@@ -278,7 +330,7 @@ const Events = () => {
                                                         onClick={() => {
                                                             const newTeamData = {...teamDataJsonDraft}
                                                             newTeamData[0].blocks![key].push({
-                                                                teamId: 0,
+                                                                teamId: "0",
                                                             })
                                                             setTeamDataJsonDraft(newTeamData)
                                                         }}
@@ -362,23 +414,28 @@ const Events = () => {
                                     eventType2 === "tournament" ?
                                         <>
                                             {teamDataJsonDraft[1].teams!.map((key, index) => (
-                                                <div key={"teamDataJsonDraft[1]TournamentDiv"+index} className={"flex flex-col"}>
+                                                <div key={"teamDataJsonDraft[1]TournamentDiv" + index}
+                                                     className={""}>
                                                     <input
                                                         type="text"
                                                         name={`team${index}`}
                                                         id={`team${index}`}
                                                         className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
+                                                        value={key.teamId}
                                                         placeholder='チーム名を入力してください'
                                                         onChange={(e) => {
                                                             const newTeamData = {...teamDataJsonDraft}
                                                             newTeamData[1].teams![index] = { // トグル切替時にteamsの存在を保証
-                                                                teamId: Number(e.target.value),
-                                                                rank: 0,
+                                                                teamId: e.target.value,
                                                             }
                                                             setTeamDataJsonDraft(newTeamData)
                                                         }
                                                         }
                                                     />
+                                                    <span
+                                                        className={`text-black `}>
+                                                        {getMatchDisplayStr(key.teamId)}
+                                                    </span>
                                                 </div>
                                             ))}
                                             <button
@@ -386,7 +443,7 @@ const Events = () => {
                                                 onClick={() => {
                                                     const newTeamData = {...teamDataJsonDraft}
                                                     newTeamData[1].teams!.push({
-                                                        teamId: 0,
+                                                        teamId: "0",
                                                     })
                                                     setTeamDataJsonDraft(newTeamData)
                                                 }}
@@ -394,16 +451,24 @@ const Events = () => {
                                             >
                                                 チーム追加
                                             </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => addTournamentTeamsFromPlans(1)}
+                                                className='bg-blue-500 hover:bg-blue-600 text-black px-4 py-2 rounded'
+                                            >
+                                                試合プランからチームを追加
+                                            </button>
                                         </>
                                         :
                                         <>
                                             {
                                                 Object.keys(teamDataJsonDraft[1].blocks!).map((key, index) => (
-                                                    <div key={"teamDataJsonDraft[1]LeagueDiv"+index} className={"flex flex-col"}>
+                                                    <div key={"teamDataJsonDraft[1]LeagueDiv" + index}
+                                                         className={"flex flex-col"}>
                                                         <p>{key}</p>
                                                         {teamDataJsonDraft[1].blocks![key].map((team, teamIndex) => (
                                                             <input
-                                                                key={"teamDataJsonDraft[1]LeagueInput"+index+teamIndex}
+                                                                key={"teamDataJsonDraft[1]LeagueInput" + index + teamIndex}
                                                                 type="text"
                                                                 name={`team${index}-${teamIndex}`}
                                                                 id={`team${index}-${teamIndex}`}
@@ -413,7 +478,7 @@ const Events = () => {
                                                                 onChange={(e) => {
                                                                     const newTeamData = {...teamDataJsonDraft}
                                                                     newTeamData[1].blocks![key][teamIndex] = {
-                                                                        teamId: Number(e.target.value),
+                                                                        teamId: e.target.value,
                                                                     }
                                                                     setTeamDataJsonDraft(newTeamData)
                                                                 }}
@@ -424,7 +489,7 @@ const Events = () => {
                                                             onClick={() => {
                                                                 const newTeamData = {...teamDataJsonDraft}
                                                                 newTeamData[1].blocks![key].push({
-                                                                    teamId: 0,
+                                                                    teamId: "0",
                                                                 })
                                                                 setTeamDataJsonDraft(newTeamData)
                                                             }}
@@ -504,6 +569,16 @@ const Events = () => {
                     </button>
                 </div>
             </form>
+            <div>
+                <input
+                    type='text'
+                    id='minPlanId'
+                    name='minPlanId'
+                    className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
+                    placeholder='最小試合プランIDを入力してください'
+                />
+
+            </div>
         </>
     )
 }

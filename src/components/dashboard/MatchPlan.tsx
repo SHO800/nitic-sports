@@ -8,6 +8,7 @@ const MatchPlan = () => {
         matchPlans,
         locations,
         matchResults,
+        events,
         mutateMatchPlans,
         getMatchDisplayStr
     } = useData()
@@ -22,22 +23,44 @@ const MatchPlan = () => {
                     <div className={"flex items-center justify-between "}>
                         <div className='flex items-center'>
                             <p className={`text-black `}>
-                                {/*XX月XX日 XX:XX ~ XX:XX*/}
-                                {matchPlan.id},
-                                {matchPlan.teamIds.map((teamId) => getMatchDisplayStr(teamId))}
-                                {new Date(matchPlan.scheduledStartTime).toLocaleString('ja-JP', {
+                                {
+                                    matchPlan.id
+                                } | {
+                                matchPlan.eventId
+                            } {
+                                events?.find((event) => event.id === matchPlan.eventId)?.name
+                            } | {
+                                matchPlan.teamIds.map((teamId, index) => {
+                                    let result = getMatchDisplayStr(teamId)
+                                    if (result === "") return ""
+                                    if (matchPlan.teamNotes[index]) {
+                                        result += `(${matchPlan.teamNotes[index]})`
+                                    }
+                                    return result
+                                }).join(" vs ")
+                            } | {
+                                new Date(matchPlan.scheduledStartTime).toLocaleString('ja-JP', {
                                     month: '2-digit',
                                     day: '2-digit',
                                     hour: '2-digit',
                                     minute: '2-digit',
-                                })} ~ {new Date(matchPlan.scheduledEndTime).toLocaleString('ja-JP', {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                            })}
-                                {matchPlan.teamNotes}
-                                {matchPlan.locationId && locations?.find((location) => location.id === matchPlan.locationId)?.name},
-                                {matchPlan.matchName},
-
+                                })
+                            } ~ {
+                                new Date(matchPlan.scheduledEndTime).toLocaleString('ja-JP', {
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                })
+                            } | {
+                                matchPlan.locationId && locations?.find((location) => location.id === matchPlan.locationId)?.name
+                            } | {
+                                matchPlan.matchName
+                            } {
+                                matchPlan.matchNote && matchPlan.matchNote.length > 0 ? (
+                                    <span className="ml-1 text-gray-500">
+                                            ({matchPlan.matchNote})
+                                        </span>
+                                ) : null
+                            }
                             </p>
                         </div>
 
@@ -54,16 +77,12 @@ const MatchPlan = () => {
                                 console.log(response)
                                 await mutateMatchPlans();
                             }}
-                            className='bg-red-500 hover:bg-red-600 text-black px-4 py-2 rounded'
+                            className='bg-red-500 hover:bg-red-600 text-black px-4 py-2 ml-4 rounded'
                         >
                             削除
                         </button>
                     </div>
-                    {/*時間*/}
-                    <div>
 
-
-                    </div>
                     {/*    表示*/}
                     {matchResults && matchResults[matchPlan.id] ? (
                         <div>
@@ -88,7 +107,8 @@ const MatchPlan = () => {
                     )}
                     <details className={"text-black pl-4"}>
                         <summary>試合結果入力</summary>
-                        <MatchResultForm matchPlan={matchPlan} matchResult={matchResults ? matchResults[matchPlan.id] : undefined}/>
+                        <MatchResultForm matchPlan={matchPlan}
+                                         matchResult={matchResults ? matchResults[matchPlan.id] : undefined}/>
                     </details>
                 </div>
             ))}

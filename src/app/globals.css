@@ -12,3 +12,7 @@ body {
     font-family: var(--font-noto-sans-jp), serif;
     font-size: 16px;
 }
+
+.line {
+    background-image: linear-gradient(45deg, transparent 49%, black 49%, black 51%, transparent 51%, transparent); /* 右下がりの斜線 */
+}

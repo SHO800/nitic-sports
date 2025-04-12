@@ -3,13 +3,13 @@ interface TeamData {
     blocks?: {
         [key: string]:
             {
-                teamId: number
+                teamId: string
                 rank?: number
             }[]
     }
     teams?:
         {
-            teamId: number
+            teamId: string
             rank?: number
         }[]
 }

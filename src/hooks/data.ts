@@ -6,7 +6,6 @@ import fetcher from "@/utils/fetcher";
 import groupTeams from "@/utils/groupTeams";
 
 export const useData = () => {
-    // const [teams, setTeamsx] = useState<Team[]>([])
     const {
         data: teams,
         error: teamError,
@@ -45,7 +44,7 @@ export const useData = () => {
     } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/score/-1`, fetcher<Score[]>)
     // const {data: schedules, error: scheduleError, isLoading: scheduleLoading} = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/schedule/-1`, fetcher<ScheduleImage[]>)
     // const {data: eventSchedules, error: eventScheduleError, isLoading: eventScheduleLoading} = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/event-schedule/-1`, fetcher<EventSchedule[]>)
-
+    
     const [groupedTeams, setGroupedTeams] = useState<Record<string, Team[]>>({})
 
     useEffect(() => {
@@ -72,7 +71,7 @@ export const useData = () => {
                 const matchName = matchPlan?.matchName
                 const expectedResult = variableTeamIdData.condition;
                 // まだ試合結果が存在しない場合
-                if (!matchResult) return `< ${matchName}${expectedResult === "W" ? "勝者" : "敗者"} >`
+                if (!matchResult) return `${matchName}${expectedResult === "W" ? "勝者" : "敗者"}`
 
 
                 if (expectedResult === "W") {
@@ -85,20 +84,22 @@ export const useData = () => {
             if (variableTeamIdData?.type === "L") { // 対象試合がリーグ
 
                 const event = events.find((event) => event.id === variableTeamIdData.eventId)
-                if (!event) return ''
+                if (!event) return `${variableTeamIdData.blockName}ブロック${variableTeamIdData.expectedRank}位`
+                
                 const teamData = event.teamData as unknown as TeamData[]
-                if (!teamData) return ''
-
+                if (!teamData) return `${variableTeamIdData.blockName}ブロック${variableTeamIdData.expectedRank}位`
+                
+                if (!teamData[variableTeamIdData.teamDataIndex].blocks) return `${variableTeamIdData.blockName}ブロック${variableTeamIdData.expectedRank}位`
                 const block = teamData[variableTeamIdData.teamDataIndex].blocks![variableTeamIdData.blockName]
-                if (!block) return ''
+                if (!block) return `${variableTeamIdData.blockName}ブロック${variableTeamIdData.expectedRank}位`
 
                 const blockTeam = block.find((team) => team.rank === variableTeamIdData.expectedRank)
                 // まだブロックの最終結果が存在しない場合
-                if (!blockTeam) return `< ${variableTeamIdData.blockName}ブロック${variableTeamIdData.expectedRank}位 >`
+                if (!blockTeam) return `${variableTeamIdData.blockName}ブロック${variableTeamIdData.expectedRank}位`
 
                 // その順位のチームがいた場合
                 const teamId = blockTeam.teamId
-                const team = teams.find((team) => team.id === teamId)
+                const team = teams.find((team) => team.id.toString() === teamId)
                 if (!team) return ''
                 return `${team.name} `
             }
@@ -147,7 +148,8 @@ export const useData = () => {
             const blockName = variableTeamIdData.blockName
 
             const expectedRank = variableTeamIdData.expectedRank
-            const block = teamData[teamDataIndex].blocks![blockName]
+            if (!teamData[teamDataIndex].blocks) return false;
+            const block = teamData[teamDataIndex].blocks[blockName]
             if (!block) return false
             const blockTeam = block.find((team) => team.rank === expectedRank)
             // 期待の順位のチームがいる (少なくともその変数でほしいブロックの結果があるかどうか)

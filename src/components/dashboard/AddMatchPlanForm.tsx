@@ -9,7 +9,64 @@ const AddMatchPlanForm = () => {
     const [teamCount, setTeamCount] = useState(2);
     const {events, groupedTeams, mutateMatchPlans} = useData()
     const [isVisibleClassSelector, setIsVisibleClassSelector] = useState(false);
-    
+
+    // 試合名の頭文字を自動でインクリメントするか
+    const [isIncrementMatchNameCapital, setIsIncrementMatchNameCapital] = useState(false)
+    // 試合名の文字を自動インクリメントするか
+    const [isIncrementMatchNameNumber, setIsIncrementMatchNameNumber] = useState(false)
+    // 会場を自動インクリメントするか
+    const [isIncrementLocation, setIsIncrementLocation] = useState(false)
+    // 会場をどこからインクリメントするか
+    const [incrementLocationRange, setIncrementLocationRange] = useState(0)
+    // 会場をどこまでインクリメントするか
+    const [incrementLocationRangeEnd, setIncrementLocationRangeEnd] = useState(0)
+
+
+    const increment = () => {
+        if (isIncrementMatchNameCapital || isIncrementMatchNameNumber) {
+
+            // 名前インプットフィールド取得
+            const matchNameInput = document.getElementById('matchName') as HTMLInputElement;
+            
+            // 入力内容取得
+            const matchName = matchNameInput.value;
+            // インクリメントするか
+            if (isIncrementMatchNameCapital) {
+                // 先頭の文字をインクリメント
+                const firstChar = matchName.charAt(0);
+                const incrementedChar = String.fromCharCode(firstChar.charCodeAt(0) + 1);
+                matchNameInput.value = incrementedChar + matchName.slice(1);
+            }
+            if (isIncrementMatchNameNumber) {
+                // 扱うのは①等の丸数字
+                // 先頭の文字をインクリメント
+                const firstChar = matchName.charAt(0);
+                const incrementedChar = String.fromCharCode(firstChar.charCodeAt(0) + 1);
+                matchNameInput.value = incrementedChar + matchName.slice(1);
+            }
+        }
+        if (isIncrementLocation) {
+            // 会場インプットフィールド取得
+            const locationInput = document.getElementById('locationId') as HTMLInputElement;
+            // 入力内容取得
+            const location = locationInput.value;
+            // 範囲取得
+            const incrementLocationRange = Number((document.getElementById('incrementLocationRange') as HTMLInputElement).value);
+            const incrementLocationRangeEnd = Number((document.getElementById('incrementLocationRangeEnd') as HTMLInputElement).value);
+            
+            // インクリメント
+            const incrementedLocation = Number(location) + incrementLocationRange;
+            // インクリメント範囲を超えたらリセット
+            if (incrementedLocation > incrementLocationRangeEnd) {
+                locationInput.value = incrementLocationRange.toString();
+            } else {
+                locationInput.value = incrementedLocation.toString();
+            }
+            
+        }
+    }
+
+
     return (
         <>
             <form
@@ -26,6 +83,7 @@ const AddMatchPlanForm = () => {
                             body: JSON.stringify({
                                 eventId: Number((document.getElementById('eventId') as HTMLInputElement).value),
                                 matchName: (document.getElementById('matchName') as HTMLInputElement).value,
+                                matchNote: (document.getElementById('teamNote') as HTMLInputElement).value,
                                 teamIds: (Array.from({length: teamCount}).map((_, index) => {
                                     return (document.getElementById(`team${index + 1}Id`) as HTMLInputElement).value
                                 })),
@@ -41,6 +99,10 @@ const AddMatchPlanForm = () => {
                     )
                     console.log(response)
                     await mutateMatchPlans();
+                    // インクリメントする場合はインクリメント
+                    if (isIncrementMatchNameCapital || isIncrementMatchNameNumber) {
+                        increment()
+                    }
                 }}
                 className='flex items-center mt-4'
             >
@@ -74,6 +136,39 @@ const AddMatchPlanForm = () => {
                             id="matchName"
                             className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
                             placeholder='試合名'
+                        />
+                        <input
+                            type='checkbox'
+                            name="isIncrementMatchNameCapital"
+                            id="isIncrementMatchNameCapital"
+                            className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
+                            checked={isIncrementMatchNameCapital}
+                            onChange={(e) => {
+                                setIsIncrementMatchNameCapital(e.target.checked)
+                            }}
+                        />
+                        <label className='text-black mr-2'
+                               htmlFor="isIncrementMatchNameCapital"
+                        >頭文字++</label>
+                        <input
+                            type='checkbox'
+                            name="isIncrementMatchNameNumber"
+                            id="isIncrementMatchNameNumber"
+                            className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
+                            checked={isIncrementMatchNameNumber}
+                            onChange={(e) => {
+                                setIsIncrementMatchNameNumber(e.target.checked)
+                            }}
+                        />
+                        <label className='text-black mr-2'
+                               htmlFor="isIncrementMatchNameNumber"
+                        >数字++</label>
+                        <input
+                            type='text'
+                            name="teamNote"
+                            id="teamNote"
+                            className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
+                            placeholder='備考'
                         />
                     </div>
                     {/*チーム数は可変*/}
@@ -122,11 +217,11 @@ const AddMatchPlanForm = () => {
                                             <div className={"fixed top-0 right-0 w-[400px] h-[400px] z-50"}>
                                                 <ClassSelector
                                                     groupedData={groupedTeams}
-                                                    callback={(id: number, name: string) => {
+                                                    callback={(id: string, name: string) => {
                                                         const input = document.getElementById(`team${index + 1}Id`) as HTMLInputElement;
-                                                        input.value = id.toString()
+                                                        input.value = id;
                                                         const span = document.getElementById(`team${index + 1}Name`) as HTMLSpanElement;
-                                                        span.innerText = name
+                                                        span.innerText = name;
                                                         setIsVisibleClassSelector(false);
                                                     }}
                                                 />
@@ -144,6 +239,60 @@ const AddMatchPlanForm = () => {
 
                                 </div>
                             ))
+                        }
+                    </div>
+                    <div>
+                        <label className='text-black mr-2'
+                               htmlFor="locationId"
+                        >場所</label>
+                        <input
+                            type='text'
+                            name="locationId"
+                            id="locationId"
+                            className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
+                            placeholder='場所'
+                        />
+                        <input
+                            type='checkbox'
+                            name="isIncrementLocation"
+                            id="isIncrementLocation"
+                            className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
+                            checked={isIncrementLocation}
+                            onChange={(e) => {
+                                setIsIncrementLocation(e.target.checked)
+                            }}
+                        />
+                        <label className='text-black mr-2'
+                               htmlFor="isIncrementLocation"
+                        >場所++</label>
+                        {isIncrementLocation &&
+                            <div>
+                                <p className='text-black mr-2'
+                                >範囲</p>
+                                <input
+                                    type='number'
+                                    name="incrementLocationRange"
+                                    id="incrementLocationRange"
+                                    className='border border-gray-400 px-2 py-2 mr-2 rounded text-black w-16'
+                                    placeholder='場所のインクリメント範囲'
+                                    value={incrementLocationRange}
+                                    onChange={(e) => {
+                                        setIncrementLocationRange(Number(e.target.value))
+                                    }}
+                                />
+                                ~
+                                <input
+                                    type='number'
+                                    name="incrementLocationRangeEnd"
+                                    id="incrementLocationRangeEnd"
+                                    className='border border-gray-400 px-2 py-2 mr-2 rounded text-black w-16'
+                                    placeholder='場所のインクリメント範囲'
+                                    value={incrementLocationRangeEnd}
+                                    onChange={(e) => {
+                                        setIncrementLocationRangeEnd(Number(e.target.value))
+                                    }}
+                                />
+                            </div>
                         }
                     </div>
                     <div>
@@ -170,18 +319,6 @@ const AddMatchPlanForm = () => {
                             required
                         />
                     </div>
-                    <div>
-                        <label className='text-black mr-2'
-                               htmlFor="locationId"
-                        >場所</label>
-                        <input
-                            type='text'
-                            name="locationId"
-                            id="locationId"
-                            className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
-                            placeholder='場所'
-                        />
-                    </div>
                     <button
                         type='submit'
                         className='bg-green-500 hover:bg-green-600 text-black px-4 py-2 rounded'
@@ -205,9 +342,9 @@ const AddMatchPlanForm = () => {
                             body: JSON.stringify({
                                 eventId: Number((document.getElementById('eventId') as HTMLInputElement).value),
                                 matchName: (document.getElementById('matchName') as HTMLInputElement).value,
+                                teamNote: (document.getElementById('teamNote') as HTMLInputElement).value,
                                 teamIds: (Array.from({length: teamCount}).map((_, index) => {
-                                    console.log(`team${index + 1}Id`)
-                                    return Number((document.getElementById(`team${index + 1}Id`) as HTMLInputElement).value)
+                                    return (document.getElementById(`team${index + 1}Id`) as HTMLInputElement).value
                                 })),
                                 teamNotes: (Array.from({length: teamCount}).map((_, index) => {
                                     return (document.getElementById(`team${index + 1}Note`) as HTMLInputElement).value
@@ -215,7 +352,7 @@ const AddMatchPlanForm = () => {
                                 scheduledStartTime: new Date((document.getElementById('scheduledStartTime') as HTMLInputElement).value),
                                 scheduledEndTime: new Date((document.getElementById('scheduledEndTime') as HTMLInputElement).value),
                                 locationId: Number((document.getElementById('locationId') as HTMLInputElement).value),
-
+                                
                             } as unknown as MatchPlanSchema),
                         }
                     )

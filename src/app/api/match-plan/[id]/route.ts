@@ -3,7 +3,13 @@ import {NextRequest} from "next/server";
 import {MatchPlan} from "@prisma/client";
 
 export async function GET() {
-    const matchPlans: MatchPlan[] = await prisma.matchPlan.findMany()
+    const matchPlans: MatchPlan[] = await prisma.matchPlan.findMany().then((matchPlans) => {
+    //     id順にソート
+        matchPlans.sort((a, b) => {
+            return a.id - b.id;
+        })
+        return matchPlans
+    })
     return Response.json(matchPlans)
 }
 
@@ -11,6 +17,7 @@ export async function POST(request: Request) {
     const {
         eventId,
         matchName,
+        matchNote,
         teamIds,
         teamNotes,
         scheduledStartTime,
@@ -20,6 +27,7 @@ export async function POST(request: Request) {
     }: {
         eventId: number,
         matchName?: string,
+        matchNote?: string,
         teamIds: string[] | number[],
         teamNotes: string[],
         scheduledStartTime: Date,
@@ -32,6 +40,7 @@ export async function POST(request: Request) {
             
             eventId,
             matchName,
+            matchNote,
             teamIds: teamIds.map((teamId) => teamId.toString()),
             teamNotes,
             scheduledStartTime,
@@ -55,6 +64,7 @@ export async function PUT(
     const {
         eventId,
         matchName,
+        matchNote,
         teamIds,
         teamNotes,
         scheduledStartTime,
@@ -63,6 +73,7 @@ export async function PUT(
     }: {
         eventId: number,
         matchName?: string,
+        matchNote?: string,
         teamIds: string[] | number[],
         teamNotes: string[],
         scheduledStartTime: Date,
@@ -77,6 +88,7 @@ export async function PUT(
         data: {
             eventId,
             matchName,
+            matchNote,
             teamIds: teamIds.map((teamId) => teamId.toString()),
             teamNotes: teamNotes,
             scheduledStartTime,

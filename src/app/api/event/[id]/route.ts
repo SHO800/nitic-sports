@@ -4,7 +4,13 @@ import {Event} from "@prisma/client";
 
 
 export async function GET() {
-    const events: Event[] = await prisma.event.findMany()
+    const events: Event[] = await prisma.event.findMany().then((events) => {
+        //     id順にソート
+        events.sort((a, b) => {
+            return a.id - b.id;
+        })
+        return events
+    })
     return Response.json(events)
 }
 
@@ -15,7 +21,7 @@ export async function POST(request: Request) {
         teamData: string
     } = await request.json()
 
-    
+
     const response = await prisma.event.create({
         data: {
             name,
@@ -32,7 +38,7 @@ export async function POST(request: Request) {
     })
     if (!response) {
         return new Response('Event not found', {status: 404})
-    }else {
+    } else {
         return new Response('Event created', {status: 200})
     }
 }
@@ -67,7 +73,7 @@ export async function PUT(
     })
     if (!response) {
         return new Response('Event not found', {status: 404})
-    }else {
+    } else {
         return new Response('Event created', {status: 200})
     }
 }
@@ -85,7 +91,7 @@ export async function DELETE(
     })
     if (!response) {
         return new Response('Event not found', {status: 404})
-    }else {
+    } else {
         return new Response('Event created', {status: 200})
     }
 }
