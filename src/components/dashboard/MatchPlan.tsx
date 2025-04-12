@@ -1,7 +1,8 @@
+"use client"
 import {useData} from "@/hooks/data";
 import {MatchResultForm} from "@/components/dashboard/MatchResultForm";
 import AddMatchPlanForm from "@/components/dashboard/AddMatchPlanForm";
-import {useEffect} from "react";
+import {useCallback, useEffect, useLayoutEffect, useRef} from "react";
 
 const MatchPlan = () => {
     const {
@@ -11,14 +12,24 @@ const MatchPlan = () => {
         matchResults,
         getMatchDisplayStr
     } = useData()
-
+    
     useEffect(() => {
-        console.log("plans changed" + matchPlans);
+        console.log("plans changed: " , matchPlans.length);
     }, [matchPlans]);
+    
+    
+    function reloadMatchPlans() {
+        // setStateで強制再読込する
+        setMatchPlans([...matchPlans]);
+    }
+    
     
     return (
         <>
             <div>{JSON.stringify(matchPlans)}</div>
+            <button onClick={reloadMatchPlans} className='bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded'>
+                Reload Match Plans
+            </button>
             {matchPlans.map((matchPlan) => (
                 <div
                     key={matchPlan.id}

@@ -78,7 +78,14 @@ export const useData = () => {
 
     const pullMatchPlan = async (newResponse: any = undefined) => {
         if (newResponse) {
-            setMatchPlans(prevState => [...prevState, newResponse])
+            setMatchPlans(prevState =>
+            {
+                const a = [...prevState, newResponse]
+                console.log(Object.is(prevState, a))
+                return a;
+                
+            }    
+            )
         } else {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/match-plan/-1`)
             const matchPlans = await response.json()
@@ -268,6 +275,10 @@ export const useData = () => {
         return null;
     }
 
+    useEffect(() => {
+        console.log("matchPlans changed in data:",  matchPlans.length);
+    }, [matchPlans]);
+    
     return {
         pullTeam,
         pullEvent,

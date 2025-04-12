@@ -40,8 +40,8 @@ const AddMatchPlanForm = () => {
                         }
                     )
                     const newMatchPlan = await response.json()
-                    console.log(newMatchPlan)
-                    await pullMatchPlan(newMatchPlan) 
+                    console.log("addmatchPlans", newMatchPlan)
+                    await pullMatchPlan(newMatchPlan)  
                 }}
                 className='flex items-center mt-4'
             >
