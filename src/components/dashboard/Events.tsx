@@ -2,6 +2,7 @@
 import {useData} from "@/hooks/data";
 import {useCallback, useState} from "react";
 import LeagueTable from "@/components/common/LeagueTable";
+import TournamentTable from "@/components/common/TournamentTable";
 
 
 const Events = () => {
@@ -115,8 +116,12 @@ const Events = () => {
                             >
                                 <div className='flex items-center'>
                                     <div className={`text-black w-full`}>
-                                        {(teamData as unknown as TeamData).type === "tournament" ? null : Object.keys((teamData as unknown as TeamData).blocks!).map((block, index) => (
-                                            
+                                        {(teamData as unknown as TeamData).type === "tournament" ?
+                                            matchPlans && teamData && (teamData as unknown as TeamData).matchPlanIdRange && 
+                                            <TournamentTable teams={(teamData as unknown as TeamData).teams!}
+                                                             matchPlans={matchPlans.filter(plan => (teamData as unknown as TeamData).matchPlanIdRange!.start <= plan.id && plan.id <= (teamData as unknown as TeamData).matchPlanIdRange!.end ||  ((teamData as unknown as TeamData).matchPlanIdRange!.additional && (teamData as unknown as TeamData).matchPlanIdRange!.additional?.includes(plan.id) ))} />
+                                            :
+                                            Object.keys((teamData as unknown as TeamData).blocks!).map((block, index) => (
                                             <LeagueTable key={event.id.toString()+block+index} i_key={"i_"+event.id.toString()+block+index} blockName={block} block={(teamData as unknown as TeamData).blocks![block]}/>
                                             )
                                         )}

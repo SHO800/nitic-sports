@@ -2,6 +2,8 @@ import MatchesWrapper from "@/components/top/MatchesWrapper";
 import OrganizedTeams from "@/types/organizedTeams";
 import {SWRConfig} from "swr";
 import groupTeams from "@/utils/groupTeams";
+import Dashboard from "@/app/dashboard/page";
+import Link from "next/link";
 
 async function getTeams(): Promise<OrganizedTeams> {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/team/-1`, {
@@ -58,8 +60,11 @@ export default async function Home() {
             <MatchesWrapper title={"進行中の試合"}>
                 <p>a</p>
             </MatchesWrapper>
-
-
+            <Link href={"/dashboard"} className={"text-blue-500 underline"}>
+                Dashboard
+            </Link>
+            
+            
         </SWRConfig>
     );
 }
