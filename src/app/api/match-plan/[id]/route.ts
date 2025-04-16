@@ -58,9 +58,9 @@ export async function POST(request: Request) {
 
 export async function PUT(
     request: NextRequest,
-    {params}: { params: { id: string } }
+    {params}: { params: Promise<{ id: string }> }
 ) {
-    const id = Number(params.id)
+    const id = Number((await params).id)
     const {
         eventId,
         matchName,
@@ -105,9 +105,9 @@ export async function PUT(
 
 // export async function PATCH (
 //     request: NextRequest,
-//     {params}: { params: { id: string } }
+//     {params}: { params: Promise<{ id: string }> }
 // ) {
-//     const id = Number(params.id)
+//     const id = Number((await params).id)
 //     const {
 //        
 //     }: {
@@ -137,9 +137,9 @@ export async function PUT(
 
 export async function DELETE(
     request: NextRequest,
-    {params}: { params: { id: string } }
+    {params}: { params: Promise<{ id: string }> }
 ) {
-    const id = Number(params.id)
+    const id = Number((await params).id)
     // リクエストのidを元に削除
     const response = await prisma.matchPlan.delete({
         where: {

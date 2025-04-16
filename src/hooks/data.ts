@@ -5,15 +5,6 @@ import useSWR from "swr";
 import fetcher from "@/utils/fetcher";
 import groupTeams from "@/utils/groupTeams";
 
-// 型定義を追加（既存のコードで定義されていない場合）
-interface TeamData {
-    blocks: {
-        [key: string]: Array<{
-            teamId: string;
-            rank: number;
-        }>;
-    };
-}
 
 export const useData = () => {
     // APIのベースURLを一箇所に定義

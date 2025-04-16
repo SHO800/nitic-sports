@@ -1,4 +1,5 @@
 import {MatchPlan, MatchResult} from "@prisma/client";
+import {TeamData} from "@/utils/tournamentUtils";
 import {useData} from "@/hooks/data";
 import {useEffect, useState} from "react";
 import analyzeVariableTeamId from "@/utils/analyzeVariableTeamId";
@@ -62,7 +63,7 @@ export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan
                             if (!leagueData.teams) return -1;
                             const team = leagueData.teams.find((team) => team.rank === analyzedTeamId.expectedRank)
                             if (team) {
-                                return team.teamId
+                                return Number(team.teamId)
                             } else {
                                 // 該当する順位のチームが見つからなかった場合
                                 return -1;

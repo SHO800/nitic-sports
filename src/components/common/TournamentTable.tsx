@@ -28,7 +28,7 @@ const TournamentTable = ({teams, matchPlans}: Props) => {
      * @param matchPlans 全試合計画リスト
      * @returns 依存している場合はtrue、そうでなければfalse
      */
-    function isDependentOnAnotherMatch(teamId, matchPlans) {
+    function isDependentOnAnotherMatch(teamId: string, matchPlans: MatchPlan[]) {
         const variableTeamIdData = analyzeVariableTeamId(teamId);
 
         // 通常のチームID（非変数）または T 以外のタイプの場合は依存関係なし

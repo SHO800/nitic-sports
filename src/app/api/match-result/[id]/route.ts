@@ -15,9 +15,9 @@ export async function GET() {
 
 export async function POST(
     request: NextRequest,
-    {params}: { params: { id: string } }
+    {params}: { params: Promise<{ id: string }> }
 ) {
-    const matchId = Number(params.id)
+    const matchId = Number((await params).id)
 
     // リクエストボディから値を取得
     const {
@@ -84,9 +84,9 @@ export async function POST(
 
 export async function DELETE(
     request: NextRequest,
-    {params}: { params: { id: string } }
+    {params}: { params: Promise<{ id: string }> }
 ) {
-    const matchId = Number(params.id)
+    const matchId = Number((await params).id)
     // リクエストのidを元に削除
     const response = await prisma.matchResult.delete({
         where: {

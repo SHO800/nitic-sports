@@ -24,9 +24,9 @@ export async function POST(request: Request) {
 
 export async function PUT(
     request: NextRequest,
-    {params}: { params: { id: string } }
+    {params}: { params: Promise<{ id: string }> }
 ) {
-    const id = Number(params.id)
+    const id = Number((await params).id)
     const {name}: { name: string } = await request.json()
     // リクエストのidを元にcompletedを反転させる
     const response = await prisma.team.update({
@@ -46,9 +46,9 @@ export async function PUT(
 
 export async function DELETE(
     request: NextRequest,
-    {params}: { params: { id: string } }
+    {params}: { params: Promise<{ id: string }> }
 ) {
-    const id = Number(params.id)
+    const id = Number((await params).id)
     // リクエストのidを元に削除
     const response = await prisma.team.delete({
         where: {
