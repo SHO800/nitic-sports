@@ -3,6 +3,7 @@ import {TournamentNode} from "@/utils/tournamentUtils";
 import {useData} from "@/hooks/data";
 import TournamentTeamBox from "@/components/common/TournamentTeamBox";
 import TournamentLine from "@/components/common/TournamentLine";
+import clsx from "clsx";
 
 const TournamentBoxWrapper = ({roundNumber, match}: { roundNumber: number, match: TournamentNode }) => {
     const {getMatchDisplayStr} = useData();
@@ -60,10 +61,18 @@ const TournamentBoxWrapper = ({roundNumber, match}: { roundNumber: number, match
 
     return (
         <div
-            className="flex flex-col"
-            style={{
-                marginBottom: roundNumber > 1 ? `${Math.pow(2, roundNumber - 1) * 3 - 2}rem` : '1rem'
-            }}
+            className={clsx(
+                "flex flex-col",
+                roundNumber === 1 ? "mt-6":
+                match.matchId ===  35 ? "mt-0 -ml-6":
+                roundNumber === 2 ? "mt-6 -ml-6":
+                match.matchId ===  39 ? "-mt-6 -ml-6":
+                roundNumber === 3 ? "mt-48 -ml-6":
+                match.matchId ===  41 ? "-mt-24 -ml-6":
+                roundNumber === 4 ? "mt-6 -ml-6":
+                ""
+            )}
+            
         >
             {match.matchId && (
                 <div className="text-md text-gray-500 mb-1">

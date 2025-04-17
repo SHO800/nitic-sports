@@ -2,7 +2,7 @@ import {ReactNode} from "react";
 
 const MatchesWrapper = ({children, title}: {children: ReactNode,  title: string }) => {
     return (
-        <div className="flex flex-col gap-4 p-4 bg-white shadow-md rounded-lg">
+        <div className="flex flex-col gap-4 p-4 mx-2 mt-2 bg-white shadow-md rounded-lg">
 
             <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold">{title}</h2>
