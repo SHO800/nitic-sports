@@ -1,7 +1,9 @@
 "use client"
-import {useData} from "@/hooks/data";
-import {MatchResultForm} from "@/components/dashboard/MatchResultForm";
+import { useState } from "react";
+import { useData } from "@/hooks/data";
 import AddMatchPlanForm from "@/components/dashboard/AddMatchPlanForm";
+import { Status, MatchPlan as MatchPlanType } from "@prisma/client";
+import MatchCard from "@/components/dashboard/matchPlan/MatchCard";
 
 const MatchPlan = () => {
     const {
@@ -11,109 +13,126 @@ const MatchPlan = () => {
         events,
         mutateMatchPlans,
         getMatchDisplayStr
-    } = useData()
+    } = useData();
+    
+    // 各試合のタイマー状態を管理
+    const [matchTimers, setMatchTimers] = useState<Record<number, boolean>>({});
+    
+    // 各試合のステータスを管理（実際のAPIから取得する代わりのローカル状態）
+    const [matchStatuses, setMatchStatuses] = useState<Record<number, Status>>({});
+    
+    // ステータスを更新する関数
+    const updateMatchStatus = async (matchId: number, status: Status) => {
+        try {
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/match-plan/${matchId}`,
+                {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        startedAt: status === Status.Playing ? new Date() : null,
+                        endedAt: status === Status.Finished ? new Date() : null,
+                        status 
+                    }),
+                },
+            );
+            if (!response.ok) {
+                throw new Error("Failed to update match status");
+            }
+            await mutateMatchPlans();
+            
+            
+            // ローカルの状態を更新
+            setMatchStatuses(prev => ({
+                ...prev,
+                [matchId]: status
+            }));
+            
+            // タイマーが開始・停止したことを記録
+            if (status === Status.Playing) {
+                setMatchTimers(prev => ({
+                    ...prev,
+                    [matchId]: true
+                }));
+            } else if (status === Status.Finished) {
+                setMatchTimers(prev => ({
+                    ...prev,
+                    [matchId]: false
+                }));
+            }
+        } catch (error) {
+            console.error("ステータス更新エラー:", error);
+        }
+    };
+
+    // タイマーの開始（Playing状態に移行）
+    const handleStartTimer = (matchId: number) => {
+        updateMatchStatus(matchId, Status.Playing);
+    };
+
+    // タイマーの停止（Finished状態に移行）
+    const handleStopTimer = (matchId: number) => {
+        updateMatchStatus(matchId, Status.Finished);
+    };
+
+    // 試合のステータスを取得
+    const getMatchStatus = (matchPlan: MatchPlanType): Status => {
+        // すでにローカル状態にステータスがある場合はそれを返す
+        if (matchStatuses[matchPlan.id] !== undefined) {
+            return matchStatuses[matchPlan.id];
+        }
+        
+        // すでに結果がある場合はCompletedステータス
+        if (matchResults && matchResults[matchPlan.id]) {
+            return Status.Completed;
+        }
+        
+        // デフォルトはDBから来るステータスを使用するか、なければPreparingとみなす
+        return matchPlan.status || Status.Preparing;
+    };
+
+    // 試合削除処理
+    const handleDeleteMatch = async (matchId: number) => {
+        try {
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/match-plan/${matchId}`,
+                {
+                    method: 'DELETE',
+                }
+            );
+            console.log(response);
+            await mutateMatchPlans();
+        } catch (error) {
+            console.error("試合削除エラー:", error);
+        }
+    };
 
     return (
         <>
-            {matchPlans?.map((matchPlan) => (
-                <div
-                    key={matchPlan.id}
-                    className='flex flex-col justify-start items-start bg-gray-200 p-2 rounded mb-2 w-full'
-                >
-                    <div className={"flex items-center justify-between "}>
-                        <div className='flex items-center'>
-                            <p className={`text-black `}>
-                                {
-                                    matchPlan.id
-                                } | {
-                                matchPlan.eventId
-                            } {
-                                events?.find((event) => event.id === matchPlan.eventId)?.name
-                            } | {
-                                matchPlan.teamIds.map((teamId, index) => {
-                                    let result = getMatchDisplayStr(teamId)
-                                    if (result === "") return ""
-                                    if (matchPlan.teamNotes[index]) {
-                                        result += `(${matchPlan.teamNotes[index]})`
-                                    }
-                                    return result
-                                }).join(" vs ")
-                            } | {
-                                new Date(matchPlan.scheduledStartTime).toLocaleString('ja-JP', {
-                                    month: '2-digit',
-                                    day: '2-digit',
-                                    hour: '2-digit',
-                                    minute: '2-digit',
-                                })
-                            } ~ {
-                                new Date(matchPlan.scheduledEndTime).toLocaleString('ja-JP', {
-                                    hour: '2-digit',
-                                    minute: '2-digit',
-                                })
-                            } | {
-                                matchPlan.locationId && locations?.find((location) => location.id === matchPlan.locationId)?.name
-                            } | {
-                                matchPlan.matchName
-                            } {
-                                matchPlan.matchNote && matchPlan.matchNote.length > 0 ? (
-                                    <span className="ml-1 text-gray-500">
-                                            ({matchPlan.matchNote})
-                                        </span>
-                                ) : null
-                            }
-                            </p>
-                        </div>
-
-                        {/*削除ボタン*/}
-                        <button
-                            onClick={async (e) => {
-                                e.preventDefault()
-                                const response = await fetch(
-                                    `${process.env.NEXT_PUBLIC_API_URL}/match-plan/${matchPlan.id}`,
-                                    {
-                                        method: 'DELETE',
-                                    }
-                                )
-                                console.log(response)
-                                await mutateMatchPlans();
-                            }}
-                            className='bg-red-500 hover:bg-red-600 text-black px-4 py-2 ml-4 rounded'
-                        >
-                            削除
-                        </button>
-                    </div>
-
-                    {/*    表示*/}
-                    {matchResults && matchResults[matchPlan.id] ? (
-                        <div>
-
-                            <div className={`text-black `}>
-                                終了: {matchResults[matchPlan.id]!.teamIds.map((teamId, index) => {
-                                return (
-                                    <p key={"score" + index} className={`text-black ml-2 `}>
-                                        {`${getMatchDisplayStr(teamId)}:${matchResults[matchPlan.id]!.matchScores[index]}`}
-                                    </p>
-                                )
-                            })}
-                            </div>
-                        </div>
-                    ) : (
-                        <div>
-
-                            <p className={`text-black `}>
-                                試合結果はまだ登録されていません
-                            </p>
-                        </div>
-                    )}
-                    <details className={"text-black pl-4"}>
-                        <summary>試合結果入力</summary>
-                        <MatchResultForm matchPlan={matchPlan}
-                                         matchResult={matchResults ? matchResults[matchPlan.id] : undefined}/>
-                    </details>
-                </div>
-            ))}
-            <AddMatchPlanForm/>
+            {matchPlans?.map((matchPlan) => {
+                const status = getMatchStatus(matchPlan);
+                
+                return (
+                    <MatchCard 
+                        key={matchPlan.id}
+                        matchPlan={matchPlan}
+                        status={status}
+                        events={events}
+                        locations={locations}
+                        matchResults={matchResults}
+                        matchTimers={matchTimers}
+                        getMatchDisplayStr={getMatchDisplayStr}
+                        handleStartTimer={handleStartTimer}
+                        handleStopTimer={handleStopTimer}
+                        handleDeleteMatch={handleDeleteMatch}
+                    />
+                );
+            })}
+            <AddMatchPlanForm />
         </>
-    )
-}
+    );
+};
+
 export default MatchPlan;

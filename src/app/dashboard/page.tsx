@@ -12,12 +12,12 @@ const Dashboard = () => {
             <div>
 
 
-                <details className='container mx-auto p-4' open>
+                <details className='container mx-auto p-4' >
                     <summary className='text-3xl font-bold mb-4'>クラス</summary>
                     <Teams/>
                 </details>
 
-                <details className='container mx-auto p-4' open>
+                <details className='container mx-auto p-4' >
                     <summary className='text-3xl font-bold mb-4'>種目</summary>
                     <Events/>
                 </details>

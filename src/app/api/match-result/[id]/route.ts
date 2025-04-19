@@ -78,6 +78,22 @@ export async function POST(
     if (!response) {
         return new Response('Event not found', {status: 404})
     }else {
+        // 試合結果が変更された場合、関連する試合のステータスを更新
+        const matchPlan = await prisma.matchPlan.findUnique({
+            where: {
+                id: matchId,
+            },
+        })
+        if (matchPlan) {
+            await prisma.matchPlan.update({
+                where: {
+                    id: matchId,
+                },
+                data: {
+                    status: 'Completed',
+                },
+            })
+        }
         return new Response('Event created', {status: 200})
     }
 }

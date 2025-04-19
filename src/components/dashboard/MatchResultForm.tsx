@@ -7,6 +7,7 @@ import analyzeVariableTeamId from "@/utils/analyzeVariableTeamId";
 export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan, matchResult?: MatchResult }) => {
     const {
         matchPlans,
+        mutateMatchPlans,
         matchResults,
         mutateMatchResults,
         getMatchDisplayStr,
@@ -116,6 +117,7 @@ export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan
                         )
                         console.log(response)
                         await mutateMatchResults();
+                        await mutateMatchPlans();
                         alert("試合結果を更新しました！ 反映には再読み込みが必要なことがあります。")
                     }
                     }
