@@ -1,0 +1,244 @@
+"use client"
+import {useData} from "@/hooks/data";
+import {useState} from "react";
+import TeamDataInput from "@/components/dashboard/events/TeamDataInput";
+
+const EventForm = () => {
+    const {mutateEvents, matchPlans} = useData();
+    const [isTwoStageCompetition, setIsTwoStageCompetition] = useState(false);
+    const [eventType1, setEventType1] = useState<string | null>("tournament");
+    const [eventType2, setEventType2] = useState<string | null>(null);
+    const [teamDataJsonDraft, setTeamDataJsonDraft] = useState<TeamData[]>([{
+        type: "tournament",
+        teams: [],
+    }]);
+
+    const addTournamentTeamsFromPlans = (teamDataIndex: number) => {
+        const eventId = Number((document.getElementById('editEventId') as HTMLInputElement).value);
+        if (!eventId) console.error("eventId is required");
+        const minPlanId = document.getElementById("minPlanId") as HTMLInputElement;
+        if (!minPlanId) console.error("minPlanId is required");
+        const plans = matchPlans?.filter((plan) => plan.eventId === eventId && plan.id >= Number(minPlanId.value));
+        if (!plans) return;
+        const teamIds = plans.map((plan) => plan.teamIds).flat();
+        const teams = teamIds.map((teamId) => {
+            return {
+                teamId: teamId,
+            };
+        });
+        setTeamDataJsonDraft((prevState) => {
+            const newState = [...prevState];
+            newState[teamDataIndex].teams = teams;
+            return newState;
+        });
+    };
+
+    return (
+        <form
+            onSubmit={async (e) => {
+                e.preventDefault();
+                const response = await fetch(
+                    `${process.env.NEXT_PUBLIC_API_URL}/event/-1`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            name: (document.getElementById('eventName') as HTMLInputElement).value,
+                            description: (document.getElementById('eventDescription') as HTMLInputElement).value,
+                            teamData: JSON.stringify(teamDataJsonDraft),
+                        }),
+                    }
+                );
+                console.log(response);
+                await mutateEvents();
+            }}
+            className='flex items-center mt-4'
+        >
+            <div className={"flex flex-col justify-start items-start"}>
+                <div>
+                    <input
+                        type='text'
+                        id='eventName'
+                        name='eventName'
+                        className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
+                        placeholder='種目名を入力してください'
+                    />
+                </div>
+                <div>
+                    <input
+                        type='text'
+                        id='eventDescription'
+                        name='eventDescription'
+                        className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
+                        placeholder='種目の説明を入力してください'
+                    />
+                </div>
+
+                <div>
+                    <input
+                        name={"isTwoStageCompetition"}
+                        id={"isTwoStageCompetition"}
+                        type="checkbox"
+                        onChange={(e) => {
+                            setIsTwoStageCompetition(e.target.checked);
+                            setEventType2(e.target.checked ? "tournament" : null);
+                            // teamDataJsonDraft[1]を初期値にする
+                            if (e.target.checked)
+                                setTeamDataJsonDraft((prevState) => {
+                                    const newState = [...prevState];
+                                    newState[1] = {
+                                        type: "tournament",
+                                        teams: []
+                                    };
+                                    return newState;
+                                });
+                        }}
+                        checked={isTwoStageCompetition}
+                        className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
+                    />
+                    <label
+                        htmlFor={"isTwoStageCompetition"}
+                        className='text-black mr-2'
+                    >予選と本選で形式を区別</label>
+                </div>
+                {isTwoStageCompetition &&
+                    <p>予選</p>
+                }
+                <div className={"ml-4"}>
+                    <input
+                        type={"radio"}
+                        name={"eventType1"}
+                        id={"eventType1Tournament"}
+                        value={"tournament"}
+                        className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
+                        defaultChecked
+                        onChange={(e) => {
+                            setEventType1(e.target.value);
+                            // teamDataJsonDraft[0]を初期値にする
+                            setTeamDataJsonDraft((prevState) => {
+                                const newState = {...prevState};
+                                newState[0] = {
+                                    type: e.target.value,
+                                    teams: []
+                                };
+                                return newState;
+                            });
+                        }}
+                    />
+                    <label
+                        htmlFor={"eventType1Tournament"}
+                        className='text-black mr-2'
+                    >トーナメント</label>
+                    <input
+                        type={"radio"}
+                        name={"eventType1"}
+                        id={"eventType1League"}
+                        value={"league"}
+                        className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
+                        onChange={(e) => {
+                            setEventType1(e.target.value);
+                            // teamDataJsonDraft[0]を初期値にする
+                            setTeamDataJsonDraft((prevState) => {
+                                const newState = {...prevState};
+                                newState[0] = {
+                                    type: e.target.value,
+                                    blocks: {},
+                                };
+                                return newState;
+                            });
+                        }}
+                    />
+                    <label
+                        htmlFor={"eventType1League"}
+                        className='text-black mr-2'
+                    >リーグ戦</label>
+                    <div>
+                        <p>チーム入力</p>
+                        <TeamDataInput 
+                            index={0} 
+                            eventType={eventType1} 
+                            teamDataJsonDraft={teamDataJsonDraft} 
+                            setTeamDataJsonDraft={setTeamDataJsonDraft}
+                            addTournamentTeamsFromPlans={addTournamentTeamsFromPlans}
+                        />
+                    </div>
+                </div>
+                {isTwoStageCompetition && 
+                    <>
+                        <p>本選</p>
+                        <div className={"ml-4"}>
+                            <input
+                                type={"radio"}
+                                name={"eventType2"}
+                                id={"eventType2Tournament"}
+                                value={"tournament"}
+                                className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
+                                defaultChecked
+                                onChange={(e) => {
+                                    setEventType2(e.target.value);
+                                    // teamDataJsonDraft[1]を初期値にする
+                                    setTeamDataJsonDraft((prevState) => {
+                                        const newState = {...prevState};
+                                        newState[1] = {
+                                            type: e.target.value,
+                                            teams: []
+                                        };
+                                        return newState;
+                                    });
+                                }}
+                            />
+                            <label
+                                htmlFor={"eventType2Tournament"}
+                                className='text-black mr-2'
+                            >トーナメント</label>
+                            <input
+                                type={"radio"}
+                                name={"eventType2"}
+                                id={"eventType2League"}
+                                value={"league"}
+                                className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
+                                onChange={(e) => {
+                                    setEventType2(e.target.value);
+                                    // teamDataJsonDraft[1]を初期値にする
+                                    setTeamDataJsonDraft((prevState) => {
+                                        const newState = {...prevState};
+                                        newState[1] = {
+                                            type: e.target.value,
+                                            blocks: {},
+                                        };
+                                        return newState;
+                                    });
+                                }}
+                            />
+                            <label
+                                htmlFor={"eventType2League"}
+                                className='text-black mr-2'
+                            >リーグ戦</label>
+                            <div>
+                                <p>チーム入力</p>
+                                <TeamDataInput 
+                                    index={1} 
+                                    eventType={eventType2} 
+                                    teamDataJsonDraft={teamDataJsonDraft} 
+                                    setTeamDataJsonDraft={setTeamDataJsonDraft}
+                                    addTournamentTeamsFromPlans={addTournamentTeamsFromPlans}
+                                />
+                            </div>
+                        </div>
+                    </>
+                }
+
+                <button
+                    type='submit'
+                    className='bg-blue-500 hover:bg-blue-600 text-black px-4 py-2 rounded'
+                >
+                    追加
+                </button>
+            </div>
+        </form>
+    );
+};
+
+export default EventForm;
