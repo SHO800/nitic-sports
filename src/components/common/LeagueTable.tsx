@@ -1,7 +1,7 @@
 "use client"
 
 import {useData} from "@/hooks/data";
-import {useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {MatchPlan} from "@prisma/client";
 import LeagueTableCell from "@/components/common/leagueTable/LeagueTableCell";
 

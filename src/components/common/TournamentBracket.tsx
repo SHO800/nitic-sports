@@ -10,17 +10,15 @@ interface TournamentBracketProps {
     relatedMatchPlans: MatchPlan[];
 }
 
-export default function TournamentBracket({eventId, isFinal, relatedMatchPlans}: TournamentBracketProps) {
+export default function TournamentBracket({eventId, isFinal, relatedMatchPlans}: Readonly<TournamentBracketProps>) {
     const {
         events,
         eventLoading,
         matchPlanLoading,
         matchPlans,
-        matchResults,
         matchResultLoading,
         teams,
         teamLoading,
-        getMatchDisplayStr
     } = useData();
 
     // データ取得後にトーナメント構造を構築
@@ -77,7 +75,8 @@ export default function TournamentBracket({eventId, isFinal, relatedMatchPlans}:
                         >
                             <div className="flex flex-col space-y-8">
                                 {roundMatches.map(match => (
-                                    <TournamentBoxWrapper key={`${eventId}-match-${match.matchId}`} roundNumber={roundNumber} match={match} />
+                                    <TournamentBoxWrapper key={`${eventId}-match-${match.matchId}`}
+                                                          roundNumber={roundNumber} match={match}/>
                                 ))}
                             </div>
                         </div>

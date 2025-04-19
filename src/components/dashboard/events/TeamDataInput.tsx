@@ -1,6 +1,5 @@
 "use client"
 import {useData} from "@/hooks/data";
-import {TeamData} from "@/types/teamData";
 
 type TeamDataInputProps = {
     index: number;
@@ -10,13 +9,24 @@ type TeamDataInputProps = {
     addTournamentTeamsFromPlans: (index: number) => void;
 }
 
-const TeamDataInput = ({ index, eventType, teamDataJsonDraft, setTeamDataJsonDraft, addTournamentTeamsFromPlans }: TeamDataInputProps) => {
-    const { getMatchDisplayStr } = useData();
+const TeamDataInput = ({
+                           index,
+                           eventType,
+                           teamDataJsonDraft,
+                           setTeamDataJsonDraft,
+                           addTournamentTeamsFromPlans
+                       }: TeamDataInputProps) => {
+    const {getMatchDisplayStr} = useData();
+
 
     if (eventType === "tournament") {
+        const teamDataJsonDraftElement = teamDataJsonDraft[index];
+        if (teamDataJsonDraftElement.type !== "tournament") return null;
+        const teamData = teamDataJsonDraftElement.teams;
         return (
+
             <>
-                {teamDataJsonDraft[index].teams!.map((key, idx) => (
+                {teamData.map((key, idx) => (
                     <div key={`teamDataJsonDraft[${index}]TournamentDiv${idx}`}
                          className={""}>
                         <input
@@ -28,9 +38,13 @@ const TeamDataInput = ({ index, eventType, teamDataJsonDraft, setTeamDataJsonDra
                             value={key.teamId}
                             onChange={(e) => {
                                 const newTeamData = {...teamDataJsonDraft};
-                                newTeamData[index].teams![idx] = {
-                                    teamId: e.target.value,
-                                };
+                                const teamDataElem = newTeamData[index];
+
+                                if ("teams" in teamDataElem) {
+                                    teamDataElem.teams[idx] = {
+                                        teamId: e.target.value,
+                                    };
+                                }
                                 setTeamDataJsonDraft(newTeamData);
                             }}
                         />
@@ -44,9 +58,12 @@ const TeamDataInput = ({ index, eventType, teamDataJsonDraft, setTeamDataJsonDra
                     type="button"
                     onClick={() => {
                         const newTeamData = {...teamDataJsonDraft};
-                        newTeamData[index].teams!.push({
-                            teamId: "0",
-                        });
+                        const teamDataElem = newTeamData[index];
+                        if ("teams" in teamDataElem) {
+                            teamDataElem.teams.push({
+                                teamId: "0",
+                            });
+                        }
                         setTeamDataJsonDraft(newTeamData);
                     }}
                     className='bg-blue-500 hover:bg-blue-600 text-black px-4 py-2 rounded'
@@ -63,14 +80,16 @@ const TeamDataInput = ({ index, eventType, teamDataJsonDraft, setTeamDataJsonDra
             </>
         );
     } else {
+        const teamDataJsonDraftElement = teamDataJsonDraft[index];
+        if (teamDataJsonDraftElement.type !== "league") return null;
         return (
             <>
                 {
-                    Object.keys(teamDataJsonDraft[index].blocks!).map((key, blockIndex) => (
+                    Object.keys(teamDataJsonDraftElement.blocks).map((key, blockIndex) => (
                         <div key={`teamDataJsonDraft[${index}]LeagueDiv${blockIndex}`}
                              className={"flex flex-col"}>
                             <p>{key}</p>
-                            {teamDataJsonDraft[index].blocks![key].map((team, teamIndex) => (
+                            {teamDataJsonDraftElement.blocks[key].map((team, teamIndex) => (
                                 <input
                                     key={`teamDataJsonDraft[${index}]LeagueInput${blockIndex}${teamIndex}`}
                                     type="text"
@@ -80,9 +99,12 @@ const TeamDataInput = ({ index, eventType, teamDataJsonDraft, setTeamDataJsonDra
                                     placeholder='IDを入力してください'
                                     onChange={(e) => {
                                         const newTeamData = {...teamDataJsonDraft};
-                                        newTeamData[index].blocks![key][teamIndex] = {
-                                            teamId: e.target.value,
-                                        };
+                                        const teamDataElem = newTeamData[index];
+                                        if ("blocks" in teamDataElem) {
+                                            teamDataElem.blocks[key][teamIndex] = {
+                                                teamId: e.target.value,
+                                            };
+                                        }
                                         setTeamDataJsonDraft(newTeamData);
                                     }}
                                 />
@@ -91,9 +113,12 @@ const TeamDataInput = ({ index, eventType, teamDataJsonDraft, setTeamDataJsonDra
                                 type="button"
                                 onClick={() => {
                                     const newTeamData = {...teamDataJsonDraft};
-                                    newTeamData[index].blocks![key].push({
-                                        teamId: "0",
-                                    });
+                                    const teamDataElem = newTeamData[index];
+                                    if ("blocks" in teamDataElem) {
+                                        teamDataElem.blocks[key].push({
+                                            teamId: "0",
+                                        });
+                                    }
                                     setTeamDataJsonDraft(newTeamData);
                                 }}
                                 className='bg-blue-500 hover:bg-blue-600 text-black px-4 py-2 rounded'
@@ -107,9 +132,14 @@ const TeamDataInput = ({ index, eventType, teamDataJsonDraft, setTeamDataJsonDra
                     type="button"
                     onClick={() => {
                         const newTeamData = {...teamDataJsonDraft};
-                        const blockName = String.fromCharCode(65 + Object.keys(newTeamData[index].blocks!).length);
-                        newTeamData[index].blocks![blockName] = [];
-                        setTeamDataJsonDraft(newTeamData);
+                        const teamDataElem = newTeamData[index];
+
+
+                        if ("blocks" in teamDataElem) {
+                            const blockName = String.fromCharCode(65 + Object.keys(teamDataElem.blocks).length);
+                            teamDataElem.blocks[blockName] = [];
+                            setTeamDataJsonDraft(newTeamData);
+                        }
                     }}
                     className='bg-blue-500 hover:bg-blue-600 text-black px-4 py-2 rounded'
                 >

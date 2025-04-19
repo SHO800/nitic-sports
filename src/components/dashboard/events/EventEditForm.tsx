@@ -1,7 +1,7 @@
 "use client"
 import {useData} from "@/hooks/data";
 
-const EventEditForm = () => {
+const EventEditForm = ({teamDataJsonDraft}: {teamDataJsonDraft: TeamData[]}) => {
     const {mutateEvents} = useData();
 
     return (
@@ -18,7 +18,7 @@ const EventEditForm = () => {
                         body: JSON.stringify({
                             name: (document.getElementById('eventName') as HTMLInputElement).value,
                             description: (document.getElementById('eventDescription') as HTMLInputElement).value,
-                            teamData: JSON.stringify([]),
+                            teamData: JSON.stringify(teamDataJsonDraft),
                         }),
                     }
                 );

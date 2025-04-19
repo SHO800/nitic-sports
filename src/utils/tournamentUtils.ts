@@ -1,4 +1,4 @@
-import {Event, MatchPlan, MatchResult, Team} from '@prisma/client';
+import {Event, MatchPlan, Team} from '@prisma/client';
 import analyzeVariableTeamId from "@/utils/analyzeVariableTeamId";
 
 export type TournamentNode = {
@@ -14,12 +14,6 @@ export interface TournamentData {
     rounds: number;
     matches: TournamentNode[];
     teamMap: Record<number, { name: string; color?: string }>;
-}
-
-export interface TeamData {
-    type: string;
-    teams?: Array<{ teamId: number }>;
-    blocks?: Record<string, Array<{ teamId: string; rank?: number }>>;
 }
 
 
@@ -84,8 +78,6 @@ export function buildTournamentBracket(
 function constructTournament(
     relatedMatchPlans: MatchPlan[],
     allMatchPlans: MatchPlan[],
-    teamMap: Record<number, { name: string; color?: string }>,
-    rounds: number
 ): TournamentNode[] {
     const nodes: TournamentNode[] = [];
 
@@ -99,7 +91,7 @@ function constructTournament(
     allMatchPlans.forEach(matchPlan => {
         allMatchPlanMap.set(matchPlan.id, matchPlan);
     });
-    
+
 
     // 渡された, このトーナメントに関連する全ての試合について繰り返す
     relatedMatchPlans.forEach(matchPlan => {
@@ -146,106 +138,47 @@ function constructTournament(
 
         })
         nodes.push(matchNode); // 試合ノードを追加
-        
+
     });
-        
+
+    return nodes;
+}
 
 
-        // 参照情報を解析してツリー構造を構築
-        // relatedMatchPlans.forEach(match => {
-        //     const matchNode: TournamentNode = {
-        //         matchId: match.id.toString(),
-        //         matchPlan: match,
-        //         round: calculateRound(match, relatedMatchPlans),
-        //         position: calculatePosition(match, relatedMatchPlans),
-        //         premiseNode: [null, null]
-        //     };
-        //
-        //     // teamIdsの解析
-        //     match.teamIds.forEach((teamId: string, index: number) => {
-        //         if (teamId.startsWith('$')) {
-        //             const analyzed = analyzeVariableTeamId(teamId);
-        //             if (!analyzed) return;
-        //             if (analyzed.type === 'T') {
-        //
-        //
-        //                 const referencedMatchId = analyzed.matchId
-        //                 const isWinner = analyzed.condition === 'W';
-        //
-        //                 // 次の試合への参照を設定
-        //                 if (matchPlanMap.has(referencedMatchId)) {
-        //                     const referencedMatch = matchPlanMap.get(referencedMatchId);
-        //                     console.log('referencedMatch', referencedMatch);
-        //                     const matchResult = matchResults[referencedMatchId];
-        //                 }
-        //             } else if (analyzed.type === 'L') {
-        //                
-        //             }
-        //            
-        //         } else if (teamId && !isNaN(parseInt(teamId))) {
-        //             // 直接チームIDが指定されている場合
-        //             const actualTeamId = parseInt(teamId, 10);
-        //             if (teamMap[actualTeamId]) {
-        //                 matchNode.premiseNode![index] = {
-        //                     teamId: actualTeamId,
-        //                     teamName: teamMap[actualTeamId].name,
-        //                     round: matchNode.round - 1,
-        //                     position: calculateChildPosition(matchNode.position, index, matchNode.round - 1)
-        //                 };
-        //             }
-        //         }
-        //     });
-        //    
-        //     nodes.push(matchNode);
-        // });
+/**
+ * 試合のラウンドを計算
+ */
+function calculateRound(match: MatchPlan, allMatches: MatchPlan[]): number {
+    // 参照関係からラウンド数を推定
+    const dependencies = match.teamIds.filter((id: string) =>
+        typeof id === 'string' && id.startsWith('$T-')).length;
 
-    
-    
-        return nodes;
-    }
-    
-    
-
-    /**
-     * 試合のラウンドを計算
-     */
-    function calculateRound(match: MatchPlan, allMatches: MatchPlan[]): number {
-        // 参照関係からラウンド数を推定
-        const dependencies = match.teamIds.filter((id: string) =>
-            typeof id === 'string' && id.startsWith('$T-')).length;
-
-        if (dependencies === 0) {
-            return 1; // 初戦
-        } else {
-            // 参照している試合から最大ラウンドを計算
-            let maxRound = 0;
-            match.teamIds.forEach((teamId: string) => {
-                if (typeof teamId === 'string' && teamId.startsWith('$T-')) {
-                    const parts = teamId.split('-');
-                    const referencedMatchId = parseInt(parts[1], 10);
-                    const referencedMatch = allMatches.find(m => m.id === referencedMatchId);
-                    if (referencedMatch) {
-                        const round = calculateRound(referencedMatch, allMatches);
-                        maxRound = Math.max(maxRound, round);
-                    }
+    if (dependencies === 0) {
+        return 1; // 初戦
+    } else {
+        // 参照している試合から最大ラウンドを計算
+        let maxRound = 0;
+        match.teamIds.forEach((teamId: string) => {
+            if (typeof teamId === 'string' && teamId.startsWith('$T-')) {
+                const parts = teamId.split('-');
+                const referencedMatchId = parseInt(parts[1], 10);
+                const referencedMatch = allMatches.find(m => m.id === referencedMatchId);
+                if (referencedMatch) {
+                    const round = calculateRound(referencedMatch, allMatches);
+                    maxRound = Math.max(maxRound, round);
                 }
-            });
-            return maxRound + 1;
-        }
+            }
+        });
+        return maxRound + 1;
     }
+}
 
-    /**
-     * 試合の位置（同じラウンド内での順序）を計算
-     */
-    function calculatePosition(match: MatchPlan, allMatches: MatchPlan[]): number {
-        const sameRoundMatches = allMatches.filter(m =>
-            calculateRound(m, allMatches) === calculateRound(match, allMatches));
-        return sameRoundMatches.indexOf(match);
-    }
-
-    /**
-     * 子ノードの位置を計算
-     */
-    function calculateChildPosition(parentPosition: number, childIndex: number, childRound: number): number {
-        return parentPosition * 2 + childIndex;
-    }
+/**
+ * 試合の位置（同じラウンド内での順序）を計算
+ */
+function calculatePosition(match: MatchPlan, allMatches: MatchPlan[]): number {
+    const sameRoundMatches = allMatches.filter(m =>
+        calculateRound(m, allMatches) === calculateRound(match, allMatches));
+    return sameRoundMatches.indexOf(match);
+}
+    

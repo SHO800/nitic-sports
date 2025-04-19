@@ -1,7 +1,6 @@
 "use client"
 import {useData} from "@/hooks/data";
-import LeagueTable from "@/components/common/LeagueTable";
-import TournamentTable from "@/components/common/TournamentTable";
+import Bracket from "@/components/common/Bracket";
 
 const EventList = () => {
     const {events, mutateEvents, matchPlans} = useData();
@@ -11,10 +10,10 @@ const EventList = () => {
             {events?.map((event) => (
                 <div
                     key={event.id}
-                    className={"flex flex-col w-full justify-start "}
+                    className={"flex flex-col w-full justify-start bg-gray-200"}
                 >
                     <div
-                        className='flex items-center justify-between bg-gray-200 p-2 rounded mb-2'
+                        className='flex items-center justify-between  p-2 rounded mb-2'
                     >
                         <div className='flex items-center'>
                             <p className={`text-black `}>
@@ -38,40 +37,19 @@ const EventList = () => {
                             削除
                         </button>
                     </div>
-                    {event.teamData.length > 0 && event.teamData.map((teamData, index) => {
-                        if (!teamData || teamData === "") return null;
-                        const teamDataWithType = teamData as unknown as TeamData;
+                    {event.description && (
+                        <div className='flex items-center'>
+                            <p className={`text-black `}>
+                                {event.description}
+                            </p>
+                        </div>
+                    )}
+                    <div className={"ml-2 bg-white rounded-xl"}>
                         
-                        return (
-                            <div
-                                key={"eventListDetails" + event.id + "-" + index}
-                                className='flex items-center justify-between bg-gray-200 p-2 rounded mb-2'
-                            >
-                                <div className='flex items-center'>
-                                    <div className={`text-black w-full`}>
-
-                                        {teamDataWithType && teamDataWithType.type === "tournament" ?
-                                            matchPlans && teamDataWithType.matchPlanIdRange &&
-                                            <TournamentTable teams={teamDataWithType.teams}
-                                                             matchPlans={matchPlans.filter(plan => teamDataWithType.matchPlanIdRange!.start <= plan.id && plan.id <= teamDataWithType.matchPlanIdRange!.end || (teamDataWithType.matchPlanIdRange!.additional && teamDataWithType.matchPlanIdRange!.additional?.includes(plan.id)))}/>
-                                            :
-                                            <>
-                                                <p>(行-列)の順</p>
-                                                {
-                                                    Object.keys(teamDataWithType.blocks).map((block, index) => (
-                                                        <LeagueTable key={event.id.toString() + block + index}
-                                                                     i_key={"i_" + event.id.toString() + block + index}
-                                                                     eventId={event.id} blockName={block}
-                                                                     block={teamDataWithType.blocks![block]}/>
-                                                    ))
-                                                }
-                                            </>
-                                        }
-                                    </div>
-                                </div>
-                            </div>
-                        )
-                    })}
+                    {matchPlans && matchPlans.length > 0 && (
+                        <Bracket eventId={event.id} matchPlans={matchPlans}/>
+                    )}
+                    </div>
                 </div>
             ))}
         </>

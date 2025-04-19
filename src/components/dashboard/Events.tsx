@@ -52,7 +52,6 @@ const Events = () => {
         <>
             <EventList />
             <EventForm />
-            <EventEditForm />
             <MinPlanIdInput />
         </>
     );
