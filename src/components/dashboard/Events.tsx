@@ -134,6 +134,7 @@ const Events = () => {
                 </div>
             ))}
 
+            
             <form
                 onSubmit={async (e) => {
                     e.preventDefault()
@@ -156,7 +157,9 @@ const Events = () => {
                 }}
                 className='flex items-center mt-4'
             >
+            
                 <div className={"flex flex-col justify-start items-start"}>
+                    <div className="border rounded py-2 pr-4 pl-2">
                     <div>
                         <input
                             type='text'
@@ -292,14 +295,14 @@ const Events = () => {
                                                 })
                                                 setTeamDataJsonDraft(newTeamData)
                                             }}
-                                            className='bg-blue-500 hover:bg-blue-600 text-black px-4 py-2 rounded'
+                                            className='bg-blue-500 hover:bg-blue-400 text-white -ml-3 px-4 py-2 rounded'
                                         >
                                             チーム追加
                                         </button>
                                         <button
                                             type="button"
                                             onClick={() => addTournamentTeamsFromPlans(0)}
-                                            className='bg-blue-500 hover:bg-blue-600 text-black px-4 py-2 rounded'
+                                            className='bg-blue-500 hover:bg-blue-400 text-white mt-1 lg:mt-0 lg:ml-1 px-4 py-2 rounded'
                                         >
                                             試合プランからチームを追加
                                         </button>
@@ -339,7 +342,7 @@ const Events = () => {
                                                             })
                                                             setTeamDataJsonDraft(newTeamData)
                                                         }}
-                                                        className='bg-blue-500 hover:bg-blue-600 text-black px-4 py-2 rounded'
+                                                        className='bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded'
                                                     >
                                                         チーム追加
                                                     </button>
@@ -355,7 +358,7 @@ const Events = () => {
                                                 newTeamData[0].blocks![blockName] = []
                                                 setTeamDataJsonDraft(newTeamData)
                                             }}
-                                            className='bg-blue-500 hover:bg-blue-600 text-black px-4 py-2 rounded'
+                                            className='bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded'
                                         >
                                             ブロック追加
                                         </button>
@@ -452,14 +455,14 @@ const Events = () => {
                                                     })
                                                     setTeamDataJsonDraft(newTeamData)
                                                 }}
-                                                className='bg-blue-500 hover:bg-blue-600 text-black px-4 py-2 rounded'
+                                                className='bg-blue-500 hover:bg-blue-400 text-white -ml-3 px-4 py-2 rounded'
                                             >
                                                 チーム追加
                                             </button>
                                             <button
                                                 type="button"
                                                 onClick={() => addTournamentTeamsFromPlans(1)}
-                                                className='bg-blue-500 hover:bg-blue-600 text-black px-4 py-2 rounded'
+                                                className='bg-blue-500 hover:bg-blue-400 text-white mt-1 lg:mt-0 lg:ml-1 px-4 py-2 rounded'
                                             >
                                                 試合プランからチームを追加
                                             </button>
@@ -498,7 +501,7 @@ const Events = () => {
                                                                 })
                                                                 setTeamDataJsonDraft(newTeamData)
                                                             }}
-                                                            className='bg-blue-500 hover:bg-blue-600 text-black px-4 py-2 rounded'
+                                                            className='bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded'
                                                         >
                                                             チーム追加
                                                         </button>
@@ -514,7 +517,7 @@ const Events = () => {
                                                     newTeamData[1].blocks![blockName] = []
                                                     setTeamDataJsonDraft(newTeamData)
                                                 }}
-                                                className='bg-blue-500 hover:bg-blue-600 text-black px-4 py-2 rounded'
+                                                className='bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded'
                                             >
                                                 ブロック追加
                                             </button>
@@ -525,11 +528,11 @@ const Events = () => {
                         </div>
                     </>
                     }
-
+                    </div>
 
                     <button
                         type='submit'
-                        className='bg-blue-500 hover:bg-blue-600 text-black px-4 py-2 rounded'
+                        className='bg-blue-500 hover:bg-blue-400 text-white mt-1 ml-3 px-4 py-2 rounded'
                     >
                         追加
                     </button>
@@ -556,34 +559,35 @@ const Events = () => {
                     )
                     console.log(response)
                 }}
-                className='flex items-center mt-4'
+                className='flex items-center mt-2'
             >
                 <div className={"flex flex-col justify-start items-start"}>
                     <input
                         type='text'
                         name="editEventId"
                         id="editEventId"
-                        className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
+                        className='border border-gray-400 px-4 py-2 mr-2 ml-3 rounded text-black'
                         placeholder='ID'
                     />
                     <button
                         type='submit'
-                        className='bg-green-500 hover:bg-green-600 text-black px-4 py-2 rounded'
+                        className='bg-green-500 hover:bg-green-400 text-white mt-1 ml-3 px-4 py-2 rounded'
                     >
                         編集
                     </button>
                 </div>
             </form>
-            <div>
+            <div className="mt-1">
                 <input
                     type='text'
                     id='minPlanId'
                     name='minPlanId'
-                    className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
+                    className='border border-gray-400 px-4 py-2 mr-2 ml-3 rounded text-black'
                     placeholder='最小試合プランIDを入力してください'
                 />
 
             </div>
+            
         </>
     )
 }
