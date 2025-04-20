@@ -26,11 +26,11 @@ export default function TournamentBracket({eventId, isFinal, relatedMatchPlans}:
         if (eventLoading || matchPlanLoading || matchResultLoading || teamLoading) {
             return null;
         }
-
+        
         // イベントが見つからない場合
         const event = events?.find(e => e.id === eventId);
         if (!event) return null;
-
+        
         return buildTournamentBracket(
             event,
             relatedMatchPlans,
@@ -39,7 +39,7 @@ export default function TournamentBracket({eventId, isFinal, relatedMatchPlans}:
             isFinal
         );
     }, [eventLoading, matchPlanLoading, matchResultLoading, teamLoading, events, relatedMatchPlans, matchPlans, teams, isFinal, eventId]);
-
+    
     if (eventLoading || matchPlanLoading || teamLoading) {
         return (
             <div className="flex justify-center items-center h-40">
@@ -64,16 +64,17 @@ export default function TournamentBracket({eventId, isFinal, relatedMatchPlans}:
                     const roundMatches = tournamentData.matches
                         .filter(match => match.round === roundNumber)
                         .sort((a, b) => a.position - b.position);
+                    
 
                     return (
                         <div
-                            key={`round-${roundIndex}`}
+                            key={eventId+"-round-" + roundIndex}
                             className="flex flex-col min-w-[250px] mr-12 relative"
                             style={{
-                                marginTop: roundNumber > 1 ? `${Math.pow(2, roundNumber - 2) * 3}rem` : '0'
+                                marginTop: roundNumber > 1 ? `${Math.pow(2, 2 - roundNumber) * 3}rem` : '0'
                             }}
                         >
-                            <div className="flex flex-col space-y-8">
+                            <div className="flex flex-col space-y-2">
                                 {roundMatches.map(match => (
                                     <TournamentBoxWrapper key={`${eventId}-match-${match.matchId}`}
                                                           roundNumber={roundNumber} match={match}/>

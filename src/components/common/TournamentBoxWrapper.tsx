@@ -63,20 +63,13 @@ const TournamentBoxWrapper = ({roundNumber, match}: { roundNumber: number, match
         <div
             className={clsx(
                 "flex flex-col",
-                roundNumber === 1 ? "mt-6":
-                match.matchId ===  35 ? "mt-0 -ml-6":
-                roundNumber === 2 ? "mt-6 -ml-6":
-                match.matchId ===  39 ? "-mt-6 -ml-6":
-                roundNumber === 3 ? "mt-48 -ml-6":
-                match.matchId ===  41 ? "-mt-24 -ml-6":
-                roundNumber === 4 ? "mt-6 -ml-6":
                 ""
             )}
             
         >
             {match.matchId && (
                 <div className="text-md text-gray-500 mb-1">
-                    <p>{match.matchPlan.matchName ?? `Match #${match.matchId}`}
+                    <p>{match.matchPlan.matchName ?? `Match #${match.matchId}`}{match.row}
                         {match.matchPlan.matchNote && (
                             <span
                                 className="ml-2 text-gray-400">{match.matchPlan.matchNote}</span>

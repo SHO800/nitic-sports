@@ -6,6 +6,7 @@ export type TournamentNode = {
     teamIds: string[]; // チームID
     matchPlan: MatchPlan;
     round: number; // ラウンド数
+    row: number; // 行数
     position: number; // 同じラウンド内での位置
     premiseNode?: [TournamentNode | string[] | null, TournamentNode | string[] | null]; // 前提とする試合のノードまたは前提とする試合を含むId
 }
@@ -59,9 +60,69 @@ export function buildTournamentBracket(
     const tournamentNodes = constructTournament(
         tournamentMatches, // 予選の試合プラン
         allMatchPlans,
-        teamMap,
-        rounds
     );
+    
+    // トーナメントノードをソート
+    tournamentNodes.sort((a, b) => a.round - b.round || a.position - b.position);
+    console.log('tournamentNodes', tournamentNodes);
+    // 各ノードに行数を追加
+    
+    // TODO: 準々決勝とかのrowの計算がうまく行っておらず全部2とかになる このnodeでのrowの更新がuseStateみたいに途中で行われないのかもしれない
+    tournamentNodes.forEach((node, index) => {
+            //     依存先
+            const dependencies = node.premiseNode?.filter((premise) => premise !== null)
+            if (!dependencies) {
+                node.row = index * 2 -1;
+                return;
+            }
+            // トーナメント外依存先の数
+            const  externalDependenciesLength = dependencies.filter(depNode => "length" in depNode).length
+        // console.log('dependencies', dependencies);
+        // console.log("externalDependenciesLength", externalDependenciesLength);
+        // console.log("matchNote", node.matchPlan.matchNote);
+            if ( dependencies.length === 0 || externalDependenciesLength >= 2) {
+                node.row = index * 2 +1;
+            }else if (dependencies.length < 3) {
+                if (dependencies.length === 1) { 
+                    const internalDependency = dependencies[0] as TournamentNode;
+                        console.log("internalDependency", internalDependency);
+                    if (dependencies.indexOf(dependencies[0]) < 1) {
+                        //上側依存なら下向きに出る
+                        node.row = internalDependency.row  + 1;
+                    }
+                    if (dependencies.indexOf(dependencies[0]) > 0) {
+                        //下側依存なら上向きに出る
+                        const internalDependency = dependencies[0] as TournamentNode;
+                        node.row = internalDependency.row  + 1;
+                    }
+                }
+                else if (externalDependenciesLength === 1) {
+                    if ( "length" in dependencies[0] && !("length" in  dependencies[1])) {
+                        // 0番目のチームが外部依存なら内部依存試合の上に出る
+                        const internalDependency = dependencies[1];
+                        node.row = internalDependency.row * 2 + 1;
+                    } else if ( "length" in dependencies[1]  &&  !("length" in  dependencies[0]) ) {
+                        // 1番目のチームが外部依存なら内部依存試合の下に出る
+                        const internalDependency = dependencies[0];
+                        node.row = internalDependency.row * 2 + 2;
+                    }
+                }
+                else if (externalDependenciesLength === 2) {
+                    // どちらも内部依存ならば、上の試合の行数の平均
+                    const internalDependency1 = dependencies[0] as TournamentNode;
+                    const internalDependency2 = dependencies[1] as TournamentNode;
+                    node.row = Math.floor((internalDependency1.row + internalDependency2.row) / 2);
+                }
+            } else { // 2つより多い場合
+                // 全ての依存先の行数の平均を取る
+                const internalDependencies = dependencies.filter(depNode => !("length" in depNode)) as TournamentNode[];
+                const sum = internalDependencies.reduce((acc, depNode) => acc + depNode.row, 0);
+                const average = Math.floor(sum / internalDependencies.length);
+                node.row = average * 2 + 1;
+            }
+    });
+
+    console.log('tournamentNodes', tournamentNodes);
 
 
     return {
@@ -100,6 +161,7 @@ function constructTournament(
             matchId: matchPlan.id,
             teamIds: matchPlan.teamIds,
             matchPlan,
+            row: 0, // 初期値
             round: calculateRound(matchPlan, relatedMatchPlans),
             position: calculatePosition(matchPlan, relatedMatchPlans),
             premiseNode: [null, null]
@@ -119,6 +181,7 @@ function constructTournament(
                             matchId: referencedMatch.id,
                             teamIds: referencedMatch.teamIds,
                             matchPlan: referencedMatch,
+                            row: 0, // 初期値
                             round: calculateRound(referencedMatch, relatedMatchPlans),
                             position: calculatePosition(referencedMatch, relatedMatchPlans),
                             premiseNode: [null, null]
