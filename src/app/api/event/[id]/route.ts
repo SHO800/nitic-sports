@@ -20,19 +20,13 @@ export async function POST(request: Request) {
         description?: string,
         teamData: string
     } = await request.json()
-
-
+    
+    
     const response = await prisma.event.create({
         data: {
             name,
             description,
-            teamData: (Object.values(JSON.parse(teamData)) as TeamData[]).map((team) => {
-                return {
-                    type: team.type,
-                    blocks: team.blocks,
-                    teams: team.teams,
-                }
-            }),
+            teamData: JSON.parse(teamData)
 
         },
     })
@@ -62,13 +56,7 @@ export async function PUT(
         data: {
             name,
             description,
-            teamData: (Object.values(JSON.parse(teamData)) as TeamData[]).map((team) => {
-                return {
-                    type: team.type,
-                    blocks: team.blocks,
-                    teams: team.teams,
-                }
-            }),
+            teamData: JSON.parse(teamData)
         },
     })
     if (!response) {
