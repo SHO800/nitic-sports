@@ -135,7 +135,7 @@ export async function updateLeagueRankings(eventId: number, matchId: number): Pr
       data: { teamData: JSON.parse(JSON.stringify(updatedTeamData)) }
     });
 
-    console.log(`ブロック "${blockName}" 状態: 完了=${blockStatus.completed}, 試合=${blockStatus.completedMatches}/${blockStatus.totalMatches}`);
+    console.log(`イベント: ${eventId} ブロック "${blockName}" 状態: 完了=${blockStatus.completed}, 試合=${blockStatus.completedMatches}/${blockStatus.totalMatches}`);
     
     return true;
   } catch (error) {
