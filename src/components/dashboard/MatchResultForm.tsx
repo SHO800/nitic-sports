@@ -129,7 +129,7 @@ export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan
                                 type='text'
                                 name={`matchResult${index}`}
                                 id={`matchResult${index}`}
-                                className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
+                                className='border border-gray-400 px-4 py-2 mt-1 mr-2 rounded text-black'
                                 placeholder='スコア'
                                 required
                                 disabled={!canInput}
@@ -154,7 +154,7 @@ export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan
                     }
                     <button
                         type='submit'
-                        className='bg-green-500 hover:bg-green-600 text-black px-4 py-2 rounded'
+                        className='bg-green-500 hover:bg-green-400 text-white mt-1 px-4 py-2 rounded'
                         disabled={!canInput}
                     >
                         更新

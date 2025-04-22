@@ -68,7 +68,7 @@ const AddMatchPlanForm = () => {
 
 
     return (
-        <>
+        <div>
             <form
                 key={"addMatchPlanForm" + teamCount}
                 onSubmit={async (e) => {
@@ -126,7 +126,7 @@ const AddMatchPlanForm = () => {
                             ))}
                         </select>
                     </div>
-                    <div>
+                    <div className="mt-1">
                         <label className='text-black mr-2'
                                htmlFor="matchName"
                         >試合名</label>
@@ -172,7 +172,10 @@ const AddMatchPlanForm = () => {
                         />
                     </div>
                     {/*チーム数は可変*/}
-                    <div>
+                    <div className="border rounded p-2 mt-1">
+                        <label className='text-black mr-2'
+                               htmlFor="teamCount"
+                        >チーム数</label>
                         <input
                             type="number"
                             id="teamCount"
@@ -183,9 +186,6 @@ const AddMatchPlanForm = () => {
                                 setTeamCount(Number(e.target.value))
                             }}
                         />
-                        <label className='text-black mr-2'
-                               htmlFor="teamCount"
-                        >チーム数</label>
 
                         {
                             [...Array(teamCount)].map((_, index) => (
@@ -241,7 +241,7 @@ const AddMatchPlanForm = () => {
                             ))
                         }
                     </div>
-                    <div>
+                    <div className="mt-1">
                         <label className='text-black mr-2'
                                htmlFor="locationId"
                         >場所</label>
@@ -295,7 +295,7 @@ const AddMatchPlanForm = () => {
                             </div>
                         }
                     </div>
-                    <div>
+                    <div className="mt-1">
                         <label className='text-black mr-2'
                                htmlFor="scheduledStartTime"
                         >開始時間*</label>
@@ -321,7 +321,7 @@ const AddMatchPlanForm = () => {
                     </div>
                     <button
                         type='submit'
-                        className='bg-green-500 hover:bg-green-600 text-black px-4 py-2 rounded'
+                        className='bg-blue-500 hover:bg-blue-400 text-white mt-1 px-4 py-2 rounded'
                     >
                         追加
                     </button>
@@ -359,25 +359,25 @@ const AddMatchPlanForm = () => {
                     console.log(response)
                     await mutateMatchPlans();
                 }}
-                className='flex items-center mt-4'
+                className='flex items-center mt-1'
             >
                 <div className={"flex flex-col justify-start items-start"}>
                     <input
                         type='text'
                         name="editMatchId"
                         id="editMatchId"
-                        className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
+                        className='border border-gray-400 px-4 py-2 mt-1 mr-2 rounded text-black'
                         placeholder='ID'
                     />
                     <button
                         type='submit'
-                        className='bg-green-500 hover:bg-green-600 text-black px-4 py-2 rounded'
+                        className='bg-green-500 hover:bg-green-400 text-white mt-1 mb-2 px-4 py-2 rounded'
                     >
                         編集
                     </button>
                 </div>
             </form>
-        </>
+        </div>
     )
 }
 export default AddMatchPlanForm; 

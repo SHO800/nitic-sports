@@ -62,7 +62,7 @@ const Location = () => {
                 />
                 <button
                     type='submit'
-                    className='bg-green-500 hover:bg-green-600 text-black px-4 py-2 rounded'
+                    className='bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded'
                 >
                     追加
                 </button>

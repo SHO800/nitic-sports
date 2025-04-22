@@ -71,7 +71,6 @@ const MatchPlan = () => {
     const handleStartTimer = (matchId: number) => {
         updateMatchStatus(matchId, Status.Playing);
     };
-
     // タイマーの停止（Finished状態に移行）
     const handleStopTimer = (matchId: number) => {
         updateMatchStatus(matchId, Status.Finished);
