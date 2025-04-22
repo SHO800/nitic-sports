@@ -108,7 +108,7 @@ export const useData = () => {
                 if (!teamData) return planStr;
 
                 const teamDataIndex = variableTeamIdData.teamDataIndex;
-                if (!teamData[teamDataIndex]?.blocks) return planStr;
+                if (teamData[teamDataIndex].type !== "league" ) return planStr;
 
                 const block = teamData[teamDataIndex].blocks[variableTeamIdData.blockName];
                 if (!block) return planStr;
@@ -127,6 +127,22 @@ export const useData = () => {
         const team = teams!.find((t) => t.id === Number(teamId));
         return team ? `${team.name} ` : '';
     }, [teams, events, matchPlans, matchResults, hasRequiredData]);
+    
+    const getBlockMatches = useCallback((eventId: number, blockName: string, block: { teamId: string }[]): MatchPlan[] => {
+        if (!hasRequiredData()) return [];
+        if (!blockName) return [];
+        
+        // 指定された種目において, 指定されたteamIeの配列に含まれるチーム同士の戦いを取得する.
+        const blockTeamIds = block.map((team) => team.teamId).sort((a, b) => a.localeCompare(b));
+        const matchPlansForEvent = matchPlans!.filter((matchPlan) => matchPlan.eventId === eventId);
+        const matchPlansForBlock = matchPlansForEvent.filter((matchPlan) => {
+            const teamIds = matchPlan.teamIds as unknown as string[];
+            return teamIds.every((teamId) => blockTeamIds.includes(teamId));
+        });
+        
+        return matchPlansForBlock
+        
+    }, [matchPlans, hasRequiredData]);
 
     // 試合結果が確定しているかどうかをチェックする関数を最適化
     const isFixedMatchResultByMatchId = useCallback((matchId: string): boolean => {
@@ -163,7 +179,7 @@ export const useData = () => {
             const blockName = variableTeamIdData.blockName;
             const expectedRank = variableTeamIdData.expectedRank;
 
-            if (!teamData[teamDataIndex]?.blocks) return false;
+            if (teamData[teamDataIndex].type !== "league") return false;
 
             const block = teamData[teamDataIndex].blocks[blockName];
             if (!block) return false;
@@ -243,13 +259,13 @@ export const useData = () => {
         scores,
         scoreLoading,
         mutateScores,
-
         // 集約した状態
         isLoading,
         hasErrors: Object.values(errors).some(Boolean),
         errors,
 
         // 最適化したヘルパー関数
+        getBlockMatches,
         getMatchDisplayStr,
         isFixedMatchResult: isFixedMatchResultByMatchId,
         isFixedMatchResultOrBlockRankByVariableId,

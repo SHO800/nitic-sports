@@ -1,5 +1,4 @@
 import {MatchPlan, MatchResult} from "@prisma/client";
-import {TeamData} from "@/utils/tournamentUtils";
 import {useData} from "@/hooks/data";
 import {useEffect, useState} from "react";
 import analyzeVariableTeamId from "@/utils/analyzeVariableTeamId";
@@ -7,6 +6,7 @@ import analyzeVariableTeamId from "@/utils/analyzeVariableTeamId";
 export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan, matchResult?: MatchResult }) => {
     const {
         matchPlans,
+        mutateMatchPlans,
         matchResults,
         mutateMatchResults,
         getMatchDisplayStr,
@@ -58,10 +58,10 @@ export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan
                         // もしリーグ戦の結果だった場合
                         // 該当するリーグ戦の結果を取得
                         const leagueData = getLeagueDataByVariableId(teamId)
-                        if (leagueData) {
+                        if (leagueData && leagueData.type === "league") {
+                            const blockName = analyzedTeamId.blockName
                             // 該当する順位のチームを取得
-                            if (!leagueData.teams) return -1;
-                            const team = leagueData.teams.find((team) => team.rank === analyzedTeamId.expectedRank)
+                            const team = leagueData.blocks[blockName].find((team) => team.rank === analyzedTeamId.expectedRank)
                             if (team) {
                                 return Number(team.teamId)
                             } else {
@@ -116,6 +116,7 @@ export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan
                         )
                         console.log(response)
                         await mutateMatchResults();
+                        await mutateMatchPlans();
                         alert("試合結果を更新しました！ 反映には再読み込みが必要なことがあります。")
                     }
                     }

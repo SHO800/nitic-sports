@@ -1,6 +1,7 @@
 import {prisma} from '@/../lib/prisma';
 import {NextRequest} from "next/server";
 import {MatchResult} from "@prisma/client";
+import {updateLeagueRankings} from '@/utils/leagueRanking';
 
 export async function GET() {
     const matchResults: MatchResult[] = await prisma.matchResult.findMany()
@@ -75,11 +76,38 @@ export async function POST(
             },
         })
     }
+    
     if (!response) {
         return new Response('Event not found', {status: 404})
     }else {
+        // 試合結果が変更された場合、関連する試合のステータスを更新
+        const matchPlan = await prisma.matchPlan.findUnique({
+            where: {
+                id: matchId,
+            },
+        })
+        if (matchPlan) {
+            await prisma.matchPlan.update({
+                where: {
+                    id: matchId,
+                },
+                data: {
+                    status: 'Completed',
+                },
+            })
+            
+            // 試合結果に基づいてリーグ順位を更新
+            try {
+                const updated = await updateLeagueRankings(matchPlan.eventId, matchId);
+                console.log(`リーグ順位更新: ${updated ? '成功' : '不要または失敗'}`);
+            } catch (error) {
+                console.error('リーグ順位更新中にエラーが発生しました:', error);
+            }
+        }
+        
         return new Response('Event created', {status: 200})
     }
+    
 }
 
 export async function DELETE(
@@ -96,6 +124,6 @@ export async function DELETE(
     if (!response) {
         return new Response('Event not found', {status: 404})
     }else {
-        return new Response('Event created', {status: 200})
+        return new Response('Event deleted', {status: 200})
     }
 }

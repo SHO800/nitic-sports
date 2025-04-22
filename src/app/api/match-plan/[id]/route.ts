@@ -1,6 +1,6 @@
 import {prisma} from '@/../lib/prisma';
 import {NextRequest} from "next/server";
-import {MatchPlan} from "@prisma/client";
+import {MatchPlan, Status} from "@prisma/client";
 
 export async function GET() {
     const matchPlans: MatchPlan[] = await prisma.matchPlan.findMany().then((matchPlans) => {
@@ -34,10 +34,16 @@ export async function POST(request: Request) {
         scheduledEndTime: Date,
         locationId?: number,
     } = await request.json()
-
+    
+    // もし追加された試合に依存関係が一つもないならステータスをPreparing(開始待ちの準備中)にする
+    
+    let status: Status = "Waiting" 
+    if (teamIds.every((teamId) => !teamId.toString().startsWith("$"))) {
+        status = "Preparing"
+    }
+    
     const response = await prisma.matchPlan.create({
         data: {
-            
             eventId,
             matchName,
             matchNote,
@@ -46,6 +52,7 @@ export async function POST(request: Request) {
             scheduledStartTime,
             scheduledEndTime,
             locationId,
+            status,
         },
     })
     if (!response) {
@@ -103,36 +110,37 @@ export async function PUT(
     }
 }
 
-// export async function PATCH (
-//     request: NextRequest,
-//     {params}: { params: Promise<{ id: string }> }
-// ) {
-//     const id = Number((await params).id)
-//     const {
-//        
-//     }: {
-//         status: 
-//     } = await request.json()
-//
-//     const response = await prisma.matchPlan.update({
-//         where: {
-//             id,
-//         },
-//         data: {
-//             matchName,
-//             teamIds: teamIds.map((teamId) => teamId.toString()),
-//             teamNotes: teamNotes,
-//             scheduledStartTime,
-//             scheduledEndTime,
-//             locationId,
-//         },
-//     })
-//     if (!response) {
-//         return new Response('Event not found', {status: 404})
-//     }else {
-//         return new Response('Event created', {status: 200})
-//     }
-// }
+export async function PATCH (
+    request: NextRequest,
+    {params}: { params: Promise<{ id: string }> }
+) {
+    const id = Number((await params).id)
+    const {
+        status,
+        startedAt,
+        endedAt,
+    }: {
+        status: Status,
+        startedAt?: Date,
+        endedAt?: Date,
+    } = await request.json()
+
+    const response = await prisma.matchPlan.update({
+        where: {
+            id,
+        },
+        data: {
+            status,
+            startedAt: startedAt ?? undefined,
+            endedAt: endedAt ?? undefined,
+        },
+    })
+    if (!response) {
+        return new Response('EventPlan not found', {status: 404})
+    }else {
+        return new Response('EventPlan updated', {status: 200})
+    }
+}
 
 
 export async function DELETE(
