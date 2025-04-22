@@ -24,7 +24,7 @@ const Schedule = async () => {
             <div className={"absolute top-0 left-0 w-full h-full pt-[100px] pb-[77px]"}>
                 {/*もしstartTime < 今 < endTimeなら*/}
                 
-                <TimeLine startTime={"2025/04/17 08:25"} endTime={"2025/04/30 17:35"}/>
+                <TimeLine startTime={"2025/04/29 08:25"} endTime={"2025/04/ 17:35"}/>
                 {/*<TimeLine startTime={new Date(Date.now())} endTime={new Date(Date.now() + 360000)}/>*/}
             </div>
         </div>

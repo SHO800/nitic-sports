@@ -77,7 +77,7 @@ const MatchPlan = () => {
                                 console.log(response)
                                 await mutateMatchPlans();
                             }}
-                            className='bg-red-500 hover:bg-red-600 text-black px-4 py-2 ml-4 rounded'
+                            className='bg-red-500 hover:bg-red-600 text-white px-4 py-2 ml-4 rounded'
                         >
                             削除
                         </button>
@@ -106,7 +106,7 @@ const MatchPlan = () => {
                         </div>
                     )}
                     <details className={"text-black pl-4"}>
-                        <summary>試合結果入力</summary>
+                        <summary className="bg-blue-500 hover:bg-blue-400 text-white rounded px-1">試合結果入力</summary>
                         <MatchResultForm matchPlan={matchPlan}
                                          matchResult={matchResults ? matchResults[matchPlan.id] : undefined}/>
                     </details>
