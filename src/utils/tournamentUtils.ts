@@ -7,6 +7,7 @@ export type TournamentNode = {
     matchPlan: MatchPlan;
     round: number; // ラウンド数
     row: number; // 行数
+    debug?: string; // デバッグ用
     position: number; // 同じラウンド内での位置
     premiseNode?: [TournamentNode | string[] | null, TournamentNode | string[] | null]; // 前提とする試合のノードまたは前提とする試合を含むId
 }
@@ -21,13 +22,13 @@ export interface TournamentData {
 /**
  * イベントデータからトーナメントの構造を構築する
  */
-export function buildTournamentBracket(
+export const  buildTournamentBracket = (
     event: Event,
     relatedMatchPlans: MatchPlan[],
     allMatchPlans: MatchPlan[],
     teams: Team[],
     isFinal: boolean,
-): TournamentData | null {
+): TournamentData | null => {
     if (!event || !relatedMatchPlans || !teams) {
         return null;
     }
@@ -68,12 +69,15 @@ export function buildTournamentBracket(
     // 各ノードに行数を追加
     
     // TODO: 準々決勝とかのrowの計算がうまく行っておらず全部2とかになる このnodeでのrowの更新がuseStateみたいに途中で行われないのかもしれない
-    tournamentNodes.forEach((node, index) => {
+    // tournamentNodes.forEach((node, index) => {
+    for (let index = 0; index < tournamentNodes.length; index++) {
+        const node = tournamentNodes[index];
             //     依存先
             const dependencies = node.premiseNode?.filter((premise) => premise !== null)
             if (!dependencies) {
                 node.row = index * 2 -1;
-                return;
+                node.debug = "no dependencies";
+                continue;
             }
             // トーナメント外依存先の数
             const  externalDependenciesLength = dependencies.filter(depNode => "length" in depNode).length
@@ -82,10 +86,13 @@ export function buildTournamentBracket(
         // console.log("matchNote", node.matchPlan.matchNote);
             if ( dependencies.length === 0 || externalDependenciesLength >= 2) {
                 node.row = index * 2 +1;
+                node.debug = "no dependencies";
             }else if (dependencies.length < 3) {
-                if (dependencies.length === 1) { 
+                if (dependencies.length === 1) {
+                    node.debug = "one dependency";
                     const internalDependency = dependencies[0] as TournamentNode;
                         console.log("internalDependency", internalDependency);
+                        console.log("one dependency processing ", node);
                     if (dependencies.indexOf(dependencies[0]) < 1) {
                         //上側依存なら下向きに出る
                         node.row = internalDependency.row  + 1;
@@ -99,15 +106,18 @@ export function buildTournamentBracket(
                 else if (externalDependenciesLength === 1) {
                     if ( "length" in dependencies[0] && !("length" in  dependencies[1])) {
                         // 0番目のチームが外部依存なら内部依存試合の上に出る
+                        node.debug = "one external dependency 1";
                         const internalDependency = dependencies[1];
                         node.row = internalDependency.row * 2 + 1;
                     } else if ( "length" in dependencies[1]  &&  !("length" in  dependencies[0]) ) {
                         // 1番目のチームが外部依存なら内部依存試合の下に出る
+                        node.debug = "one external dependency 2";
                         const internalDependency = dependencies[0];
                         node.row = internalDependency.row * 2 + 2;
                     }
                 }
                 else if (externalDependenciesLength === 2) {
+                    node.debug = "two external dependencies";
                     // どちらも内部依存ならば、上の試合の行数の平均
                     const internalDependency1 = dependencies[0] as TournamentNode;
                     const internalDependency2 = dependencies[1] as TournamentNode;
@@ -115,12 +125,13 @@ export function buildTournamentBracket(
                 }
             } else { // 2つより多い場合
                 // 全ての依存先の行数の平均を取る
+                node.debug = "more than two dependencies";
                 const internalDependencies = dependencies.filter(depNode => !("length" in depNode)) as TournamentNode[];
                 const sum = internalDependencies.reduce((acc, depNode) => acc + depNode.row, 0);
                 const average = Math.floor(sum / internalDependencies.length);
                 node.row = average * 2 + 1;
             }
-    });
+    }
 
     console.log('tournamentNodes', tournamentNodes);
 
