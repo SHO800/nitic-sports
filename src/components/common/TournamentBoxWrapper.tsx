@@ -1,11 +1,11 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {CSSProperties, useEffect, useRef, useState} from "react";
 import {TournamentNode} from "@/utils/tournamentUtils";
 import {useData} from "@/hooks/data";
 import TournamentTeamBox from "@/components/common/TournamentTeamBox";
 import TournamentLine from "@/components/common/TournamentLine";
 import clsx from "clsx";
 
-const TournamentBoxWrapper = ({roundNumber, match}: { roundNumber: number, match: TournamentNode }) => {
+const TournamentBoxWrapper = ({roundNumber, match, boxStyle}: { roundNumber: number, match: TournamentNode, boxStyle: CSSProperties }) => {
     const {getMatchDisplayStr} = useData();
 
     const matchBoxRef = useRef<HTMLDivElement | null>(null);
@@ -61,14 +61,11 @@ const TournamentBoxWrapper = ({roundNumber, match}: { roundNumber: number, match
 
     return (
         <div
-            className={clsx(
-                "flex flex-col",
-                ""
-            )}
-            
+            className={"h-20 relative"}
+            style={boxStyle}
         >
             {match.matchId && (
-                <div className="text-md text-gray-500 mb-1">
+                <div className="text-md text-gray-500 mb-1 absolute translate-y-[-100%]">
                     <p>{match.matchPlan.matchName ?? `Match #${match.matchId}`}{match.row}
                         {match.matchPlan.matchNote && (
                             <span
@@ -76,10 +73,9 @@ const TournamentBoxWrapper = ({roundNumber, match}: { roundNumber: number, match
                         )}
                     </p>
                 </div>
-
             )}
-
-            <div className="border border-gray-200 rounded relative shadow-sm" ref={matchBoxRef}>
+            
+            <div className="border border-gray-200 rounded relative shadow-sm " ref={matchBoxRef}>
                 {match.premiseNode?.map((child, idx) => (
                     <TournamentTeamBox key={`team-${idx}-${match.matchId}`}
                                        displayStr={getMatchDisplayStr(match.teamIds[idx])} color={"#000000"}/>

@@ -65,75 +65,78 @@ export const  buildTournamentBracket = (
     
     // トーナメントノードをソート
     tournamentNodes.sort((a, b) => a.round - b.round || a.position - b.position);
-    console.log('tournamentNodes', tournamentNodes);
     // 各ノードに行数を追加
     
     // TODO: 準々決勝とかのrowの計算がうまく行っておらず全部2とかになる このnodeでのrowの更新がuseStateみたいに途中で行われないのかもしれない
     // tournamentNodes.forEach((node, index) => {
     for (let index = 0; index < tournamentNodes.length; index++) {
-        const node = tournamentNodes[index];
+        // const node = tournamentNodes[index];
             //     依存先
-            const dependencies = node.premiseNode?.filter((premise) => premise !== null)
-            if (!dependencies) {
-                node.row = index * 2 -1;
-                node.debug = "no dependencies";
+            const dependenciesReplica = tournamentNodes[index].premiseNode?.filter((premise) => premise !== null)  // これは各Nodeに複製されたほうのNode, 最新のNodeではない
+                    
+        
+            if (!dependenciesReplica) {
+                tournamentNodes[index].row = index * 2 -1;
+                tournamentNodes[index].debug = "cant find dep";
                 continue;
             }
-            // トーナメント外依存先の数
+            const dependencies =  dependenciesReplica?.map((premise) => {
+                if ("length" in premise) return premise
+                return tournamentNodes.find(value => value.matchId === premise?.matchId) 
+            }).filter(value => value !== undefined)
+        
+            // トーナメント外依存先の数 string[]を含んでいる数
             const  externalDependenciesLength = dependencies.filter(depNode => "length" in depNode).length
-        // console.log('dependencies', dependencies);
-        // console.log("externalDependenciesLength", externalDependenciesLength);
-        // console.log("matchNote", node.matchPlan.matchNote);
             if ( dependencies.length === 0 || externalDependenciesLength >= 2) {
-                node.row = index * 2 +1;
-                node.debug = "no dependencies";
+                tournamentNodes[index].row = index * 2 +1;
+                tournamentNodes[index].debug = "no dependencies";
             }else if (dependencies.length < 3) {
-                if (dependencies.length === 1) {
-                    node.debug = "one dependency";
+                if (dependencies.length === 1) { // 片方のチームは固定, もう片方は動的な場合
+                    tournamentNodes[index].debug = "one dependency";
                     const internalDependency = dependencies[0] as TournamentNode;
-                        console.log("internalDependency", internalDependency);
-                        console.log("one dependency processing ", node);
-                    if (dependencies.indexOf(dependencies[0]) < 1) {
+                    
+                    
+                    if (dependencies.indexOf(dependencies[0]) === 0) {
                         //上側依存なら下向きに出る
-                        node.row = internalDependency.row  + 1;
+                        tournamentNodes[index].row = internalDependency.row  + 1;
                     }
-                    if (dependencies.indexOf(dependencies[0]) > 0) {
+                    else if (dependencies.indexOf(dependencies[0]) > 0) {
                         //下側依存なら上向きに出る
-                        const internalDependency = dependencies[0] as TournamentNode;
-                        node.row = internalDependency.row  + 1;
+                        tournamentNodes[index].row = internalDependency.row  - 1;
                     }
+                    else {
+                        console.log("not found")
+                    }
+                }
+                else if (externalDependenciesLength === 0) {
+                    tournamentNodes[index].debug = "two internal dependencies";
+                    // どちらも内部依存ならば、上の試合の行数の平均
+                    const internalDependency1 = dependencies[0] as TournamentNode;
+                    const internalDependency2 = dependencies[1] as TournamentNode;
+                    tournamentNodes[index].row = Math.floor((internalDependency1.row + internalDependency2.row) / 2);
                 }
                 else if (externalDependenciesLength === 1) {
                     if ( "length" in dependencies[0] && !("length" in  dependencies[1])) {
                         // 0番目のチームが外部依存なら内部依存試合の上に出る
-                        node.debug = "one external dependency 1";
+                        tournamentNodes[index].debug = "one external dependency 1";
                         const internalDependency = dependencies[1];
-                        node.row = internalDependency.row * 2 + 1;
+                        tournamentNodes[index].row = internalDependency.row * 2 + 1;
                     } else if ( "length" in dependencies[1]  &&  !("length" in  dependencies[0]) ) {
                         // 1番目のチームが外部依存なら内部依存試合の下に出る
-                        node.debug = "one external dependency 2";
+                        tournamentNodes[index].debug = "one external dependency 2";
                         const internalDependency = dependencies[0];
-                        node.row = internalDependency.row * 2 + 2;
+                        tournamentNodes[index].row = internalDependency.row * 2 + 2;
                     }
-                }
-                else if (externalDependenciesLength === 2) {
-                    node.debug = "two external dependencies";
-                    // どちらも内部依存ならば、上の試合の行数の平均
-                    const internalDependency1 = dependencies[0] as TournamentNode;
-                    const internalDependency2 = dependencies[1] as TournamentNode;
-                    node.row = Math.floor((internalDependency1.row + internalDependency2.row) / 2);
                 }
             } else { // 2つより多い場合
                 // 全ての依存先の行数の平均を取る
-                node.debug = "more than two dependencies";
+                tournamentNodes[index].debug = "more than two dependencies";
                 const internalDependencies = dependencies.filter(depNode => !("length" in depNode)) as TournamentNode[];
                 const sum = internalDependencies.reduce((acc, depNode) => acc + depNode.row, 0);
                 const average = Math.floor(sum / internalDependencies.length);
-                node.row = average * 2 + 1;
+                tournamentNodes[index].row = average * 2 + 1;
             }
     }
-
-    console.log('tournamentNodes', tournamentNodes);
 
 
     return {

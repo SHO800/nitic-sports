@@ -41,7 +41,7 @@ const TournamentTeamBox = ({displayStr, color}: { displayStr: string, color?: st
     }, []);
     return (
         <div
-            className={`flex justify-between items-center p-2 relative`}
+            className={`flex justify-between items-center p-2 relative h-10`}
             ref={boxRef}
         >
                           <span className="truncate max-w-[180px]">

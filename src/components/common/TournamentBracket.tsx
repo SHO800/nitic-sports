@@ -3,6 +3,7 @@ import {useData} from '@/hooks/data';
 import {buildTournamentBracket, TournamentData} from '@/utils/tournamentUtils';
 import {MatchPlan} from "@prisma/client";
 import TournamentBoxWrapper from "@/components/common/TournamentBoxWrapper";
+import {max} from "@floating-ui/utils";
 
 interface TournamentBracketProps {
     eventId: number;
@@ -55,33 +56,56 @@ export default function TournamentBracket({eventId, isFinal, relatedMatchPlans}:
             </div>
         );
     }
-
+    
+    const maxRowNum = max(...tournamentData.matches.map(value => value.row))
+    if (maxRowNum == Infinity) return <></>
+    
+    
+    
     return (
         <div className="w-full overflow-x-auto">
-            <div className="flex flex-row min-w-max pb-8">
+            {/*<div className="flex flex-row min-w-max pb-8">*/}
+            <div className="grid  min-w-[250px]  relative"
+                 style={{
+                     gridTemplateColumns: `repeat(${tournamentData.rounds}, 10em)`,
+                     gridTemplateRows: `40px repeat(${maxRowNum}, 80px)`
+                 }}
+            >
                 {Array.from({length: tournamentData.rounds}).map((_, roundIndex) => {
                     const roundNumber = roundIndex + 1;
                     const roundMatches = tournamentData.matches
                         .filter(match => match.round === roundNumber)
                         .sort((a, b) => a.position - b.position);
+                    const roundMatchesWithSpace = Array.from({length: maxRowNum}, (_,  index) => roundMatches.find(m => m.row -1 === index))
                     
+                    const a = roundMatchesWithSpace.map(match => {
+                        if (match) return <TournamentBoxWrapper key={`${eventId}-match-${match.matchId}`}
+                                                                roundNumber={roundNumber} match={match}
+                                                                boxStyle={{
+                                                                    gridColumn: roundNumber,
+                                                                    gridRow: match.row
+                                                                }}
+                        />
+                        else null
+                    })
 
-                    return (
-                        <div
-                            key={eventId+"-round-" + roundIndex}
-                            className="flex flex-col min-w-[250px] mr-12 relative"
-                            style={{
-                                marginTop: roundNumber > 1 ? `${Math.pow(2, 2 - roundNumber) * 3}rem` : '0'
-                            }}
-                        >
-                            <div className="flex flex-col space-y-2">
-                                {roundMatches.map(match => (
-                                    <TournamentBoxWrapper key={`${eventId}-match-${match.matchId}`}
-                                                          roundNumber={roundNumber} match={match}/>
-                                ))}
-                            </div>
-                        </div>
-                    );
+                    return a
+                        // <div
+                        //     key={eventId+"-round-" + roundIndex}
+                        //     className="flex flex-col min-w-[250px] mr-12 relative"
+                        //     style={{}}
+                        // >
+                            {/*<div className="flex flex-col space-y-2">*/}
+                            {/*    {roundMatchesWithSpace.map(match => {*/}
+                            {/*        if (match) return <TournamentBoxWrapper key={`${eventId}-match-${match.matchId}`}*/}
+                            {/*                              roundNumber={roundNumber} match={match}/>*/}
+                            {/*        else return <div className={"h-20"} ></div>*/}
+                            {/*    })}*/}
+                            {/*</div>*/}
+                    
+                            
+                    
+                        // </div>
                 })}
             </div>
         </div>
