@@ -1,49 +1,48 @@
 import React, {CSSProperties, useEffect, useRef, useState} from "react";
-import {TournamentNode} from "@/utils/tournamentUtils";
+import {implementsTournamentNode, TournamentNode} from "@/utils/tournamentUtils";
 import {useData} from "@/hooks/data";
 import TournamentTeamBox from "@/components/common/TournamentTeamBox";
 import TournamentLine from "@/components/common/TournamentLine";
-import clsx from "clsx";
 
-const TournamentBoxWrapper = ({roundNumber, match, boxStyle}: { roundNumber: number, match: TournamentNode, boxStyle: CSSProperties }) => {
+const TournamentBoxWrapper = ({roundNumber, match, boxStyle}: {
+    roundNumber: number,
+    match: TournamentNode,
+    boxStyle: CSSProperties
+}) => {
     const {getMatchDisplayStr} = useData();
 
     const matchBoxRef = useRef<HTMLDivElement | null>(null);
-    const [horizontalLineCoordinates, setHorizontalLineCoordinates] = useState({
+    const [afterHorizontalLineCoordinates, setAfterHorizontalLineCoordinates] = useState({
         startX: 0,
         startY: 0,
         endX: 0,
         endY: 0
     });
 
-    const [verticalLineCoordinates, setVerticalLineCoordinates] = useState({
+    const [afterVerticalLineCoordinates, setAfterVerticalLineCoordinates] = useState({
         startX: 0,
         startY: 0,
         endX: 0,
         endY: 0
     });
+    
 
 
     useEffect(() => {
         //     監視
         const observer = new ResizeObserver(() => {
-            if (matchBoxRef.current ) {
+            if (matchBoxRef.current) {
                 const box = matchBoxRef.current.getBoundingClientRect();
                 const childCount = matchBoxRef.current.childElementCount;
-                
-                
-                const startX = box.width + 10;
-                const endX = box.width + 12;
-                const startY =  box.height  / childCount - 2; // 2は太さ
-                const endY = box.height * ( childCount - 1) / childCount - 2;
 
-                setVerticalLineCoordinates({startX, startY, endX, endY});
+
+                const startX = box.width;
+                const startY = box.height / childCount - 2; // 2は太さ
+                const endX = box.width + box.height / childCount;
+                const endY = box.height / (childCount-1) - 2;
+
+                setAfterVerticalLineCoordinates({startX, startY, endX, endY});
                 
-                const horizontalStartX = box.width + 12;
-                const horizontalEndX = box.width + 24;
-                const horizontalStartY = box.height / 2 - 2;
-                const horizontalEndY = box.height / 2 + 2;
-                setHorizontalLineCoordinates({startX: horizontalStartX, startY: horizontalStartY, endX: horizontalEndX, endY: horizontalEndY});
             }
         });
 
@@ -61,12 +60,12 @@ const TournamentBoxWrapper = ({roundNumber, match, boxStyle}: { roundNumber: num
 
     return (
         <div
-            className={"h-20 relative"}
+            className={"h-20 relative pl-14"}
             style={boxStyle}
         >
             {match.matchId && (
                 <div className="text-md text-gray-500 mb-1 absolute translate-y-[-100%]">
-                    <p>{match.matchPlan.matchName ?? `Match #${match.matchId}`}{match.row}
+                    <p>{match.matchPlan.matchName} {`#${match.matchId}`} @{match.row}
                         {match.matchPlan.matchNote && (
                             <span
                                 className="ml-2 text-gray-400">{match.matchPlan.matchNote}</span>
@@ -74,29 +73,43 @@ const TournamentBoxWrapper = ({roundNumber, match, boxStyle}: { roundNumber: num
                     </p>
                 </div>
             )}
-            
+
             <div className="border border-gray-200 rounded relative shadow-sm " ref={matchBoxRef}>
                 {match.premiseNode?.map((child, idx) => (
+                    <>
                     <TournamentTeamBox key={`team-${idx}-${match.matchId}`}
                                        displayStr={getMatchDisplayStr(match.teamIds[idx])} color={"#000000"}/>
+                        {
+                            implementsTournamentNode(child) && 
+                            <div key={`team-${idx}-${match.matchId}-div`} className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
+                                
+                            </div>
+                        }
 
+                    </>
                 ))}
-            <TournamentLine startX={verticalLineCoordinates.startX}
-                            startY={verticalLineCoordinates.startY}
-                            endX={verticalLineCoordinates.endX}
-                            endY={verticalLineCoordinates.endY}
-                            isVertical={true}
-                            color={"#000000"}
-                            thickness={2}
-                             />
-                <TournamentLine startX={horizontalLineCoordinates.startX}
-                                startY={horizontalLineCoordinates.startY}
-                                endX={horizontalLineCoordinates.endX}
-                                endY={horizontalLineCoordinates.endY}
-                                isVertical={false}
-                                color={"#000000"}
-                                thickness={2}
-                />
+                {/*<TournamentLine startX={afterVerticalLineCoordinates.startX}*/}
+                {/*                startY={afterVerticalLineCoordinates.startY}*/}
+                {/*                endX={afterVerticalLineCoordinates.endX}*/}
+                {/*                endY={afterVerticalLineCoordinates.endY}*/}
+                {/*                isVertical={true}*/}
+                {/*                color={"#000000"}*/}
+                {/*                thickness={2}*/}
+                {/*/>*/}
+                {/*<TournamentLine startX={afterHorizontalLineCoordinates.startX}*/}
+                {/*                startY={afterHorizontalLineCoordinates.startY}*/}
+                {/*                endX={afterHorizontalLineCoordinates.endX}*/}
+                {/*                endY={afterHorizontalLineCoordinates.endY}*/}
+                {/*                isVertical={false}*/}
+                {/*                color={"#000000"}*/}
+                {/*                thickness={2}*/}
+                {/*/>*/}
+                <TournamentLine startX={afterVerticalLineCoordinates.startX}
+                                startY={afterVerticalLineCoordinates.startY} 
+                                endX={afterVerticalLineCoordinates.endX}
+                                endY={afterVerticalLineCoordinates.endY}
+                                type={"RT"}
+                                 color={"#000000"} thickness={2} />
             </div>
         </div>
     )

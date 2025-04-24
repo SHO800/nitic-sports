@@ -12,6 +12,19 @@ export type TournamentNode = {
     premiseNode?: [TournamentNode | string[] | null, TournamentNode | string[] | null]; // 前提とする試合のノードまたは前提とする試合を含むId
 }
 
+export const implementsTournamentNode = (obj: any): obj is TournamentNode => {
+    return (
+        obj &&
+        typeof obj.matchId === 'number' &&
+        obj.teamIds && 
+        Array.isArray(obj.teamIds) &&
+        typeof obj.round === 'number' &&
+        typeof obj.row === 'number' &&
+        typeof obj.position === 'number' &&
+        (obj.premiseNode === undefined || Array.isArray(obj.premiseNode))
+    );
+}
+
 export interface TournamentData {
     rounds: number;
     matches: TournamentNode[];
@@ -99,10 +112,12 @@ export const  buildTournamentBracket = (
                     if (dependencies.indexOf(dependencies[0]) === 0) {
                         //上側依存なら下向きに出る
                         tournamentNodes[index].row = internalDependency.row  + 1;
+                        tournamentNodes[index].debug = "one dependency 1";
                     }
                     else if (dependencies.indexOf(dependencies[0]) > 0) {
                         //下側依存なら上向きに出る
                         tournamentNodes[index].row = internalDependency.row  - 1;
+                        tournamentNodes[index].debug = "one dependency 2";
                     }
                     else {
                         console.log("not found")
@@ -120,12 +135,12 @@ export const  buildTournamentBracket = (
                         // 0番目のチームが外部依存なら内部依存試合の上に出る
                         tournamentNodes[index].debug = "one external dependency 1";
                         const internalDependency = dependencies[1];
-                        tournamentNodes[index].row = internalDependency.row * 2 + 1;
+                        tournamentNodes[index].row = internalDependency.row -1;
                     } else if ( "length" in dependencies[1]  &&  !("length" in  dependencies[0]) ) {
                         // 1番目のチームが外部依存なら内部依存試合の下に出る
                         tournamentNodes[index].debug = "one external dependency 2";
                         const internalDependency = dependencies[0];
-                        tournamentNodes[index].row = internalDependency.row * 2 + 2;
+                        tournamentNodes[index].row = internalDependency.row +1 ;
                     }
                 }
             } else { // 2つより多い場合

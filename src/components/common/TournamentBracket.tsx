@@ -67,8 +67,8 @@ export default function TournamentBracket({eventId, isFinal, relatedMatchPlans}:
             {/*<div className="flex flex-row min-w-max pb-8">*/}
             <div className="grid  min-w-[250px]  relative"
                  style={{
-                     gridTemplateColumns: `repeat(${tournamentData.rounds}, 10em)`,
-                     gridTemplateRows: `40px repeat(${maxRowNum}, 80px)`
+                     gridTemplateColumns: `repeat(${tournamentData.rounds}, 224px)`,
+                     gridTemplateRows: `repeat(${maxRowNum}, 80px)`
                  }}
             >
                 {Array.from({length: tournamentData.rounds}).map((_, roundIndex) => {
@@ -77,8 +77,8 @@ export default function TournamentBracket({eventId, isFinal, relatedMatchPlans}:
                         .filter(match => match.round === roundNumber)
                         .sort((a, b) => a.position - b.position);
                     const roundMatchesWithSpace = Array.from({length: maxRowNum}, (_,  index) => roundMatches.find(m => m.row -1 === index))
-                    
-                    const a = roundMatchesWithSpace.map(match => {
+
+                    return roundMatchesWithSpace.map(match => {
                         if (match) return <TournamentBoxWrapper key={`${eventId}-match-${match.matchId}`}
                                                                 roundNumber={roundNumber} match={match}
                                                                 boxStyle={{
@@ -88,8 +88,6 @@ export default function TournamentBracket({eventId, isFinal, relatedMatchPlans}:
                         />
                         else null
                     })
-
-                    return a
                         // <div
                         //     key={eventId+"-round-" + roundIndex}
                         //     className="flex flex-col min-w-[250px] mr-12 relative"

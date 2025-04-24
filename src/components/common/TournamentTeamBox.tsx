@@ -47,14 +47,14 @@ const TournamentTeamBox = ({displayStr, color}: { displayStr: string, color?: st
                           <span className="truncate max-w-[180px]">
             {displayStr}
                           </span>
-            <TournamentLine startX={lineCoordinates.startX}
-                            startY={lineCoordinates.startY}
-                            endX={lineCoordinates.endX}
-                            endY={lineCoordinates.endY}
-                            isVertical={false}
-                            color={color}
-                            thickness={2}
-            />
+            {/*<TournamentLine startX={lineCoordinates.startX}*/}
+            {/*                startY={lineCoordinates.startY}*/}
+            {/*                endX={lineCoordinates.endX}*/}
+            {/*                endY={lineCoordinates.endY}*/}
+            {/*                isVertical={false}*/}
+            {/*                color={color}*/}
+            {/*                thickness={2}*/}
+            {/*/>*/}
         </div>
     )
 }
