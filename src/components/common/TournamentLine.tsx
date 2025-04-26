@@ -82,7 +82,8 @@ export const TournamentLine: React.FC<TournamentLineProps> = ({
                     top: `${startY}px`,
                     width: `${endX - startX}px`,
                     height: `${endY - startY}px`,
-                    backgroundColor: color,
+                    boxShadow: `-${thickness}px ${thickness}px #000000 inset`,
+                    backgroundColor: "white",
                     
                     
                 }}
