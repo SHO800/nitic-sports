@@ -24,7 +24,7 @@ const MatchResult = ({matchPlan, matchResults, getMatchDisplayStr}: MatchResultP
                         <p key={"score" + index} className="text-black ml-2">
                             {`${getMatchDisplayStr(teamId.toString())}:${matchResult.matchScores[index]}`}
                             {matchResult.winnerTeamId === teamId ? (
-                                <span className="ml-1"> ☆ </span>
+                                <span className="ml-1"> ○ </span>
                                 
                             ) : null}
                         </p>

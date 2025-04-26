@@ -128,6 +128,47 @@ export const useData = () => {
         return team ? `${team.name} ` : '';
     }, [teams, events, matchPlans, matchResults, hasRequiredData]);
     
+    const getActualTeamIdByVariableId = useCallback((variableId: string): number|null => {
+        if (!hasRequiredData() || !variableId.startsWith("$")) return null;
+
+        const variableTeamIdData = analyzeVariableTeamId(variableId);
+        if (!variableTeamIdData) return null;
+
+        if (variableTeamIdData.type === "T") {
+            const matchPlan = matchPlans!.find((mp) => mp.id === variableTeamIdData.matchId);
+            if (!matchPlan) return null;
+
+            const matchResult = matchResults![variableTeamIdData.matchId];
+            if (!matchResult) return null;
+
+            return variableTeamIdData.condition === "W" ? matchResult.winnerTeamId : matchResult.loserTeamId;
+        }
+
+        if (variableTeamIdData.type === "L") {
+            const event = events!.find((e) => e.id === variableTeamIdData.eventId);
+            if (!event) return null;
+
+            const teamData = event.teamData as unknown as TeamData[];
+            if (!teamData) return null;
+
+            const teamDataIndex = variableTeamIdData.teamDataIndex;
+            const blockName = variableTeamIdData.blockName;
+            const expectedRank = variableTeamIdData.expectedRank;
+
+            if (teamData[teamDataIndex].type !== "league") return null;
+
+            const block = teamData[teamDataIndex].blocks[blockName];
+            if (!block) return null;
+
+            const blockTeam = block.find((t) => t.rank === expectedRank);
+            if (!blockTeam) return null;
+
+            return Number(blockTeam.teamId);
+        }
+
+        return null;
+    }, [matchPlans, matchResults, events, hasRequiredData]);
+    
     const getBlockMatches = useCallback((eventId: number, blockName: string, block: { teamId: string }[]): MatchPlan[] => {
         if (!hasRequiredData()) return [];
         if (!blockName) return [];
@@ -267,6 +308,7 @@ export const useData = () => {
         // 最適化したヘルパー関数
         getBlockMatches,
         getMatchDisplayStr,
+        getActualTeamIdByVariableId,
         isFixedMatchResult: isFixedMatchResultByMatchId,
         isFixedMatchResultOrBlockRankByVariableId,
         searchMatchPlanByVariableId,

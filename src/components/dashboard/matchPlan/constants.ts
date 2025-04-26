@@ -1,5 +1,3 @@
-import {Status} from "@prisma/client";
-
 export const statusNames = {
     Waiting: "前提試合待機中",
     Preparing: "開始待機中",

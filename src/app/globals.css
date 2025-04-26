@@ -12,3 +12,16 @@ body {
     font-family: var(--font-noto-sans-jp), serif;
     font-size: 16px;
 }
+
+.stroke-dashoffset-1 {
+    animation: stroke-dashoffset-animation 0.5s ease-in forwards ;
+}
+.stroke-dashoffset-2 {
+    animation: stroke-dashoffset-animation 0.5s ease-out forwards 0.5s ;
+}
+
+@keyframes stroke-dashoffset-animation {
+    100% {
+        stroke-dashoffset: 0;
+    }
+}

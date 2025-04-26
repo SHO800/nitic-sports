@@ -11,7 +11,8 @@ export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan
         mutateMatchResults,
         getMatchDisplayStr,
         getLeagueDataByVariableId,
-        isFixedMatchResultOrBlockRankByVariableId
+        isFixedMatchResultOrBlockRankByVariableId,
+        getActualTeamIdByVariableId
     } = useData()
 
     
@@ -123,7 +124,10 @@ export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan
                 >
                     {/*チームごとに枠を用意*/}
                     {
-                        matchPlan.teamIds.map((teamId, index) => (
+                        matchPlan.teamIds.map((teamId, index) => {
+                            const actualTeamId = getActualTeamIdByVariableId(teamId)
+                            const ac = actualTeamId ? actualTeamId.toString() : teamId
+                        return (
                             <div key={"matchResultTeam" + index}>
                                 {getMatchDisplayStr(teamId)}: <input
                                 type='text'
@@ -141,15 +145,15 @@ export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan
                                 value={actualMatchScores[index] || ""}
                             />
                                 <input type="radio" name={"matchResultWinner-" + matchPlan.id}
-                                       id={`matchResult-${matchPlan.id}-${index}`} required value={teamId}
+                                       id={`matchResult-${matchPlan.id}-${index}`} required value={ac}
                                        disabled={!canInput}
                                        onChange={(e) => {
                                            setActualWinnerTeamId(Number(e.target.value))
                                        }}
-                                        checked={actualWinnerTeamId === Number(teamId)}
+                                        checked={actualWinnerTeamId === Number(ac)}
                                 />
                             </div>
-                        ))
+                        )})
 
                     }
                     <button

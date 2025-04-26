@@ -1,9 +1,11 @@
-import React, {useMemo} from 'react';
+import React, {useMemo, useEffect} from 'react';
 import {useData} from '@/hooks/data';
 import {buildTournamentBracket, TournamentData} from '@/utils/tournamentUtils';
-import {MatchPlan} from "@prisma/client";
+import {MatchPlan, MatchResult} from "@prisma/client";
 import TournamentBoxWrapper from "@/components/common/TournamentBoxWrapper";
 import {max} from "@floating-ui/utils";
+import {processRoundMatches} from "@/utils/tournamentBracketUtils";
+import {TournamentBracketProvider, useTournamentBracket} from '@/contexts/TournamentBracketContext';
 
 interface TournamentBracketProps {
     eventId: number;
@@ -11,6 +13,52 @@ interface TournamentBracketProps {
     relatedMatchPlans: MatchPlan[];
 }
 
+// 内部コンポーネント：TournamentBracketProviderの中で使用
+function TournamentBracketContent({
+    eventId,
+    tournamentData,
+    maxRound,
+    maxRowNum,
+    processedRounds,
+    matchResults
+}: {
+    eventId: number;
+    tournamentData: TournamentData;
+    maxRound: number,
+    maxRowNum: number;
+    processedRounds: ReturnType<typeof processRoundMatches>;
+    matchResults?: Record<string, MatchResult>;
+}) {
+
+    
+    return (
+        <div className="w-full overflow-x-auto">
+            <div className="grid min-w-[250px] relative"
+                 style={{
+                     gridTemplateColumns: `repeat(${tournamentData.rounds}, 224px)`,
+                     gridTemplateRows: `repeat(${maxRowNum}, 80px)`
+                 }}
+            >
+                {processedRounds.map(({ roundNumber, roundMatchesWithSpace }) => {
+                    return roundMatchesWithSpace.map(match => {
+                        if (match) return <TournamentBoxWrapper key={`${eventId}-match-${match.matchId}`}
+                                                                isFinal={maxRound-1 <= roundNumber}
+                                                                roundNumber={roundNumber} 
+                                                                match={match}
+                                                                boxStyle={{
+                                                                    gridColumn: roundNumber,
+                                                                    gridRow: match.row
+                                                                }}
+                                                                matchResult={matchResults && matchResults[match.matchId]}
+                        />
+                    })
+                })}
+            </div>
+        </div>
+    );
+}
+
+// メインコンポーネント
 export default function TournamentBracket({eventId, isFinal, relatedMatchPlans}: Readonly<TournamentBracketProps>) {
     const {
         events,
@@ -18,6 +66,7 @@ export default function TournamentBracket({eventId, isFinal, relatedMatchPlans}:
         matchPlanLoading,
         matchPlans,
         matchResultLoading,
+        matchResults,
         teams,
         teamLoading,
     } = useData();
@@ -56,56 +105,24 @@ export default function TournamentBracket({eventId, isFinal, relatedMatchPlans}:
             </div>
         );
     }
-    
+    const maxRound = tournamentData.rounds;
     const maxRowNum = max(...tournamentData.matches.map(value => value.row))
     if (maxRowNum == Infinity) return <></>
     
-    
+    // 切り分けたユーティリティ関数を使用
+    // 空白列も追加
+    const processedRounds = [...processRoundMatches(tournamentData, maxRowNum), {roundNumber: 6, roundMatchesWithSpace: Array.from({length: maxRowNum})}];
     
     return (
-        <div className="w-full overflow-x-auto">
-            {/*<div className="flex flex-row min-w-max pb-8">*/}
-            <div className="grid  min-w-[250px]  relative"
-                 style={{
-                     gridTemplateColumns: `repeat(${tournamentData.rounds}, 224px)`,
-                     gridTemplateRows: `repeat(${maxRowNum}, 80px)`
-                 }}
-            >
-                {Array.from({length: tournamentData.rounds}).map((_, roundIndex) => {
-                    const roundNumber = roundIndex + 1;
-                    const roundMatches = tournamentData.matches
-                        .filter(match => match.round === roundNumber)
-                        .sort((a, b) => a.position - b.position);
-                    const roundMatchesWithSpace = Array.from({length: maxRowNum}, (_,  index) => roundMatches.find(m => m.row -1 === index))
-
-                    return roundMatchesWithSpace.map(match => {
-                        if (match) return <TournamentBoxWrapper key={`${eventId}-match-${match.matchId}`}
-                                                                roundNumber={roundNumber} match={match}
-                                                                boxStyle={{
-                                                                    gridColumn: roundNumber,
-                                                                    gridRow: match.row
-                                                                }}
-                        />
-                        else null
-                    })
-                        // <div
-                        //     key={eventId+"-round-" + roundIndex}
-                        //     className="flex flex-col min-w-[250px] mr-12 relative"
-                        //     style={{}}
-                        // >
-                            {/*<div className="flex flex-col space-y-2">*/}
-                            {/*    {roundMatchesWithSpace.map(match => {*/}
-                            {/*        if (match) return <TournamentBoxWrapper key={`${eventId}-match-${match.matchId}`}*/}
-                            {/*                              roundNumber={roundNumber} match={match}/>*/}
-                            {/*        else return <div className={"h-20"} ></div>*/}
-                            {/*    })}*/}
-                            {/*</div>*/}
-                    
-                            
-                    
-                        // </div>
-                })}
-            </div>
-        </div>
+        <TournamentBracketProvider>
+            <TournamentBracketContent
+                eventId={eventId}
+                tournamentData={tournamentData}
+                maxRound={maxRound}
+                maxRowNum={maxRowNum}
+                processedRounds={processedRounds}
+                matchResults={matchResults}
+            />
+        </TournamentBracketProvider>
     );
 }

@@ -97,6 +97,7 @@ export async function POST(
             })
             
             // 試合結果に基づいてリーグ順位を更新
+            
             try {
                 const updated = await updateLeagueRankings(matchPlan.eventId, matchId);
                 console.log(`リーグ順位更新: ${updated ? '成功' : '不要または失敗'}`);
