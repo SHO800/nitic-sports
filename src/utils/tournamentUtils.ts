@@ -30,6 +30,8 @@ export interface TournamentData {
     rounds: number;
     matches: TournamentNode[];
     teamMap: Record<number, { name: string; color?: string }>;
+    matchPlanRange: MatchPlanRange
+    
 }
 
 
@@ -153,7 +155,8 @@ export const buildTournamentBracket = (
     return {
         rounds,
         matches: tournamentNodes,
-        teamMap
+        teamMap,
+        matchPlanRange: tournamentData.matchPlanIdRange!        
     };
 }
 

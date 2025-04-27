@@ -56,6 +56,7 @@ interface LeagueTeamData extends BaseTeamData {
 interface TournamentTeamData extends BaseTeamData {
   type: 'tournament';
   teams: TeamInfo[];
+  seedLowerFlag?: boolean; // シードがある場合、trueなら下側に、falseなら上側にチームを配置
 }
 
 // 共用体型として定義（discriminated union）

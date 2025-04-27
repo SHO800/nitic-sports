@@ -73,17 +73,8 @@ const TournamentBoxWrapper = ({isFinal, roundNumber, match, boxStyle, matchResul
         const rowDiff = nextRow - currentRow;
         const currentRound = match.round;
         const nextRound = nextNode.round;
-        // const rowSpan = Math.abs(rowDiff) + 1;
         const roundDiff = nextRound - currentRound;
-
-        let type: "H" | "V" | "LT" | "RT" | "LB" | "RB";
-        if (rowDiff === 0) {
-            type = "H";
-        } else if (rowDiff > 0) {
-            type = "V";
-        } else {
-            type = "H";
-        }
+        
         const nextNodeTargetRowIndex = nextNode.premiseNode?.findIndex(nextNodePremise => {
             if (implementsTournamentNode(nextNodePremise)) {
                 return nextNodePremise.matchId === match.matchId;

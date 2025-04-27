@@ -5,6 +5,7 @@ import TournamentBracket from '@/components/common/TournamentBracket';
 import LeagueTable from '@/components/common/LeagueTable';
 import {useData} from '@/hooks/data';
 import {MatchPlan} from "@prisma/client";
+import TournamentTable from "@/components/common/tournamentTable/TournamentTable";
 
 const Bracket = ({eventId, matchPlans}: { eventId: number, matchPlans: MatchPlan[] }) => {
 
@@ -133,12 +134,18 @@ const Bracket = ({eventId, matchPlans}: { eventId: number, matchPlans: MatchPlan
                 <div className="bg-white rounded-lg shadow-md p-6 overflow-hidden">
                     
                     {currentType === 'tournament' && (
-                        <TournamentBracket
-                            key={`bracket-tournament-${eventId}`}
-                            eventId={eventId}
-                            isFinal={isFinal}
-                            relatedMatchPlans={relatedMatchPlans}
-                        />
+                        // <TournamentBracket
+                        //     key={`bracket-tournament-${eventId}`}
+                        //     eventId={eventId}
+                        //     isFinal={isFinal}
+                        //     relatedMatchPlans={relatedMatchPlans}
+                        // />
+                        <TournamentTable
+                                key={`bracket-tournament-${eventId}`}
+                                eventId={eventId}
+                                isFinal={isFinal}
+                                relatedMatchPlans={relatedMatchPlans}
+                            />
                     )}
 
                     {currentType === 'league' && teamData?.type === "league" && teamData.blocks && (
