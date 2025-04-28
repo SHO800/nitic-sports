@@ -11,7 +11,7 @@ export function processRoundMatches(tournamentData: TournamentData, maxRowNum: n
     
     return Array.from({length: tournamentData.rounds}).map((_, roundIndex) => {
         const roundNumber = roundIndex + 1;
-        const roundMatches = tournamentData.matches
+        const roundMatches = tournamentData.nodes
             .filter(match => match.round === roundNumber)
             .sort((a, b) => a.position - b.position);
 

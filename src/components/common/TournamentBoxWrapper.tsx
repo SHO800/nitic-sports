@@ -1,5 +1,5 @@
 import React, {CSSProperties, Fragment, useCallback, useEffect, useMemo, useRef, useState} from "react";
-import {implementsTournamentNode, TournamentNode} from "@/utils/tournamentUtils";
+import {implementsTournamentNode, TournamentMatchNode} from "@/utils/tournamentUtils";
 import {useData} from "@/hooks/data";
 import TournamentTeamBox from "@/components/common/TournamentTeamBox";
 import {MatchResult} from "@prisma/client";
@@ -10,7 +10,7 @@ import analyzeVariableTeamId from "@/utils/analyzeVariableTeamId";
 const TournamentBoxWrapper = ({isFinal, roundNumber, match, boxStyle, matchResult}: {
     isFinal: boolean,
     roundNumber: number,
-    match: TournamentNode,
+    match: TournamentMatchNode,
     boxStyle: CSSProperties,
     matchResult?: MatchResult
 }) => {

@@ -89,81 +89,67 @@ const TournamentTable = ({eventId, isFinal, relatedMatchPlans}: Readonly<Tournam
 
     // 参加チームを取得
     // このトーナメントに関わるチームを取得
-    const teamsInTournament = tournamentData.matches
-        .map(match => match.teamIds)
-        .flat()  // teamIdsだけ抽出
-        .filter((teamId, index, self) => self.indexOf(teamId) === index) // 重複を排除
-        .filter((teamId) => {
-            // もし解析したときにこのトーナメント内に依存しているチームidなら除外
-            const at = analyzeVariableTeamId(teamId);
-            if (!at || at.type !== "T") return true;
-            if (tournamentData.matchPlanRange) {
-                const range = tournamentData.matchPlanRange;
-                if (range.start <= at.matchId && at.matchId <= range.end || (range.additional && at.matchId in range.additional)) {
-                    return false;
-                }
-            }
-            // atがnull(直接チームid指定)だったりリーグの結果依存だったりこのトーナメント依存でないならばok
-            return true;
-        })
-    const maxRowNum = teamsInTournament.length*2;
-    
-    const processedRounds = Array.from({length: tournamentData.rounds})
-        .map((_, roundIndex) => {
-            const roundNumber = roundIndex + 1;
-            const roundMatches = tournamentData.matches
-                .filter(match => match.round === roundNumber)
-                .sort((a, b) => a.position - b.position);
+    const maxRowNum = tournamentData.teamIds.length * 2;
 
-            const roundMatchesWithSpace = Array.from(
-                {length: maxRowNum},
-                (_, index) => roundMatches.find(m => m.row - 1 === index)
-            );
-
-            return {
-                roundNumber,
-                roundMatchesWithSpace
-            };
-        })
-    
-    
-    let tournamentTeams: string[] = [] 
-    if (processedRounds[0]) {
-        tournamentTeams = processedRounds[0].roundMatchesWithSpace.filter(team => !!team).flatMap(team => team?.teamIds)
-        for (let i = 1; i < processedRounds.length; i++) {
-            processedRounds[i].roundMatchesWithSpace
-                .filter(node => !!node)
-                .forEach((node) => {
-                    const premise = node?.premiseNode
-                    if (!premise) return
-                    const dependIdx = premise.findIndex(node => implementsTournamentNode(node))
-                    if (dependIdx === -1 || dependIdx === undefined) return;
-
-                    const depend = premise[dependIdx] as TournamentNode // トーナメント内に依存しているノードを探しているのでstringは除外
-                    const rawTeam = node.teamIds.filter(teamId => teamsInTournament.includes(teamId))
-
-                    if (depend && rawTeam.length > 0) {
-                        if (dependIdx < premise.length/2) { // 上半分が依存やつなら
-                            //     下側に出る
-                            const idx = tournamentTeams.findLastIndex(teamId => depend.teamIds.includes(teamId))
-                            if (idx) tournamentTeams.splice(idx+rawTeam.length, 0, ...rawTeam);
-                        } else {
-                            // 上側に出る
-                            const idx = tournamentTeams.findIndex(teamId => depend.teamIds.includes(teamId))
-                            if (idx) tournamentTeams.splice(idx, 0, ...rawTeam)
+    // const processedRounds = Array.from({length: tournamentData.rounds})
+    //     .map((_, roundIndex) => {
+    //         const roundNumber = roundIndex + 1;
+    //         const roundMatches = tournamentData.matches
+    //             .filter(match => match.column === roundNumber)
+    //             .sort((a, b) => a.row - b.row);
+    //
+    //         const roundMatchesWithSpace = Array.from(
+    //             {length: maxRowNum},
+    //             (_, index) => roundMatches.find(m => m.row - 1 === index)
+    //         );
+    //
+    //         return {
+    //             roundNumber,
+    //             roundMatchesWithSpace
+    //         };
+    //     })
 
 
-                        }
-                    }
-                })
-        }
-    }
-    
+    let tournamentTeams: string[] = []
+    // if (processedRounds[0]) {
+    //
+    //     tournamentTeams = processedRounds[0].roundMatchesWithSpace.filter(team => !!team && team.type === "match").flatMap(team => team?.tournamentMatchNode.teamIds)
+    //     for (let i = 1; i < processedRounds.length; i++) {
+    //         processedRounds[i].roundMatchesWithSpace
+    //             .filter(node => !!node)
+    //             .forEach((node) => {
+    //                 if (node?.type !== "match") return
+    //                 const premise = node?.tournamentMatchNode.premiseNode
+    //                 if (!premise) return
+    //                 const dependIdx = premise.findIndex(node => implementsTournamentNode(node))
+    //                 if (dependIdx === -1 || dependIdx === undefined) return;
+    //
+    //                 const depend = premise[dependIdx] as TournamentNode // トーナメント内に依存しているノードを探しているのでstringは除外
+    //                 const rawTeam = node.tournamentMatchNode.teamIds.filter(teamId => tournamentTeams.includes(teamId))
+    //
+    //                 if (depend && rawTeam.length > 0) {
+    //                     if (dependIdx < premise.length / 2) { // 上半分が依存やつなら
+    //                         //     下側に出る
+    //                         const idx = tournamentTeams.findLastIndex(teamId => depend.type === "match" && depend.tournamentMatchNode.teamIds.includes(teamId))
+    //                         if (idx) tournamentTeams.splice(idx + rawTeam.length, 0, ...rawTeam);
+    //                     } else {
+    //                         // 上側に出る
+    //                         const idx = tournamentTeams.findIndex(teamId => depend.type === "match" && depend.tournamentMatchNode.teamIds.includes(teamId))
+    //                         if (idx) tournamentTeams.splice(idx, 0, ...rawTeam)
+    //
+    //
+    //                     }
+    //                 }
+    //             })
+    //     }
+    // }
+
     const tournamentTeamsWithSpace: (string | undefined)[] = [...tournamentTeams]
     // tournamentTeamsに余白を1行ずつ追加
-    for (let i = 0; i < maxRowNum-1; i++) {
+    for (let i = 0; i < maxRowNum - 1; i++) {
         tournamentTeamsWithSpace.splice(i * 2 + 1, 0, undefined);
     }
+    console.log("tournamentm", tournamentData.nodes)
     
     return (
         <div className="w-full overflow-x-auto">
@@ -173,23 +159,41 @@ const TournamentTable = ({eventId, isFinal, relatedMatchPlans}: Readonly<Tournam
                      gridTemplateRows: `repeat(${maxRowNum}, ${rowHeight}px)`
                  }}
             >
-                
-                {processedRounds.map(({roundNumber, roundMatchesWithSpace}) => {
-                    return roundMatchesWithSpace.map(match => {
-                        if (match) return <TournamentBoxWrapper key={`${eventId}-match-${match.matchId}`}
-                                                                isFinal={maxRound - 1 <= roundNumber}
-                                                                roundNumber={roundNumber}
-                                                                match={match}
-                                                                boxStyle={{
-                                                                    gridColumn: roundNumber,
-                                                                    gridRow: match.row
-                                                                }}
-                                                                matchResult={matchResults && matchResults[match.matchId]}
-                                                                boxNodes={boxNodes}
-                                                                registerNode={registerNode}
-                        />
+                {
+                    tournamentData.nodes.map(match => {
+                        return <div 
+                            key={"node-"+match.nodeId}
+                            style={{
+                                gridColumn: match.column,
+                                gridRow: match.row
+                            }}
+                            >
+                            {match.nodeId}
+                            {match.type}
+                        </div>
+                            
+                        
                     })
-                })}
+                }
+
+                
+                {/*{processedRounds.map(({roundNumber, roundMatchesWithSpace}) => {*/}
+                {/*    return roundMatchesWithSpace.map(match => {*/}
+                {/*        if (match?.type === "match") return <TournamentBoxWrapper*/}
+                {/*            key={`${eventId}-match-${match.matchId}`}*/}
+                {/*            isFinal={maxRound - 1 <= roundNumber}*/}
+                {/*            roundNumber={roundNumber}*/}
+                {/*            match={match}*/}
+                {/*            boxStyle={{*/}
+                {/*                gridColumn: roundNumber,*/}
+                {/*                gridRow: match.row*/}
+                {/*            }}*/}
+                {/*            matchResult={matchResults && matchResults[match.matchId]}*/}
+                {/*            boxNodes={boxNodes}*/}
+                {/*            registerNode={registerNode}*/}
+                {/*        />*/}
+                {/*    })*/}
+                {/*})}*/}
 
                 {/*{*/}
                 {/*    tournamentTeamsWithSpace.map((teamId, index) => {*/}
@@ -203,42 +207,42 @@ const TournamentTable = ({eventId, isFinal, relatedMatchPlans}: Readonly<Tournam
                 {/*                    gridColumn: 1,*/}
                 {/*                    gridRow: index+1*/}
                 {/*                }}*/}
-                
+
                 {/*            >*/}
                 {/*                <TournamentTeamBox*/}
                 {/*                    isFinal={false}*/}
                 {/*                    boxIndex={index * 2}*/}
                 {/*                    boxLength={0}*/}
                 {/*                    roundNumber={1}*/}
-                
+
                 {/*                    displayStr={getMatchDisplayStr(teamId.id)}*/}
                 {/*                    isWon={false}*/}
-                
+
                 {/*                />*/}
                 {/*            </div>*/}
                 {/*        )*/}
                 {/*    })*/}
                 {/*}*/}
 
-                {
-                    processedRounds.map(({roundNumber, roundMatchesWithSpace}) => {
-                        if (roundNumber === 1) return null;
-                        return roundMatchesWithSpace.map(match => {
-                            if (match) return (
-                                <div
-                                    key={"d-"+roundNumber+"-"+eventId+"-"+match.matchId}
-                                    className={"h-20 relative  bg-red-400 w-24"}
-                                    style={{
-                                        gridColumn: roundNumber,
-                                        gridRow: match.row*2
-                                    }}
-                                >
-                                    {match.teamIds}
-                                </div>
-                            )
-                        })
-                    })
-                }
+                {/*{*/}
+                {/*    processedRounds.map(({roundNumber, roundMatchesWithSpace}) => {*/}
+                {/*        // if (roundNumber === 1) return null;*/}
+                {/*        return roundMatchesWithSpace.map(match => {*/}
+                {/*            if (match?.type === "match") return (*/}
+                {/*                <div*/}
+                {/*                    key={"d-" + roundNumber + "-" + eventId + "-" + match.matchId}*/}
+                {/*                    className={"h-20 relative  bg-red-400 w-24"}*/}
+                {/*                    style={{*/}
+                {/*                        gridColumn: roundNumber,*/}
+                {/*                        gridRow: match.row * 2*/}
+                {/*                    }}*/}
+                {/*                >*/}
+                {/*                    {match.tournamentMatchNode.teamIds}*/}
+                {/*                </div>*/}
+                {/*            )*/}
+                {/*        })*/}
+                {/*    })*/}
+                {/*}*/}
 
             </div>
         </div>
@@ -286,7 +290,7 @@ const TournamentBoxWrapper = ({isFinal, roundNumber, match, boxStyle, matchResul
     // 現在のマッチを前提とする次のノード
     const nextNode = useMemo(() => {
         if (match.nextNode) {
-            return boxNodes[match.nextNode.matchId];
+            return boxNodes[match.nodeId];
         }
         return null;
     }, [match.nextNode, boxNodes]);
@@ -294,10 +298,10 @@ const TournamentBoxWrapper = ({isFinal, roundNumber, match, boxStyle, matchResul
 
     // このボックスのRefをコンテキストに登録
     useEffect(() => {
-        if (match.matchId && wrapperRef.current) {
-            registerNode(match.matchId, match)
+        if (match.nodeId && wrapperRef.current) {
+            registerNode(match.nodeId, match)
         }
-    }, [match, match.matchId, registerNode]);
+    }, [match, match.nodeId, registerNode]);
     // リサイズ時や初回レンダリング時に座標を再計算
     const calculateLineCoordinates = useCallback(() => {
 
@@ -314,20 +318,22 @@ const TournamentBoxWrapper = ({isFinal, roundNumber, match, boxStyle, matchResul
         const currentRow = match.row;
         const nextRow = nextNode.row;
         const rowDiff = nextRow - currentRow;
-        const currentRound = match.round;
-        const nextRound = nextNode.round;
+        const currentRound = match.column;
+        const nextRound = nextNode.column;
         const roundDiff = nextRound - currentRound;
 
-        const nextNodeTargetRowIndex = nextNode.premiseNode?.findIndex(nextNodePremise => {
-            if (implementsTournamentNode(nextNodePremise)) {
-                return nextNodePremise.matchId === match.matchId;
-            } else if (!nextNodePremise) {
-                return false;
-            } else {
-                for (const element of nextNodePremise) {
-                    const at = analyzeVariableTeamId(element)
-                    if (at?.type === "T" && at.matchId === match.matchId) {
-                        return true;
+        const nextNodeTargetRowIndex = nextNode.type === "team" ? undefined : nextNode.tournamentMatchNode.premiseNode?.findIndex(nextNodePremise => {
+            if (match.type === "match") { // 問題が起こったらあやしいところ
+                if (implementsTournamentNode(nextNodePremise)) {
+                    return nextNodePremise.type === "match" && (nextNodePremise.matchId === match.matchId);
+                } else if (!nextNodePremise) {
+                    return false;
+                } else {
+                    for (const element of nextNodePremise) {
+                        const at = analyzeVariableTeamId(element)
+                        if (at?.type === "T" && at.matchId === match.matchId) {
+                            return true;
+                        }
                     }
                 }
             }
@@ -357,7 +363,7 @@ const TournamentBoxWrapper = ({isFinal, roundNumber, match, boxStyle, matchResul
             endX: currentBoxRect.width + (rowWidth * (roundDiff - 1)) + 10 + 46,
             endY: rowHeight * rowDiff + teamBoxHeight * (nextNodeTargetRowIndex * 2 + 1),
         })
-    }, [nextNode, match.matchId, match.row, match.round]);
+    }, [nextNode, match, ]);
 
     // 次のノードとの接続線のための座標計算
     useEffect(() => {
@@ -376,7 +382,7 @@ const TournamentBoxWrapper = ({isFinal, roundNumber, match, boxStyle, matchResul
                     observer.unobserve(matchBoxRef.current);
                 }
             };
-        }, [nextNode, match.matchId, match.row, match.round, calculateLineCoordinates]
+        }, [nextNode, match, calculateLineCoordinates]
     );
 
     return (
@@ -385,28 +391,28 @@ const TournamentBoxWrapper = ({isFinal, roundNumber, match, boxStyle, matchResul
             style={boxStyle}
             ref={wrapperRef}
         >
-            {match.matchId && (
+            {match.type==="match" && match.matchId && (
                 <div className="text-md text-gray-500 mb-1 absolute translate-y-[-100%]">
-                    <p>{match.matchPlan.matchName} {`#${match.matchId}`} @{match.row}a
-                        {nextNode && nextNode.matchId}
-                        {match.matchPlan.matchNote && (
+                    <p>{match.tournamentMatchNode.matchPlan.matchName} {`#${match.matchId}`} @{match.row}a
+                        {nextNode && nextNode.type === "match" && nextNode.matchId}
+                        {match.tournamentMatchNode.matchPlan.matchNote && (
                             <span
-                                className="ml-2 text-gray-400">{match.matchPlan.matchNote}</span>
+                                className="ml-2 text-gray-400">{match.tournamentMatchNode.matchPlan.matchNote}</span>
                         )}
                     </p>
                 </div>
             )}
 
             <div className="border border-gray-200  rounded relative shadow-sm " ref={matchBoxRef}>
-                {match.premiseNode?.map((child, idx) => {
-                    let processedTeamId: string | number | null = getActualTeamIdByVariableId(match.teamIds[idx])
-                    if (!processedTeamId) processedTeamId = match.teamIds[idx].toString()
+                {match.type === "match" && match.tournamentMatchNode.premiseNode?.map((child, idx) => {
+                    let processedTeamId: string | number | null = getActualTeamIdByVariableId(match.tournamentMatchNode.teamIds[idx])
+                    if (!processedTeamId) processedTeamId = match.tournamentMatchNode.teamIds[idx].toString()
                     return (
                         <Fragment key={`team-${idx}-${match.matchId}-frag-${match.matchId}`}>
                             <TournamentTeamBox key={`team-${idx}-${match.matchId}`}
                                                isFinal={isFinal}
-                                               displayStr={getMatchDisplayStr(match.teamIds[idx])}
-                                               boxLength={match.teamIds.length}
+                                               displayStr={getMatchDisplayStr(match.tournamentMatchNode.teamIds[idx])}
+                                               boxLength={match.tournamentMatchNode.teamIds.length}
                                                boxIndex={idx}
                                                roundNumber={roundNumber}
                                                isWon={matchResult ? matchResult.winnerTeamId.toString() === processedTeamId.toString() : false}

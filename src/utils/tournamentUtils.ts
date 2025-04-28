@@ -1,19 +1,43 @@
 import {Event, MatchPlan, Team} from '@prisma/client';
 import analyzeVariableTeamId from "@/utils/analyzeVariableTeamId";
 
-export type TournamentNode = {
+export type TournamentMatchNode = {
     matchId: number;
     teamIds: string[]; // チームID
     matchPlan: MatchPlan;
-    round: number; // ラウンド数
-    row: number; // 行数
     debug?: string; // デバッグ用
     position: number; // 同じラウンド内での位置
-    premiseNode?: [TournamentNode | string[] | null, TournamentNode | string[] | null]; // 前提とする試合のノードまたは前提とする試合を含むId
-    nextNode?: TournamentNode | null; // 次の試合のノード
+    premiseNode?: (TournamentNode | string[] | null)[]; // 前提とする試合のノードまたは前提とする試合を含むId
+}
+
+export type TournamentNode = {
+    nodeId: number
+    type: "team"
+    teamId: string | number
+    row: number
+    column: number
+    nextNode?: TournamentNode | null
+} | {
+    nodeId: number
+    type: "match"
+    matchId: number
+    row: number
+    column: number
+    tournamentMatchNode: TournamentMatchNode
+    nextNode?: TournamentNode | null
 }
 
 export const implementsTournamentNode = (obj: any): obj is TournamentNode => {
+    return (
+        obj &&
+        typeof obj.nodeId === 'number' &&
+        (obj.type === 'team' || obj.type === 'match') &&
+        typeof obj.row === 'number' &&
+        typeof obj.column === 'number'
+    )
+}
+
+export const implementsTournamentMatchNode = (obj: any): obj is TournamentMatchNode => {
     return (
         obj &&
         typeof obj.matchId === 'number' &&
@@ -28,10 +52,11 @@ export const implementsTournamentNode = (obj: any): obj is TournamentNode => {
 
 export interface TournamentData {
     rounds: number;
-    matches: TournamentNode[];
+    nodes: TournamentNode[];
+    teamIds: string[];
     teamMap: Record<number, { name: string; color?: string }>;
     matchPlanRange: MatchPlanRange
-    
+
 }
 
 
@@ -72,92 +97,133 @@ export const buildTournamentBracket = (
     // トーナメントの深さ（ラウンド数）を計算
     const teamIds = tournamentData.teams ? tournamentData.teams.map(t => t.teamId) : [];
     const rounds = Math.ceil(Math.log2(teamIds.length || 1))
-
+    
+    const teamNodes = teamIds.map((teamId, index) => ({
+        type: "team",
+        nodeId: index,
+        teamId,
+        row: index*2+1,
+        column: 0,
+        
+    } as TournamentNode))
+    
     // トーナメントノードを構築
-    const tournamentNodes = constructTournament(
-        tournamentMatches, // 予選の試合プラン
+    let tournamentNodes = constructTournament(
+        tournamentMatches, // このトーナメントに関係している試合情報
         allMatchPlans,
+        teamNodes.length
     );
 
-    // トーナメントノードをソート
-    tournamentNodes.sort((a, b) => a.round - b.round || a.position - b.position);
+    
+    const nodes = [...teamNodes, ...tournamentNodes.filter(node => node.type === "match").sort((a, b) => a.column - b.column || a.tournamentMatchNode.position - b.tournamentMatchNode.position)]
     // 各ノードに行数を追加
 
-    // TODO: 準々決勝とかのrowの計算がうまく行っておらず全部2とかになる このnodeでのrowの更新がuseStateみたいに途中で行われないのかもしれない
-    // tournamentNodes.forEach((node, index) => {
-    for (let index = 0; index < tournamentNodes.length; index++) {
+    // チームの並びは最初に参加チームとして登場するときに並びを決める
+    // そこから依存ノードのチームidから検索する
+
+    // 準々決勝とかのrowの計算がうまく行っておらず全部2とかになる このnodeでのrowの更新がuseStateみたいに途中で行われないのかもしれない
+    // 个 各nodeに複製されたpremiseNodeを更新していたせいでtournamentNodesにある本体が更新されていなかったせい
+    for (let index = 0; index < nodes.length; index++) {
+        const node = nodes[index];
+        if (node.type === "team") continue
+         
         // 依存先
-        const dependenciesReplica = tournamentNodes[index].premiseNode?.filter((premise) => premise !== null)  // これは各Nodeに複製されたほうのNode, 最新のNodeではない
+        const dependenciesReplica = node.tournamentMatchNode.premiseNode?.filter((premise) => premise !== null)  // これは各Nodeに複製されたほうのNode, 最新のNodeではない
 
 
         if (!dependenciesReplica) {
-            tournamentNodes[index].row = index * 2 - 1;
-            tournamentNodes[index].debug = "cant find dep";
+            node.row = index * 2 - 1;
+            node.tournamentMatchNode.debug = "cant find dep";
             continue;
         }
         const dependencies = dependenciesReplica?.map((premise) => {
             if ("length" in premise) return premise
-            return tournamentNodes.find(value => value.matchId === premise?.matchId)
+            return nodes.find(value => value.type === "match" && premise.type === "match" && (value.matchId === premise.matchId))
         }).filter(value => value !== undefined)
 
         // トーナメント外依存先の数 string[]を含んでいる数
         const externalDependenciesLength = dependencies.filter(depNode => "length" in depNode).length
         if (dependencies.length === 0 || externalDependenciesLength >= 2) {
-            tournamentNodes[index].row = index * 2 + 1;
-            tournamentNodes[index].debug = "no dependencies";
+            node.row = index * 2 + 1;
+            node.tournamentMatchNode.debug = "no dependencies";
         } else if (dependencies.length < 3) {
             if (dependencies.length === 1) { // 片方のチームは固定, もう片方は動的な場合
-                tournamentNodes[index].debug = "one dependency";
+                node.tournamentMatchNode.debug = "one dependency";
                 const internalDependency = dependencies[0] as TournamentNode;
 
 
                 if (dependencies.indexOf(dependencies[0]) === 0) {
                     //上側依存なら下向きに出る
-                    tournamentNodes[index].row = internalDependency.row + 1;
-                    tournamentNodes[index].debug = "one dependency 1";
+                    node.row = internalDependency.row + 1;
+                    node.tournamentMatchNode.debug = "one dependency 1";
                 } else if (dependencies.indexOf(dependencies[0]) > 0) {
                     //下側依存なら上向きに出る
-                    tournamentNodes[index].row = internalDependency.row - 1;
-                    tournamentNodes[index].debug = "one dependency 2";
+                    node.row = internalDependency.row - 1;
+                    node.tournamentMatchNode.debug = "one dependency 2";
                 } else {
                     console.log("not found")
                 }
             } else if (externalDependenciesLength === 0) {
-                tournamentNodes[index].debug = "two internal dependencies";
+                node.tournamentMatchNode.debug = "two internal dependencies";
                 // どちらも内部依存ならば、上の試合の行数の平均
                 const internalDependency1 = dependencies[0] as TournamentNode;
                 const internalDependency2 = dependencies[1] as TournamentNode;
-                tournamentNodes[index].row = Math.floor((internalDependency1.row + internalDependency2.row) / 2);
+                node.row = Math.floor((internalDependency1.row + internalDependency2.row) / 2);
             } else if (externalDependenciesLength === 1) {
                 if ("length" in dependencies[0] && !("length" in dependencies[1])) {
                     // 0番目のチームが外部依存なら内部依存試合の上に出る
-                    tournamentNodes[index].debug = "one external dependency 1";
+                    node.tournamentMatchNode.debug = "one external dependency 1";
                     const internalDependency = dependencies[1];
-                    tournamentNodes[index].row = internalDependency.row - 1;
+                    node.row = internalDependency.row - 1;
                 } else if ("length" in dependencies[1] && !("length" in dependencies[0])) {
                     // 1番目のチームが外部依存なら内部依存試合の下に出る
-                    tournamentNodes[index].debug = "one external dependency 2";
+                    node.tournamentMatchNode.debug = "one external dependency 2";
                     const internalDependency = dependencies[0];
-                    tournamentNodes[index].row = internalDependency.row + 1;
+                    node.row = internalDependency.row + 1;
                 }
             }
         } else { // 2つより多い場合
             // 全ての依存先の行数の平均を取る
-            tournamentNodes[index].debug = "more than two dependencies";
+            node.tournamentMatchNode.debug = "more than two dependencies";
             const internalDependencies = dependencies.filter(depNode => !("length" in depNode)) as TournamentNode[];
             const sum = internalDependencies.reduce((acc, depNode) => acc + depNode.row, 0);
             const average = Math.floor(sum / internalDependencies.length);
-            tournamentNodes[index].row = average * 2 + 1;
+            node.row = average * 2 + 1;
         }
     }
 
 
     return {
         rounds,
-        matches: tournamentNodes,
+        nodes,
+        teamIds,
         teamMap,
-        matchPlanRange: tournamentData.matchPlanIdRange!        
+        matchPlanRange: tournamentData.matchPlanIdRange!
     };
+}
+
+function searchTeamOrMatchRows(
+    nodes: TournamentNode[],
+    searchNodes: (TournamentNode | string[])[]
+): TournamentNode[] {
+    const foundNodes: TournamentNode[] = [];
+    searchNodes.forEach(searchNode => {
+        if ("length" in searchNode) { // string[]
+            searchNode.forEach(teamId => { // 各チームIdについて, それが素のnumberなら直接teamNode, 変数idでこのトーナメント内の試合ならnode, このトーナメント外の試合ならteamNode
+                if (teamId.startsWith("$")) {
+                    
+                }else { // 素のnumber
+                    const teamNode = nodes.find(node => node.type === "team" && node.teamId === teamId);
+                    if (teamNode) {
+                        foundNodes.push(teamNode);
+                    }
+                }
+                    
+                }
+                
+            })
+    })
+    
 }
 
 /**
@@ -167,6 +233,7 @@ export const buildTournamentBracket = (
 function constructTournament(
     relatedMatchPlans: MatchPlan[],
     allMatchPlans: MatchPlan[],
+    nodeIdStart: number = 0,
 ): TournamentNode[] {
     const nodes: TournamentNode[] = [];
 
@@ -186,14 +253,18 @@ function constructTournament(
     relatedMatchPlans.forEach(matchPlan => {
         // 試合ノードを作成
         const matchNode: TournamentNode = {
+            type: "match",
+            nodeId: nodeIdStart + nodes.length,
             matchId: matchPlan.id,
-            teamIds: matchPlan.teamIds,
-            matchPlan,
             row: 0, // 初期値
-            round: calculateRound(matchPlan, relatedMatchPlans),
-            position: calculatePosition(matchPlan, relatedMatchPlans),
-            premiseNode: [null, null]
-
+            column: calculateRound(matchPlan, relatedMatchPlans),
+            tournamentMatchNode: {
+                matchId: matchPlan.id,
+                teamIds: matchPlan.teamIds,
+                matchPlan,
+                position: calculatePosition(matchPlan, relatedMatchPlans),
+                premiseNode: [null, null]
+            }
         };
 
         // チームIDを解析して、何かの試合を前提としているならそのidを指定
@@ -205,21 +276,25 @@ function constructTournament(
                     const referencedMatchId = analyzed.matchId; // その依存先の試合idを取得しておき
                     if (matchPlanMap.has(referencedMatchId)) { // その依存先の試合がこのトーナメント内の試合であるならば
                         const referencedMatch = matchPlanMap.get(referencedMatchId); // その依存先の試合のデータを取得
-                        matchNode.premiseNode![index] = { // この試合の依存関係にその参照先の試合情報を追加
-                            matchId: referencedMatch.id,
-                            teamIds: referencedMatch.teamIds,
-                            matchPlan: referencedMatch,
+                        matchNode.tournamentMatchNode.premiseNode![index] = { // この試合の依存関係にその参照先の試合情報を追加
+                            nodeId: nodeIdStart + nodes.length,  // しかしもしすでにある場合はそれ+1にしたい
+                            type: "match",
                             row: 0, // 初期値
-                            round: calculateRound(referencedMatch, relatedMatchPlans),
-                            position: calculatePosition(referencedMatch, relatedMatchPlans),
-                            premiseNode: [null, null],
+                            column: calculateRound(referencedMatch, relatedMatchPlans),
                             nextNode: matchNode,
-                        };
+                            tournamentMatchNode: {
+                                matchId: referencedMatch.id,
+                                teamIds: referencedMatch.teamIds,
+                                matchPlan: referencedMatch,
+                                position: calculatePosition(referencedMatch, relatedMatchPlans),
+                                premiseNode: [null, null],
+                            }
+                        } as TournamentNode;
 
                         // 依存先の試合のノードを追加
                         if (analyzed.condition === "W") {
-                            const referencedMatchNode = nodes.find(node => node.matchId === referencedMatch.id);
-                            if (referencedMatchNode) {
+                            const referencedMatchNode = nodes.find(node => node.type === "match" && (node.matchId === referencedMatch.id));
+                            if (referencedMatchNode && referencedMatchNode.type === "match") {
                                 referencedMatchNode.nextNode = matchNode; // 依存先の試合のノードにこの試合を追加
                             }
                         }
@@ -227,11 +302,11 @@ function constructTournament(
 
                     } else { // その依存先の試合がこのトーナメント内の試合でないならば
                         // 依存関係にその試合の情報を含むチーム名を追加
-                        matchNode.premiseNode![index] = [teamId];
+                        matchNode.tournamentMatchNode.premiseNode![index] = [teamId];
                     }
                 } else { // あるリーグ制の試合結果に依存する場合
                     // このトーナメント内の試合には依存していないことが明らかなので、依存関係にその試合情報を含むチーム名を追加.
-                    matchNode.premiseNode![index] = [teamId];
+                    matchNode.tournamentMatchNode.premiseNode![index] = [teamId];
                 }
             } else { // なにかの試合を前提としていない (直接チームidが指定されている) 場合は依存関係がない
 

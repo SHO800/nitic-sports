@@ -1,5 +1,5 @@
 import React, {createContext, RefObject, useCallback, useContext, useState} from 'react';
-import {TournamentNode} from "@/utils/tournamentUtils";
+import {TournamentMatchNode} from "@/utils/tournamentUtils";
 
 // 座標情報の型定義
 export interface BoxCoordinates {
@@ -14,8 +14,8 @@ export interface BoxCoordinates {
 interface TournamentBracketContextType {
     // registerBoxRef: (matchId: number, ref: RefObject<HTMLDivElement>) => void;
     // getBoxCoordinates: (matchId: number) => BoxCoordinates | null;
-    boxNodes: Record<number, TournamentNode>;
-    registerNode: (matchId: number, node: TournamentNode) => void;
+    boxNodes: Record<number, TournamentMatchNode>;
+    registerNode: (matchId: number, node: TournamentMatchNode) => void;
 }
 
 // コンテキストの作成
@@ -33,10 +33,10 @@ export const useTournamentBracket = () => {
 // プロバイダーコンポーネント
 export const TournamentBracketProvider: React.FC<{ children: React.ReactNode }> = ({children}) => {
     // refとマッチIDの対応を管理するオブジェクト
-    const [boxNodes, setBoxNodes] = useState<Record<number, TournamentNode>>({});
+    const [boxNodes, setBoxNodes] = useState<Record<number, TournamentMatchNode>>({});
 
     // refを登録する関数
-    const registerNode = useCallback((matchId: number, node: TournamentNode) => {
+    const registerNode = useCallback((matchId: number, node: TournamentMatchNode) => {
         setBoxNodes(prev => ({
             ...prev,
             [matchId]: node

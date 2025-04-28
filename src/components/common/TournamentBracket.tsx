@@ -106,7 +106,7 @@ export default function TournamentBracket({eventId, isFinal, relatedMatchPlans}:
         );
     }
     const maxRound = tournamentData.rounds;
-    const maxRowNum = max(...tournamentData.matches.map(value => value.row))
+    const maxRowNum = max(...tournamentData.nodes.map(value => value.row))
     if (maxRowNum == Infinity) return <></>
 
     // 切り分けたユーティリティ関数を使用
