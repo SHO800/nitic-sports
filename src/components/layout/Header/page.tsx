@@ -38,6 +38,7 @@ export default function Header() {
           <Link href="/">Home</Link>
           <Link href="/dashboard">Dashboard</Link>
           <Link href="/schedule">Schedule</Link>
+          <Link href="/map">Map</Link>
         </div>
       </div>
 
@@ -57,6 +58,8 @@ export default function Header() {
           <Link href="/dashboard" onClick={() => setIsOpen(!isOpen)} className='pl-2'>Dashboard</Link>
           <div className='h-0.5 bg-gray-400'></div>
           <Link href="/schedule" onClick={() => setIsOpen(!isOpen)} className='pl-2'>Schedule</Link>
+          <div className='h-0.5 bg-gray-400'></div>
+          <Link href="/map" onClick={() => setIsOpen(!isOpen)} className='pl-2'>Map</Link>
         </div>
       </Transition>
     </nav>
