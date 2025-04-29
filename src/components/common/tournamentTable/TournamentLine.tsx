@@ -234,7 +234,7 @@ export const TournamentLine: React.FC<TournamentLineProps> = ({
                 <line style={{
                     strokeDasharray: `${endY - startY}px`,
                     strokeDashoffset: `${endY - startY}px`,
-                    animation: `stroke-dashoffset-animation ${duration}ms ease-out forwards ${timeout + duration}ms`,
+                    animation: `stroke-dashoffset-animation ${duration}ms ease-out forwards ${timeout+duration }ms`,
                 }}
                       x1={endX - startX}
                       y1={endY - startY}

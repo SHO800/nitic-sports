@@ -2,7 +2,7 @@
 
 import {useCallback, useEffect, useState} from 'react';
 import TournamentBracket from '@/components/common/TournamentBracket';
-import LeagueTable from '@/components/common/LeagueTable';
+import LeagueTable from '@/components/common/leagueTable/LeagueTable';
 import {useData} from '@/hooks/data';
 import {MatchPlan} from "@prisma/client";
 import TournamentTable from "@/components/common/tournamentTable/TournamentTable";

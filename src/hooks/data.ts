@@ -92,7 +92,7 @@ export const useData = () => {
 
                 if (expectedResult === "L") {
                     const team = teams!.find((t) => t.id === matchResult.loserTeamId);
-                    return team ? `${team.name} ` : '';
+                    return team ? `${team.name} ` : `${matchName}敗者`;
                 }
             }
 
