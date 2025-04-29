@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import Header from "@/components/layout/Header/page";
 import Footer from "@/components/layout/Footer/page";
+import DataPreFetcher from "@/components/common/DataPreFetcher";
 
 const notoSansJp = Noto_Sans_JP({
     subsets: ['latin'],
@@ -31,8 +32,10 @@ export default function RootLayout({
             className={`${notoSansJp.variable} antialiased text-lg bg-gray-200`}
         >
         <Header/>
+        <DataPreFetcher>
         {children}
-        <Analytics />
+        </DataPreFetcher>
+        <Analytics/>
         <SpeedInsights/>
         <Footer/>
         </body>

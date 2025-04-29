@@ -5,7 +5,7 @@ const Teams = () => {
     const {teams, mutateTeams} = useData()
     return (
         <>
-            {teams?.map((team) => (
+            {Array.isArray(teams) && teams?.map((team) => (
                 <div
                     key={team.id}
                     className='flex items-center justify-between bg-gray-200 p-2 rounded mb-2'

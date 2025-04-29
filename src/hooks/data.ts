@@ -61,7 +61,7 @@ export const useData = () => {
 
     // 必須データが揃っているかのチェック関数
     const hasRequiredData = useCallback(() => {
-        return !!(matchPlans && matchResults && teams && events);
+        return !!(matchPlans && matchResults && teams && events && Array.isArray(teams));
     }, [matchPlans, matchResults, teams, events]);
 
     // 試合名表示文字列取得関数を最適化
@@ -124,7 +124,8 @@ export const useData = () => {
         }
 
         // 通常のチームID処理
-        const team = teams!.find((t) => t.id === Number(teamId));
+        if (!teams || !events || !matchPlans || !matchResults || !Array.isArray(teams)) return '';
+        const team = teams.find((t) => t.id === Number(teamId));
         return team ? `${team.name} ` : '';
     }, [teams, events, matchPlans, matchResults, hasRequiredData]);
     

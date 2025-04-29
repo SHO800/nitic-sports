@@ -3,6 +3,7 @@ import {Team} from "@prisma/client";
 
 const groupTeams: (teams: Team[]) => { [p: string]: Team[] } = (teams: Team[]) => {
     // nameの最初の1文字目でグルーピング
+    if (!Array.isArray(teams)) return {}
     const organizedTeams = teams.reduce((acc: OrganizedTeams, team: Team) => {
         const firstLetter = team.name.charAt(0).toUpperCase();
         if (!acc[firstLetter]) {

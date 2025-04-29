@@ -1,7 +1,6 @@
 "use client";
 
 import {useCallback, useEffect, useState} from 'react';
-import TournamentBracket from '@/components/common/TournamentBracket';
 import LeagueTable from '@/components/common/leagueTable/LeagueTable';
 import {useData} from '@/hooks/data';
 import {MatchPlan} from "@prisma/client";
@@ -39,7 +38,7 @@ const Bracket = ({eventId, matchPlans}: { eventId: number, matchPlans: MatchPlan
 
     const teamData = getTeamData();
     const currentType = getCurrentType();
-    
+
     useEffect(() => {
         if (!eventLoading && events && eventId) {
             const event = events.find(e => e.id === eventId);
@@ -132,7 +131,7 @@ const Bracket = ({eventId, matchPlans}: { eventId: number, matchPlans: MatchPlan
 
             {(hasPreliminary || hasFinal) ? (
                 <div className="bg-white rounded-lg shadow-md p-6 overflow-hidden">
-                    
+
                     {currentType === 'tournament' && (
                         // <TournamentBracket
                         //     key={`bracket-tournament-${eventId}`}
@@ -141,15 +140,15 @@ const Bracket = ({eventId, matchPlans}: { eventId: number, matchPlans: MatchPlan
                         //     relatedMatchPlans={relatedMatchPlans}
                         // />
                         <TournamentTable
-                                key={`bracket-tournament-${eventId}`}
-                                eventId={eventId}
-                                isFinal={isFinal}
-                                relatedMatchPlans={relatedMatchPlans}
-                            />
+                            key={`bracket-tournament-${eventId}`}
+                            eventId={eventId}
+                            isFinal={isFinal}
+                            relatedMatchPlans={relatedMatchPlans}
+                        />
                     )}
 
                     {currentType === 'league' && teamData?.type === "league" && teamData.blocks && (
-                        
+
                         <div className="space-y-8">
                             {Object.keys(teamData.blocks).map((blockName) => (
                                 <div key={`league-${eventId}-${blockName}`} className="mb-6">
