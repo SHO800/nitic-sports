@@ -36,7 +36,7 @@ const MatchCard = ({
     return (
         <div className="flex flex-col justify-start items-start bg-gray-200 p-2 rounded mb-2 w-full">
             <div className="flex items-center justify-between w-full">
-                <div className="flex items-center">
+                <div className="flex items-center bg-amber-100">
                     <MatchInfo 
                         matchPlan={matchPlan}
                         events={events}
