@@ -1,32 +1,26 @@
 import { useState } from "react";
 import { useData } from "@/hooks/data";
-// import MatchInfoForMap from "./MatchInfoForReader";
+import MatchInfoForReader from "../reader/MatchInfoForReader";
 import { Status, MatchPlan as MatchPlanType } from "@prisma/client";
-// import MatchCountdownForMap from "./MatchCountdownForMap";
-// import MatchTimer from "../dashboard/MatchTimer";
-import Modal from "./Modal";
+import MatchCountdownForInfo from "../infomation/MatchCountdownForInfo";
 
-type Props = {
-    placeId: number | null;
-    isOpen: boolean;
-    closeModal: () => void;
-}
+type Props =
+    | {placeId: number | null;}
 
-const EventModal = ({placeId, isOpen, closeModal}:Props) => {
-    
-    if(!isOpen)return null;
+const MapInfo = ({placeId}:Props) => {
 
     const [matchStatuses, setMatchStatuses] = useState<Record<number, Status>>({});
         
     const {
-        // matchPlans,
-        // events,
-        // locations,
+        matchPlans,
+        events,
+        locations,
         matchResults,
-        // getMatchDisplayStr
+        getMatchDisplayStr
     } = useData();
 
-    {/*
+    const filteredItems = matchPlans?.filter((item) => item.locationId === placeId)
+
     const getMatchStatus = (matchPlan: MatchPlanType): Status => {
         // すでにローカル状態にステータスがある場合はそれを返す
         if (matchStatuses[matchPlan.id] !== undefined) {
@@ -41,46 +35,49 @@ const EventModal = ({placeId, isOpen, closeModal}:Props) => {
         // デフォルトはDBから来るステータスを使用するか、なければPreparingとみなす
         return matchPlan.status || Status.Preparing;
     };
-    */}
+
+    if(filteredItems?.length === 0){
+        return(
+            <div className="flex flex-col justify-center">
+                <div className="flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[40vw] min-h-[30vh] bg-gray-100 rounded overflow-auto">
+                    <p>本日の営業は終了いたしました</p>
+                </div>
+            </div>
+        )
+    }
 
     return(
-        <div className="flex flex-col fixed z-80 w-full  h-screen -mt-18 bg-black/30 justify-center items-center">
-                <div className="flex flex-col lg:w-[60vw] px-1 pb-4 bg-gray-300 rounded item-center">    
-                    <button onClick={closeModal} className="flex mr-1 ml-auto my-1 px-2 py-1 bg-red-400 hover:bg-red-300 rounded text-white float-right">×</button>
-                    {/*
-                    <div className="flex bg-gray-300 justify-center pb-1 rounded-t">実施予定の試合</div>
+        <div className="flex flex-col justify-center">
+                <div className="flex flex-col lg:mx-20 px-1 py-2 min-w-[40vw] min-h-[30vh] bg-gray-100 rounded overflow-auto">
                     {filteredItems?.map((item) => {
                         
                         const status = getMatchStatus(item);
 
                         return(
-                        <div className="flex justify-center bg-gray-300 px-10 -mt-0.5 rounded">
-                            <div key={item.id} className="flex flex-col bg-white mb-1 rounded">
-                                <p className="flex justify-center bg-white text-black px-1 rounded text-2xl">
-                                    <MatchInfoForMap
+                        <div className="flex justify-center bg-gray-100 px-10 rounded">
+                            <div key={item.id} className="flex flex-col bg-white mb-1 border rounded">
+                                <div className="flex justify-center bg-white text-black px-1 rounded text-2xl">
+
+                                    <MatchInfoForReader
                                         matchPlan={item}
                                         events={events}
                                         locations={locations}
                                         getMatchDisplayStr={getMatchDisplayStr}
                                     />
-                                </p>
+                                </div>
                                 <p  className="flex justify-center bg-white text-black px-1 rounded text-2xl">
+                                    {/* 開始前なら予定時間との差を表示 */}
                                     {(status === Status.Waiting || status === Status.Preparing) && (
-                                        <MatchCountdownForMap scheduledStartTime={item.scheduledStartTime} />
+                                        <MatchCountdownForInfo scheduledStartTime={item.scheduledStartTime}/>
                                     )}
                                 </p>
                             </div>
                         </div>
                         );
                     })}
-                */}
-
-                <Modal placeId={placeId} />
-
-                </div>
+                </div>  
         </div>
     )
-    
-}
+    }
 
-export default EventModal;
+export default MapInfo;

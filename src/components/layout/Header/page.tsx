@@ -9,7 +9,8 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className=" bg-blue-900 text-white p-4 rounded">
+    <>
+    <nav className="fixed z-100 w-full bg-blue-900 text-white p-4 rounded">
       <div className="flex items-center justify-between">
         <div className="text-lg font-bold">2025年度体育大会</div>
 
@@ -38,6 +39,7 @@ export default function Header() {
           <Link href="/">Home</Link>
           <Link href="/dashboard">Dashboard</Link>
           <Link href="/schedule">Schedule</Link>
+          <Link href="/infomation">Infomation</Link>
           <Link href="/map">Map</Link>
         </div>
       </div>
@@ -59,9 +61,13 @@ export default function Header() {
           <div className='h-0.5 bg-gray-400'></div>
           <Link href="/schedule" onClick={() => setIsOpen(!isOpen)} className='pl-2'>Schedule</Link>
           <div className='h-0.5 bg-gray-400'></div>
+          <Link href="/infomation" onClick={() => setIsOpen(!isOpen)} className='pl-2'>Infomation</Link>
+          <div className='h-0.5 bg-gray-400'></div>
           <Link href="/map" onClick={() => setIsOpen(!isOpen)} className='pl-2'>Map</Link>
         </div>
       </Transition>
     </nav>
+    <div className='w-full p-6 rounded'>blank</div>
+  </>
   );
 }
