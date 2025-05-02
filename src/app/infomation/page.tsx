@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import NowHot from "@/components/infomation/NowHot";
+import DelayInfo from "@/components/infomation/DelayInfo";
 
 const Infomation = () => {
     
@@ -10,7 +11,7 @@ const Infomation = () => {
     return(
         <div className="min-h-screen">  
             <div>
-                <h1 className="flex justify-center mx-2 my-1 bg-amber-500 rounded"><p className="text-6xl text-white animate-ping">NOW HOT!!</p></h1>
+                <h1 className="flex justify-center mx-2 my-1 bg-amber-500 rounded"><p className="text-6xl text-white animate-pulse">NOW HOT!!</p></h1>
             
                 <div className="flex justify-center bg-blue-300 mx-1 lg:mx-20 mb-2 p-1 rounded">
                         <NowHot eventIds="all"/>
@@ -18,7 +19,7 @@ const Infomation = () => {
             </div>
 
             <div>
-                <div className="flex justify-center mx-2 mb-1 bg-amber-500 rounded"><p className="text-4xl text-white animate-ping">競技別NOW HOT!!</p></div>
+                <div className="flex justify-center mx-2 mb-1 bg-amber-500 rounded"><p className="text-4xl text-white animate-pulse">競技別NOW HOT!!</p></div>
                 
                 <div className="flex flex-row px-1 justify-center">
                     <button onClick={() => setSelectedId(1)} className={`text-sm rounded-t px-2 py-1 border-r border-black ${selectedId === 1 ? "bg-blue-300 text-black" : "bg-blue-400 text-white border-b"}`}>バド</button>
@@ -33,6 +34,12 @@ const Infomation = () => {
 
                 <div className="flex justify-center bg-blue-300 mx-1 lg:mx-20 mb-2 p-1 rounded">
                     <NowHot eventId={selectedId} />
+                </div>
+            </div>
+            <div>
+                <div className="flex justify-center mx-2 mb-1 bg-red-500 rounded"><p className="text-4xl text-white animate-pulse">遅延情報</p></div>
+                <div className="flex justify-center bg-blue-300 mx-1 lg:mx-20 mb-2 p-1 rounded">
+                    <DelayInfo />
                 </div>
             </div>
         </div>

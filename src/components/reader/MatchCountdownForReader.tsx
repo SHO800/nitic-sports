@@ -5,10 +5,10 @@ type MatchCountdownProps = {
     scheduledStartTime: Date | string;
 };
 
-const MatchCountdownForInfo = ({scheduledStartTime}: MatchCountdownProps) => {
-    const {formatTimeDifference, currentTime} = useCurrentTime();
+const MatchCountdownForReader = ({scheduledStartTime}: MatchCountdownProps) => {
+    const {formatTimeDifference} = useCurrentTime();
     
-    const {str, isPast, waiting} = formatTimeDifference(scheduledStartTime)
+    const {str, isPast,waiting} = formatTimeDifference(scheduledStartTime)
     
     
     return (
@@ -16,7 +16,7 @@ const MatchCountdownForInfo = ({scheduledStartTime}: MatchCountdownProps) => {
             {/* 開始時間が過ぎている場合は赤色で表示 */}
             {isPast ? (
                 <p className="text-red-500">
-                    {str} 遅延しています
+                    遅延: {str}
                 </p>
             ) : (
                 <p className="text-green-800">
@@ -31,4 +31,4 @@ const MatchCountdownForInfo = ({scheduledStartTime}: MatchCountdownProps) => {
     );
 };
 
-export default MatchCountdownForInfo;
+export default MatchCountdownForReader;
