@@ -1,14 +1,21 @@
 import {useData} from "@/hooks/data";
 import {Fragment, useEffect, useMemo, useRef, useState} from "react";
-import {Event, Location, MatchPlan} from "@prisma/client";
+import {Event, Location, MatchPlan, Status} from "@prisma/client";
+import {judgeDay12String} from "@/utils/judgeDay12";
+import MatchInfo from "@/components/dashboard/matchPlan/MatchInfo";
+import StatusBadge from "@/components/dashboard/matchPlan/StatusBadge";
+import DeleteButton from "@/components/dashboard/matchPlan/DeleteButton";
+import MatchCountdown from "@/components/dashboard/matchPlan/MatchCountdown";
+import MatchTimer from "@/components/dashboard/MatchTimer";
+import MatchResult from "@/components/dashboard/matchPlan/MatchResult";
 
 const MatchesByLocation = ({locationId}: { locationId: number }) => {
-    const {matchPlans, locations, events, getMatchDisplayStr} = useData()
+    const {matchPlans, locations, events, getMatchDisplayStr, matchResults} = useData()
     const [currentLocation, setCurrentLocation] = useState<Location | null>(null)
     const [matchesInLocation, setMatchesInLocation] = useState<MatchPlan[]>([])
     const wrapperRef = useRef<HTMLDivElement | null>(null);
     const [fontSize, setFontSize] = useState(16);
-    
+
     const handleResize = () => {
         if (wrapperRef.current) {
             const width = wrapperRef.current.clientWidth;
@@ -16,7 +23,7 @@ const MatchesByLocation = ({locationId}: { locationId: number }) => {
             setFontSize(newFontSize);
         }
     }
-    
+
     useEffect(() => {
         handleResize();
         window.addEventListener('resize', handleResize);
@@ -53,7 +60,8 @@ const MatchesByLocation = ({locationId}: { locationId: number }) => {
     }, [locations, locationId])
 
     return (
-        <div className={"w-full h-full flex flex-col items-center"} style={{fontSize: fontSize+"px"}} ref={wrapperRef}>
+        <div className={"w-full h-full flex flex-col items-center"} style={{fontSize: fontSize + "px"}}
+             ref={wrapperRef}>
             <div
                 className={"ml-8 pr-8 mt-5 pb-2 w-full text-4xl font-bold border-b-2 [border-image:linear-gradient(to_right,#888,#888_60%,#eee)_1]"}>
                 {currentLocation?.name}
@@ -74,19 +82,16 @@ const MatchesByLocation = ({locationId}: { locationId: number }) => {
                                     className={"text-gray-500 ml-1 font-normal"}>#{match.id}</small></p>
                                 <p className={"text-[.9em] mt-auto mb-1 w-fit whitespace-nowrap min-w-16  "}>{eventsById[match.eventId]?.name}</p>
                             </div>
-                            
+
                             {/*開始時間等*/}
-                            <p className={"text-[.9em] mt-auto mb-1 w-fit whitespace-nowrap min-w-16  "}>
-                                {new Date(match.scheduledStartTime).toLocaleString("ja-JP", {
-                                    year: "numeric",
-                                    month: "2-digit",
-                                    day: "2-digit",
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                    second: "2-digit",
-                                })}
+                            <p className={"text-[.9em] mt-auto mb-1 mx-auto w-fit whitespace-nowrap min-w-16 text-center "}>
+                                {judgeDay12String(match.scheduledStartTime) ?? "Day1"} {new Date(match.scheduledStartTime).toLocaleString("ja-JP", {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                hour12: false,
+                            })} ~
                             </p>
-                            
+
                             {/*対戦チーム等*/}
                             <p className={"flex flex-row justify-center space-x-8 border-y-[2px] border-y-gray-400"}>
                                 {teamsDisplayNames.map((teamName, index) => {
@@ -99,10 +104,50 @@ const MatchesByLocation = ({locationId}: { locationId: number }) => {
                                     )
                                 })}
                             </p>
-                            
-                            {/*    操作ボタン*/}
-                            <div className={"flex flex-row justify-start"}>
 
+                            {/*    操作ボタン*/}
+                            <div className={"flex flex-col justify-start"}>
+                                <div className="flex items-center justify-between w-full">
+                                    <div className="flex items-center bg-amber-100">
+                                        <MatchInfo
+                                            matchPlan={match}
+                                            events={events}
+                                            locations={locations}
+                                            getMatchDisplayStr={getMatchDisplayStr}
+                                        />
+                                    </div>
+
+                                    <div className="flex items-center">
+                                        <StatusBadge status={status}/>
+                                        <DeleteButton
+                                            matchId={match.id}
+                                            onDelete={() => handleDeleteMatch(match.id)}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* 開始前なら予定時間との差を表示 */}
+                                {(status === Status.Waiting || status === Status.Preparing) && (
+                                    <MatchCountdown scheduledStartTime={match.scheduledStartTime}/>
+                                )}
+
+                                {/* タイマー表示 - Preparing（準備中）またはPlaying（試合中）の場合だけ表示 */}
+                                {(status === Status.Preparing || status === Status.Playing) && (
+                                    <MatchTimer
+                                        matchId={match.id}
+                                        status={status}
+                                        isRunning={status === Status.Playing}
+                                        onStart={() => handleStartTimer(match.id)}
+                                        onStop={() => handleStopTimer(match.id)}
+                                    />
+                                )}
+
+                                {/* 試合結果表示 */}
+                                <MatchResult
+                                    matchPlan={match}
+                                    matchResults={matchResults}
+                                    getMatchDisplayStr={getMatchDisplayStr}
+                                />
                             </div>
                         </div>
                     )
