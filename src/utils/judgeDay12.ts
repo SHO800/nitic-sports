@@ -4,7 +4,8 @@ const secondDay = new Date('2025-05-23')
 export const judgeDay12 = (date: Date) => {
     const firstDayTime = firstDay.getTime();
     const secondDayTime = secondDay.getTime();
-    const dateTime = date.getTime();
+    const cushionDate = new Date(date)
+    const dateTime = cushionDate.getTime();
 
     if (dateTime >= firstDayTime && dateTime < secondDayTime) {
         return 1;

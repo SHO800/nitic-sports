@@ -9,8 +9,8 @@ import MatchCountdown from "@/components/dashboard/matchPlan/MatchCountdown";
 import MatchTimer from "@/components/dashboard/MatchTimer";
 import MatchResult from "@/components/dashboard/matchPlan/MatchResult";
 
-const MatchesByLocation = ({locationId}: { locationId: number }) => {
-    const {matchPlans, locations, events, getMatchDisplayStr, matchResults} = useData()
+const MatchesByLocation = ({locationId}: { locationId: string }) => {
+    const {matchPlans, locations, events, getMatchDisplayStr, matchResults, mutateMatchPlans} = useData()
     const [currentLocation, setCurrentLocation] = useState<Location | null>(null)
     const [matchesInLocation, setMatchesInLocation] = useState<MatchPlan[]>([])
     const wrapperRef = useRef<HTMLDivElement | null>(null);
@@ -59,6 +59,86 @@ const MatchesByLocation = ({locationId}: { locationId: number }) => {
 
     }, [locations, locationId])
 
+
+    // 各試合のタイマー状態を管理
+    const [matchTimers, setMatchTimers] = useState<Record<number, boolean>>({});
+
+    // 各試合のステータスを管理（実際のAPIから取得する代わりのローカル状態）
+    const [matchStatuses, setMatchStatuses] = useState<Record<number, Status>>({});
+
+    // ステータスを更新する関数
+    const updateMatchStatus = async (matchId: number, status: Status) => {
+        try {
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/match-plan/${matchId}`,
+                {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        startedAt: status === Status.Playing ? new Date() : null,
+                        endedAt: status === Status.Finished ? new Date() : null,
+                        status
+                    }),
+                },
+            );
+            if (!response.ok) {
+                throw new Error("Failed to update match status");
+            }
+            await mutateMatchPlans();
+
+            
+            // ローカルの状態を更新
+            setMatchStatuses(prev => ({
+                ...prev,
+                [matchId]: status
+            }));
+
+            // タイマーが開始・停止したことを記録
+            if (status === Status.Playing) {
+                setMatchTimers(prev => ({
+                    ...prev,
+                    [matchId]: true
+                }));
+            } else if (status === Status.Finished) {
+                setMatchTimers(prev => ({
+                    ...prev,
+                    [matchId]: false
+                }));
+            }
+        } catch (error) {
+            console.error("ステータス更新エラー:", error);
+        }
+    }
+
+    // タイマーの開始（Playing状態に移行）
+    const handleStartTimer = (matchId: number) => {
+        updateMatchStatus(matchId, Status.Playing);
+    };
+    // タイマーの停止（Finished状態に移行）
+    const handleStopTimer = (matchId: number) => {
+        updateMatchStatus(matchId, Status.Finished);
+    };
+
+    // 試合のステータスを取得
+    const getMatchStatus = (matchPlan: MatchPlan): Status => {
+        // すでにローカル状態にステータスがある場合はそれを返す
+        if (matchStatuses[matchPlan.id] !== undefined) {
+            return matchStatuses[matchPlan.id];
+        }
+
+        // すでに結果がある場合はCompletedステータス
+        if (matchResults && matchResults[matchPlan.id]) {
+            return Status.Completed;
+        }
+
+        // デフォルトはDBから来るステータスを使用するか、なければPreparingとみなす
+        return matchPlan.status || Status.Preparing;
+    };
+    
+
+
     return (
         <div className={"w-full h-full flex flex-col items-center"} style={{fontSize: fontSize + "px"}}
              ref={wrapperRef}>
@@ -67,7 +147,8 @@ const MatchesByLocation = ({locationId}: { locationId: number }) => {
                 {currentLocation?.name}
             </div>
 
-            <div className={"flex flex-col items-center px-4 m-8 space-y-4 w-full overflow-x-scroll overscroll-none"}>
+            <div
+                className={"flex flex-col items-center px-4 m-8 space-y-4 w-full overflow-x-scroll overscroll-none"}>
                 {matchesInLocation.map(match => {
                     const teamsDisplayNames = match.teamIds.map(teamId => getMatchDisplayStr(teamId))
 
@@ -107,24 +188,14 @@ const MatchesByLocation = ({locationId}: { locationId: number }) => {
 
                             {/*    操作ボタン*/}
                             <div className={"flex flex-col justify-start"}>
-                                <div className="flex items-center justify-between w-full">
-                                    <div className="flex items-center bg-amber-100">
-                                        <MatchInfo
-                                            matchPlan={match}
-                                            events={events}
-                                            locations={locations}
-                                            getMatchDisplayStr={getMatchDisplayStr}
-                                        />
-                                    </div>
+                                <MatchInfo
+                                    matchPlan={match}
+                                    events={events}
+                                    locations={locations}
+                                    getMatchDisplayStr={getMatchDisplayStr}
+                                />
 
-                                    <div className="flex items-center">
-                                        <StatusBadge status={status}/>
-                                        <DeleteButton
-                                            matchId={match.id}
-                                            onDelete={() => handleDeleteMatch(match.id)}
-                                        />
-                                    </div>
-                                </div>
+                                <StatusBadge status={match.status}/>
 
                                 {/* 開始前なら予定時間との差を表示 */}
                                 {(status === Status.Waiting || status === Status.Preparing) && (
@@ -157,4 +228,4 @@ const MatchesByLocation = ({locationId}: { locationId: number }) => {
     )
 }
 
-export default MatchesByLocation
+export default MatchesByLocation;
