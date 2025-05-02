@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useData } from "@/hooks/data";
 import MatchInfoForReader from "../reader/MatchInfoForReader";
 import { Status, MatchPlan as MatchPlanType } from "@prisma/client";
-import MatchCountdownForInfo from "../infomation/MatchCountdownForInfo";
+import MatchCountdownForReader from "@/components/reader/MatchCountdownForReader";
 
 type Props =
     | {placeId: number | null;}
@@ -68,7 +68,7 @@ const MapInfo = ({placeId}:Props) => {
                                 <p  className="flex justify-center bg-white text-black px-1 rounded text-2xl">
                                     {/* 開始前なら予定時間との差を表示 */}
                                     {(status === Status.Waiting || status === Status.Preparing) && (
-                                        <MatchCountdownForInfo scheduledStartTime={item.scheduledStartTime}/>
+                                        <MatchCountdownForReader scheduledStartTime={item.scheduledStartTime}/>
                                     )}
                                 </p>
                             </div>
