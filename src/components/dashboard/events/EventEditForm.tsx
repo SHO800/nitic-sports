@@ -1,5 +1,6 @@
 "use client"
 import {useData} from "@/hooks/data";
+import {updateEvent} from "@/app/actions/data";
 
 const EventEditForm = ({teamDataJsonDraft}: {teamDataJsonDraft: TeamData[]}) => {
     const {mutateEvents} = useData();
@@ -8,21 +9,12 @@ const EventEditForm = ({teamDataJsonDraft}: {teamDataJsonDraft: TeamData[]}) => 
         <form
             onSubmit={async (e) => {
                 e.preventDefault();
-                const response = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/event/${(document.getElementById('editEventId') as HTMLInputElement).value}`,
-                    {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            name: (document.getElementById('eventName') as HTMLInputElement).value,
-                            description: (document.getElementById('eventDescription') as HTMLInputElement).value,
-                            teamData: JSON.stringify(teamDataJsonDraft),
-                        }),
-                    }
+                await updateEvent(
+                    Number((document.getElementById('editEventId') as HTMLInputElement).value),
+                    (document.getElementById('eventName') as HTMLInputElement).value,
+                    teamDataJsonDraft,
+                    (document.getElementById('eventDescription') as HTMLInputElement).value
                 );
-                console.log(response);
                 await mutateEvents();
             }}
             className='flex items-center mt-4'

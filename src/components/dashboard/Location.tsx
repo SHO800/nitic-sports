@@ -1,5 +1,6 @@
 "use client"
 import {useData} from "@/hooks/data";
+import {createLocation, deleteLocation} from "@/app/actions/data";
 
 const Location = () => {
     const {locations, mutateLocations} = useData()
@@ -18,13 +19,7 @@ const Location = () => {
                     <button
                         onClick={async (e) => {
                             e.preventDefault()
-                            const response = await fetch(
-                                `${process.env.NEXT_PUBLIC_API_URL}/location/${location.id}`,
-                                {
-                                    method: 'DELETE',
-                                }
-                            )
-                            console.log(response)
+                            await deleteLocation(location.id)
                             await mutateLocations();
                         }}
                         className='bg-red-500 hover:bg-red-600 text-black px-4 py-2 rounded'
@@ -36,19 +31,11 @@ const Location = () => {
             <form
                 onSubmit={async (e) => {
                     e.preventDefault()
-                    const response = await fetch(
-                        `${process.env.NEXT_PUBLIC_API_URL}/location/-1`,
-                        {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                name: (document.getElementById('locationName') as HTMLInputElement).value,
-                            }),
-                        }
+                    await createLocation(
+                        (document.getElementById('locationName') as HTMLInputElement).value,
+                        {} as any, // TODO: locationの座標を取得する
+                        undefined
                     )
-                    console.log(response)
                     await mutateLocations();
                 }}
                 className='flex items-center mt-4'

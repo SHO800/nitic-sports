@@ -86,8 +86,8 @@ export async function updateMatchPlanStatus(
         },
         data: {
             status,
-            startedAt: startedAt ?? status === "Playing" ? new Date() : null,
-            endedAt: endedAt ?? status === "Finished" ? new Date() : null,
+            startedAt: startedAt ?? status === "Playing" ? new Date() : undefined,
+            endedAt: endedAt ?? status === "Finished" ? new Date() : undefined,
         },
     })
 
@@ -111,7 +111,7 @@ export async function deleteMatchPlan(id: number) {
 
 export async function createEvent(
     name: string,
-    teamData: TeamData,
+    teamData: TeamData[],
     description?: string
 ) {
     const response = await prisma.event.create({
@@ -129,7 +129,7 @@ export async function createEvent(
 export async function updateEvent(
     id: number,
     name: string,
-    teamData: TeamData,
+    teamData: TeamData[],
     description?: string
 ) {
     const response = await prisma.event.update({

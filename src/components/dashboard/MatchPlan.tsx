@@ -1,9 +1,10 @@
 "use client"
-import { useState } from "react";
-import { useData } from "@/hooks/data";
+import {Fragment, useState} from "react";
+import {useData} from "@/hooks/data";
 import AddMatchPlanForm from "@/components/dashboard/AddMatchPlanForm";
-import { Status, MatchPlan as MatchPlanType } from "@prisma/client";
+import {MatchPlan as MatchPlanType, Status} from "@prisma/client";
 import MatchCard from "@/components/dashboard/matchPlan/MatchCard";
+import {deleteMatchPlan, updateMatchPlanStatus} from "@/app/actions/data";
 
 const MatchPlan = () => {
     const {
@@ -14,42 +15,29 @@ const MatchPlan = () => {
         mutateMatchPlans,
         getMatchDisplayStr
     } = useData();
-    
+
     // 各試合のタイマー状態を管理
     const [matchTimers, setMatchTimers] = useState<Record<number, boolean>>({});
-    
+
     // 各試合のステータスを管理（実際のAPIから取得する代わりのローカル状態）
     const [matchStatuses, setMatchStatuses] = useState<Record<number, Status>>({});
-    
+
     // ステータスを更新する関数
     const updateMatchStatus = async (matchId: number, status: Status) => {
         try {
-            const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/match-plan/${matchId}`,
-                {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        startedAt: status === Status.Playing ? new Date() : null,
-                        endedAt: status === Status.Finished ? new Date() : null,
-                        status 
-                    }),
-                },
-            );
-            if (!response.ok) {
-                throw new Error("Failed to update match status");
-            }
+            await updateMatchPlanStatus(
+                matchId,
+                status,
+                status === Status.Playing ? new Date() : undefined,
+                status === Status.Finished ? new Date() : undefined
+            )
             await mutateMatchPlans();
-            
-            
             // ローカルの状態を更新
             setMatchStatuses(prev => ({
                 ...prev,
                 [matchId]: status
             }));
-            
+
             // タイマーが開始・停止したことを記録
             if (status === Status.Playing) {
                 setMatchTimers(prev => ({
@@ -82,12 +70,12 @@ const MatchPlan = () => {
         if (matchStatuses[matchPlan.id] !== undefined) {
             return matchStatuses[matchPlan.id];
         }
-        
+
         // すでに結果がある場合はCompletedステータス
         if (matchResults && matchResults[matchPlan.id]) {
             return Status.Completed;
         }
-        
+
         // デフォルトはDBから来るステータスを使用するか、なければPreparingとみなす
         return matchPlan.status || Status.Preparing;
     };
@@ -95,13 +83,7 @@ const MatchPlan = () => {
     // 試合削除処理
     const handleDeleteMatch = async (matchId: number) => {
         try {
-            const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/match-plan/${matchId}`,
-                {
-                    method: 'DELETE',
-                }
-            );
-            console.log(response);
+            await deleteMatchPlan(matchId);
             await mutateMatchPlans();
         } catch (error) {
             console.error("試合削除エラー:", error);
@@ -112,24 +94,25 @@ const MatchPlan = () => {
         <>
             {matchPlans?.map((matchPlan) => {
                 const status = getMatchStatus(matchPlan);
-                
+
                 return (
-                    <MatchCard 
-                        key={matchPlan.id}
-                        matchPlan={matchPlan}
-                        status={status}
-                        events={events}
-                        locations={locations}
-                        matchResults={matchResults}
-                        matchTimers={matchTimers}
-                        getMatchDisplayStr={getMatchDisplayStr}
-                        handleStartTimer={handleStartTimer}
-                        handleStopTimer={handleStopTimer}
-                        handleDeleteMatch={handleDeleteMatch}
-                    />
+                    <Fragment key={matchPlan.id}>
+                        <MatchCard
+                            matchPlan={matchPlan}
+                            status={status}
+                            events={events}
+                            locations={locations}
+                            matchResults={matchResults}
+                            matchTimers={matchTimers}
+                            getMatchDisplayStr={getMatchDisplayStr}
+                            handleStartTimer={handleStartTimer}
+                            handleStopTimer={handleStopTimer}
+                            handleDeleteMatch={handleDeleteMatch}
+                        />
+                    </Fragment>
                 );
             })}
-            <AddMatchPlanForm />
+            <AddMatchPlanForm/>
         </>
     );
 };

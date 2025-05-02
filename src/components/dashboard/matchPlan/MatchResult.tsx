@@ -48,6 +48,9 @@ const MatchResult = ({matchPlan, matchResults, getMatchDisplayStr}: MatchResultP
                     </p>
                 </div>
             )}
+            {matchPlan.status}
+            {matchPlan.startedAt}
+            {matchPlan.endedAt}
             {matchPlan.status === "Finished" && matchPlan.startedAt && matchPlan.endedAt &&
                 
                 <details className="text-black pl-4">

@@ -2,6 +2,7 @@ import {MatchPlan as MatchPlanSchema} from "@prisma/client"
 import ClassSelector from "@/components/common/ClassSelector";
 import {useState} from "react";
 import {useData} from "@/hooks/data";
+import {createMatchPlan} from "@/app/actions/data";
 
 
 const AddMatchPlanForm = () => {
@@ -332,31 +333,20 @@ const AddMatchPlanForm = () => {
                 key={"editMatchPlanForm" + teamCount}
                 onSubmit={async (e) => {
                     e.preventDefault()
-                    const response = await fetch(
-                        `${process.env.NEXT_PUBLIC_API_URL}/match-plan/${(document.getElementById('editMatchId') as HTMLInputElement).value}`,
-                        {
-                            method: 'PUT',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                eventId: Number((document.getElementById('eventId') as HTMLInputElement).value),
-                                matchName: (document.getElementById('matchName') as HTMLInputElement).value,
-                                teamNote: (document.getElementById('teamNote') as HTMLInputElement).value,
-                                teamIds: (Array.from({length: teamCount}).map((_, index) => {
-                                    return (document.getElementById(`team${index + 1}Id`) as HTMLInputElement).value
-                                })),
-                                teamNotes: (Array.from({length: teamCount}).map((_, index) => {
-                                    return (document.getElementById(`team${index + 1}Note`) as HTMLInputElement).value
-                                })),
-                                scheduledStartTime: new Date((document.getElementById('scheduledStartTime') as HTMLInputElement).value),
-                                scheduledEndTime: new Date((document.getElementById('scheduledEndTime') as HTMLInputElement).value),
-                                locationId: Number((document.getElementById('locationId') as HTMLInputElement).value),
-                                
-                            } as unknown as MatchPlanSchema),
-                        }
+                    await createMatchPlan(
+                        Number((document.getElementById('eventId') as HTMLInputElement).value),
+                        (Array.from({length: teamCount}).map((_, index) => {
+                            return (document.getElementById(`team${index + 1}Id`) as HTMLInputElement).value
+                        })),
+                        (Array.from({length: teamCount}).map((_, index) => {
+                            return (document.getElementById(`team${index + 1}Note`) as HTMLInputElement).value
+                        })),
+                        new Date((document.getElementById('scheduledStartTime') as HTMLInputElement).value),
+                        new Date((document.getElementById('scheduledEndTime') as HTMLInputElement).value),
+                        Number((document.getElementById('locationId') as HTMLInputElement).value),
+                        (document.getElementById('matchName') as HTMLInputElement).value,
+                        (document.getElementById('teamNote') as HTMLInputElement).value,
                     )
-                    console.log(response)
                     await mutateMatchPlans();
                 }}
                 className='flex items-center mt-1'

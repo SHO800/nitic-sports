@@ -3,6 +3,7 @@ import {useData} from "@/hooks/data";
 import {useState} from "react";
 import TeamDataInput from "@/components/dashboard/events/TeamDataInput";
 import EventEditForm from "@/components/dashboard/events/EventEditForm";
+import {createEvent} from "@/app/actions/data";
 
 const EventForm = () => {
     const {mutateEvents, matchPlans} = useData();
@@ -41,21 +42,11 @@ const EventForm = () => {
             <form
                 onSubmit={async (e) => {
                     e.preventDefault();
-                    const response = await fetch(
-                        `${process.env.NEXT_PUBLIC_API_URL}/event/-1`,
-                        {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                name: (document.getElementById('eventName') as HTMLInputElement).value,
-                                description: (document.getElementById('eventDescription') as HTMLInputElement).value,
-                                teamData: JSON.stringify(teamDataJsonDraft),
-                            }),
-                        }
-                    );
-                    console.log(response);
+                    await createEvent(
+                        (document.getElementById('eventName') as HTMLInputElement).value,
+                        teamDataJsonDraft,
+                        (document.getElementById('eventDescription') as HTMLInputElement).value,
+                    )
                     await mutateEvents();
                 }}
                 className='flex items-center mt-4'

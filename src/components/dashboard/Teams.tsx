@@ -1,5 +1,6 @@
 "use client"
 import {useData} from "@/hooks/data";
+import {createTeam, deleteTeam} from "@/app/actions/data";
 
 const Teams = () => {
     const {teams, mutateTeams} = useData()
@@ -18,13 +19,7 @@ const Teams = () => {
                     <button
                         onClick={async (e) => {
                             e.preventDefault()
-                            const response = await fetch(
-                                `${process.env.NEXT_PUBLIC_API_URL}/team/${team.id}`,
-                                {
-                                    method: 'DELETE',
-                                }
-                            )
-                            console.log(response)
+                            await deleteTeam(team.id)
                         }}
                         className='bg-red-500 hover:bg-red-600 text-black px-4 py-2 rounded'
                     >
@@ -35,19 +30,7 @@ const Teams = () => {
             <form
                 onSubmit={async (e) => {
                     e.preventDefault()
-                    const response = await fetch(
-                        `${process.env.NEXT_PUBLIC_API_URL}/team/-1`,
-                        {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                name: (document.getElementById('teamName') as HTMLInputElement).value,
-                            }),
-                        }
-                    )
-                    console.log(response)
+                    await createTeam((document.getElementById('teamName') as HTMLInputElement).value)
                     await mutateTeams();
                 }}
                 className='flex items-center mt-4'

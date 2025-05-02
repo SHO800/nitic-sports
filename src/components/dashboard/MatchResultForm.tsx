@@ -2,6 +2,7 @@ import {MatchPlan, MatchResult} from "@prisma/client";
 import {useData} from "@/hooks/data";
 import {useEffect, useState} from "react";
 import analyzeVariableTeamId from "@/utils/analyzeVariableTeamId";
+import {createMatchResult} from "@/app/actions/data";
 
 export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan, matchResult?: MatchResult }) => {
     const {
@@ -15,12 +16,11 @@ export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan
         getActualTeamIdByVariableId
     } = useData()
 
-    
 
-    const [actualTeamIds, setActualTeamIds] = useState<number[]>(matchResult? matchResult.teamIds : []);
-    const [actualMatchScores, setActualMatchScores] = useState<string[]>(matchResult? matchResult.matchScores : []);
-    const [actualWinnerTeamId, setActualWinnerTeamId] = useState<number>(matchResult? matchResult.winnerTeamId : 0);
-    const [actualLoserTeamId, setActualLoserTeamId] = useState<number | null>(matchResult? matchResult.loserTeamId : null); // 複数対戦の場合はそもそも表示しない
+    const [actualTeamIds, setActualTeamIds] = useState<number[]>(matchResult ? matchResult.teamIds : []);
+    const [actualMatchScores, setActualMatchScores] = useState<string[]>(matchResult ? matchResult.matchScores : []);
+    const [actualWinnerTeamId, setActualWinnerTeamId] = useState<number>(matchResult ? matchResult.winnerTeamId : 0);
+    const [actualLoserTeamId, setActualLoserTeamId] = useState<number | null>(matchResult ? matchResult.loserTeamId : null); // 複数対戦の場合はそもそも表示しない
     const [actualResultNote, setActualResultNote] = useState<string>(matchResult?.resultNote ? matchResult.resultNote : "");
     const [actualResultSecretNote, setActualResultSecretNote] = useState<string>(matchResult?.resultSecretNote ? matchResult.resultSecretNote : "");
 
@@ -37,7 +37,7 @@ export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan
         if (variableTeamIds.length > 0) {
             // すべての依存試合の結果が確定していなければこの試合結果を入力できないようにする
             setCanInput(variableTeamIds.every(id => isFixedMatchResultOrBlockRankByVariableId(id)))
-            
+
         }
         // 最初からactualTeamIdsに当初予定されていたteamIdsをいれる処理
         const defaultTeamIds = matchPlan.teamIds.map((teamId): number => {
@@ -51,9 +51,9 @@ export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan
                     if (analyzedTeamId === null) return -1;
                     if (analyzedTeamId.type === "T") {
                         if (!matchResults) return -1;
-                        if (analyzedTeamId.condition === "W") 
+                        if (analyzedTeamId.condition === "W")
                             return matchResults[analyzedTeamId.matchId]?.winnerTeamId ?? -1
-                        else 
+                        else
                             return matchResults[analyzedTeamId.matchId]?.loserTeamId ?? -1
                     } else if (analyzedTeamId.type === "L") {
                         // もしリーグ戦の結果だった場合
@@ -72,8 +72,7 @@ export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan
                         }
                     }
                     return -1;
-                }
-                else return -1; // 別の箇所でそもそも入力不可にする処理が走るので空でok
+                } else return -1; // 別の箇所でそもそも入力不可にする処理が走るので空でok
             }
         })
         setActualTeamIds(defaultTeamIds);
@@ -97,25 +96,16 @@ export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan
                 <form
                     onSubmit={async (e) => {
                         e.preventDefault()
-                        const response = await fetch(
-                            `${process.env.NEXT_PUBLIC_API_URL}/match-result/${matchPlan.id}`,
-                            {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({
-                                    matchPlanId: matchPlan.id,
-                                    resultNote: actualResultNote,
-                                    secretNote: actualResultSecretNote,
-                                    matchScores: actualMatchScores,
-                                    winnerTeamId: actualWinnerTeamId,
-                                    loserTeamId: actualLoserTeamId,
-                                    teamIds: actualTeamIds,
-                                }),
-                            }
+                        await createMatchResult(
+                            matchPlan.id,
+                            matchPlan.eventId,
+                            actualTeamIds,
+                            actualMatchScores,
+                            actualWinnerTeamId,
+                            actualLoserTeamId ?? undefined,
+                            actualResultNote,
+                            actualResultSecretNote,
                         )
-                        console.log(response)
                         await mutateMatchResults();
                         await mutateMatchPlans();
                         alert("試合結果を更新しました！ 反映には再読み込みが必要なことがあります。")
@@ -127,33 +117,34 @@ export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan
                         matchPlan.teamIds.map((teamId, index) => {
                             const actualTeamId = getActualTeamIdByVariableId(teamId)
                             const ac = actualTeamId ? actualTeamId.toString() : teamId
-                        return (
-                            <div key={"matchResultTeam" + index}>
-                                {getMatchDisplayStr(teamId)}: <input
-                                type='text'
-                                name={`matchResult${index}`}
-                                id={`matchResult${index}`}
-                                className='border border-gray-400 px-4 py-2 mt-1 mr-2 rounded text-black'
-                                placeholder='スコア'
-                                required
-                                disabled={!canInput}
-                                onChange={(e) => {
-                                    const newMatchScores = [...actualMatchScores]
-                                    newMatchScores[index] = e.target.value
-                                    setActualMatchScores(newMatchScores)
-                                }}
-                                value={actualMatchScores[index] || ""}
-                            />
-                                <input type="radio" name={"matchResultWinner-" + matchPlan.id}
-                                       id={`matchResult-${matchPlan.id}-${index}`} required value={ac}
-                                       disabled={!canInput}
-                                       onChange={(e) => {
-                                           setActualWinnerTeamId(Number(e.target.value))
-                                       }}
-                                        checked={actualWinnerTeamId === Number(ac)}
+                            return (
+                                <div key={"matchResultTeam" + index}>
+                                    {getMatchDisplayStr(teamId)}: <input
+                                    type='text'
+                                    name={`matchResult${index}`}
+                                    id={`matchResult${index}`}
+                                    className='border border-gray-400 px-4 py-2 mt-1 mr-2 rounded text-black'
+                                    placeholder='スコア'
+                                    required
+                                    disabled={!canInput}
+                                    onChange={(e) => {
+                                        const newMatchScores = [...actualMatchScores]
+                                        newMatchScores[index] = e.target.value
+                                        setActualMatchScores(newMatchScores)
+                                    }}
+                                    value={actualMatchScores[index] || ""}
                                 />
-                            </div>
-                        )})
+                                    <input type="radio" name={"matchResultWinner-" + matchPlan.id}
+                                           id={`matchResult-${matchPlan.id}-${index}`} required value={ac}
+                                           disabled={!canInput}
+                                           onChange={(e) => {
+                                               setActualWinnerTeamId(Number(e.target.value))
+                                           }}
+                                           checked={actualWinnerTeamId === Number(ac)}
+                                    />
+                                </div>
+                            )
+                        })
 
                     }
                     <button

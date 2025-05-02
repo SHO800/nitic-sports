@@ -1,6 +1,7 @@
 "use client"
 import {useData} from "@/hooks/data";
 import Bracket from "@/components/common/Bracket";
+import {deleteEvent} from "@/app/actions/data";
 
 const EventList = () => {
     const {events, mutateEvents, matchPlans} = useData();
@@ -23,13 +24,7 @@ const EventList = () => {
                         <button
                             onClick={async (e) => {
                                 e.preventDefault()
-                                const response = await fetch(
-                                    `${process.env.NEXT_PUBLIC_API_URL}/event/${event.id}`,
-                                    {
-                                        method: 'DELETE',
-                                    }
-                                )
-                                console.log(response)
+                                await deleteEvent(event.id);
                                 await mutateEvents()
                             }}
                             className='bg-red-500 hover:bg-red-600 text-black px-4 py-2 rounded'

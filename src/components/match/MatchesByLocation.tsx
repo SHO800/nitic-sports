@@ -8,6 +8,7 @@ import DeleteButton from "@/components/dashboard/matchPlan/DeleteButton";
 import MatchCountdown from "@/components/dashboard/matchPlan/MatchCountdown";
 import MatchTimer from "@/components/dashboard/MatchTimer";
 import MatchResult from "@/components/dashboard/matchPlan/MatchResult";
+import {updateMatchPlanStatus} from "@/app/actions/data";
 
 const MatchesByLocation = ({locationId}: { locationId: string }) => {
     const {matchPlans, locations, events, getMatchDisplayStr, matchResults, mutateMatchPlans} = useData()
@@ -69,23 +70,12 @@ const MatchesByLocation = ({locationId}: { locationId: string }) => {
     // ステータスを更新する関数
     const updateMatchStatus = async (matchId: number, status: Status) => {
         try {
-            const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/match-plan/${matchId}`,
-                {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        startedAt: status === Status.Playing ? new Date() : null,
-                        endedAt: status === Status.Finished ? new Date() : null,
-                        status
-                    }),
-                },
-            );
-            if (!response.ok) {
-                throw new Error("Failed to update match status");
-            }
+            await updateMatchPlanStatus(
+                matchId,
+                status,
+                status === Status.Playing ? new Date() : undefined,
+                status === Status.Finished ? new Date() : undefined
+            )
             await mutateMatchPlans();
 
             
