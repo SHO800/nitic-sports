@@ -4,7 +4,6 @@ import { useState } from "react";
 import { MatchPlan as MatchPlanType } from "@prisma/client";
 import { useCurrentTime } from "@/hooks/currenTime";
 import { judgeDay12String } from "@/utils/judgeDay12";
-import InfoModal from "../infomation/InfoModal";
 
 type MatchInfoProps = {
     matchPlan: MatchPlanType;
@@ -14,9 +13,8 @@ type MatchInfoProps = {
 
 };
 
-const MatchInfoForReader = ({ matchPlan, events, locations, getMatchDisplayStr }: MatchInfoProps) => {
+const MatchInfoOnModal = ({ matchPlan, events, locations, getMatchDisplayStr }: MatchInfoProps) => {
     
-    const [isOpen, setIsOpen] = useState(false);
     const {currentTime} = useCurrentTime();
     const startTimeDate = new Date(matchPlan.scheduledStartTime);
     const startTime = startTimeDate.getTime();
@@ -35,14 +33,11 @@ const MatchInfoForReader = ({ matchPlan, events, locations, getMatchDisplayStr }
             getMatchDisplayStr,
         };
 
-    const OpenModal = () => setIsOpen(true);
-    const CloseModal = () => setIsOpen(false);
-
     const isPast = matchPlan.status === "Waiting" || matchPlan.status === "Preparing" && ReceivedMatchPlans.scheduledStartTimeNum < currentTime
     
     return (
         <div className="w-full text-black">
-            <div onClick={() => OpenModal()} className="flex w-full bg-white text-[17px] justify-between items-center">
+            <div className="flex w-full bg-white text-[17px] justify-between items-center">
                 <p className="ml-2">#{matchPlan.id}</p>
                 <p className={`${(matchPlan.matchNote?.trim() === "" || matchPlan.matchNote === null) ? "" : "bg-amber-500 text-white mx-2 my-0.5 px-1 py-0.5 rounded"}`}>{matchPlan.matchNote}</p>
                 <p className={`${(matchPlan.matchNote?.trim() !== "" || matchPlan.matchNote === null) ? "mr-2" : "mr-6"}`}>{events?.find((event) => event.id === matchPlan.eventId)?.name}</p>
@@ -50,7 +45,7 @@ const MatchInfoForReader = ({ matchPlan, events, locations, getMatchDisplayStr }
             
             <div className="relative bg-black h-[0.5px] mx-2"></div>
             
-            <div onClick={() => OpenModal()} className="flex bg-white text-4xl py-1 justify-center">
+            <div className="flex bg-white text-4xl py-1 justify-center">
                 {
                     matchPlan.teamIds.map((teamId, index) => {
                         let result = getMatchDisplayStr(teamId)
@@ -65,7 +60,7 @@ const MatchInfoForReader = ({ matchPlan, events, locations, getMatchDisplayStr }
             
             <div className="relative bg-black h-[0.5px] mx-2"></div>
             
-            <div onClick={() => OpenModal()} className="flex px-2 bg-white text-[17px] justify-between">
+            <div className="flex px-2 bg-white text-[20px] justify-between">
                 <div className={`flex ml-1 ${(isPast) ? "text-red-500" : "text-black"} `}>
                     <div className="mr-1.5">
                         {JudgedSchedule}
@@ -85,18 +80,8 @@ const MatchInfoForReader = ({ matchPlan, events, locations, getMatchDisplayStr }
                 }
                 </div>
             </div>
-
-            <InfoModal
-                matchPlan={matchPlan}
-                events={events}
-                locations={locations}
-                getMatchDisplayStr={getMatchDisplayStr}
-                isOpen={isOpen}
-                closeModal={CloseModal}
-            />
-
         </div>
     );
 };
 
-export default MatchInfoForReader;
+export default MatchInfoOnModal;

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import MapInfo from "./MapInfo";
-import { Playpen_Sans } from "next/font/google";
+// import { Playpen_Sans } from "next/font/google";
 
 type Props = {
     placeId:number | null;

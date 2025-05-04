@@ -44,8 +44,8 @@ const EventModal = ({placeId, isOpen, closeModal}:Props) => {
     */}
 
     return(
-        <div className="flex flex-col fixed z-80 w-full  h-screen -mt-18 bg-black/30 justify-center items-center">
-                <div className="flex flex-col lg:w-[60vw] px-1 pb-4 bg-gray-300 rounded item-center">    
+        <div className="flex flex-col fixed inset-0 z-80 w-full  h-screen bg-black/30 justify-center items-center">
+                <div className="flex flex-col lg:w-[60vw] px-1 pb-4 bg-gray-300 rounded">    
                     <button onClick={closeModal} className="flex mr-1 ml-auto my-1 px-2 py-1 bg-red-400 hover:bg-red-300 rounded text-white float-right">×</button>
                     {/*
                     <div className="flex bg-gray-300 justify-center pb-1 rounded-t">実施予定の試合</div>
