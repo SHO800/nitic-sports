@@ -15,11 +15,11 @@ const MatchCountdownForReader = ({scheduledStartTime}: MatchCountdownProps) => {
         <div className="text-black">
             {/* 開始時間が過ぎている場合は赤色で表示 */}
             {isPast ? (
-                <p className="text-red-500">
-                    遅延: {str}
+                <p className="text-red-500 text-[20px]">
+                    {str} 遅延しています
                 </p>
             ) : (
-                <p className="text-green-800">
+                <p className="text-green-800 text-[20px]">
                     あと {str} で開始
                     {
                         waiting &&  <span className={"ml-1 text-sm"}>応答待機中 (最大1分)</span> 

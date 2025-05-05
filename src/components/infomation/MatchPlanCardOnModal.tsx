@@ -76,11 +76,12 @@ const MatchPlanCardOnMaodal = ({matchPlan, events, locations, status, getMatchDi
 
     return(
         <div className="flex flex-col min-w-[80vw] justify-center">
-                <div className="flex flex-col lg:mx-20 px-1 py-2 bg-gray-100 rounded overflow-auto">
-                        <div className="flex flex-col justify-center bg-gray-100 mb-4 px-10 rounded">
-                            <p>試合情報</p>
-                            <div className="flex flex-col bg-white mb-1 border rounded">
-                                <div className="flex justify-center min-w-[60vw] bg-white text-black px-1 rounded text-2xl">
+                <div className="flex flex-col lg:mx-40 px-1 py-2 bg-gray-100 rounded overflow-auto">
+                        <div className="flex justify-center bg-gray-100 mb-4 px-5 rounded">
+                            <div className="flex flex-col">
+                            <p className="font-bold mb-2">試合情報</p>
+                            <div className="flex flex-col bg-white w-[60vw] lg:w-[30vw] mb-1 border rounded ">
+                                <div className="flex justify-center bg-white text-black px-1 rounded text-2xl">
                                     
                                     <MatchInfoOnModal
                                         matchPlan={matchPlan}
@@ -94,11 +95,12 @@ const MatchPlanCardOnMaodal = ({matchPlan, events, locations, status, getMatchDi
                                 <>
                                     <div className="relative bg-black h-[0.5px] mx-3 mt-0.5"></div>
                                     
-                                    <p className="flex justify-center bg-white text-black px-1 rounded text-2xl">
+                                    <p className="flex bg-white text-black px-1 rounded text-2xl justify-center">
                                         <MatchCountdownForReader scheduledStartTime={matchPlan.scheduledStartTime} />
                                     </p>
                                 </>
                                 )}
+                            </div>
                             </div>
                         </div>
                 </div>  

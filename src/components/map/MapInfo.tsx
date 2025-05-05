@@ -3,6 +3,7 @@ import { useData } from "@/hooks/data";
 // import { Status, MatchPlan as MatchPlanType } from "@prisma/client";
 // import MatchCountdownForReader from "../reader/MatchCountdownForReader";
 import MatchInfoOnModal from "../infomation/MatchInfoOnModal";
+import MatchInfoForReader from "../reader/MatchInfoForReader";
 
 type Props =
     | {placeId: number | null;}
@@ -62,7 +63,7 @@ const MapInfo = ({placeId}:Props) => {
                             <div key={item.id} className="flex flex-col bg-white mb-1 border rounded">
                                 <div className="flex justify-center bg-white text-black px-1 rounded text-2xl">
 
-                                    <MatchInfoOnModal
+                                    <MatchInfoForReader
                                         matchPlan={item}
                                         events={events}
                                         locations={locations}

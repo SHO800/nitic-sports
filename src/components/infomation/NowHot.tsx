@@ -61,7 +61,7 @@ const NowHot: React.FC<Props> = (props) => {
                         return(
                         <div className="flex justify-center bg-gray-100 px-10 rounded">
                             <div key={item.id} className="flex flex-col bg-white mb-1 border rounded">
-                                <div className="flex justify-center min-w-[60vw] bg-white text-black px-1 rounded text-2xl">
+                                <div className="flex justify-center w-[60vw] lg:w-[30vw] bg-white text-black px-1 rounded text-2xl">
                                     
                                     <MatchInfoForReader
                                         matchPlan={item}
@@ -134,7 +134,7 @@ const NowHot: React.FC<Props> = (props) => {
                             return(
                             <div className="flex justify-center bg-gray-100 px-10 rounded">
                                 <div key={item.id} className="flex flex-col bg-white mb-1 border rounded">
-                                    <div className="flex justify-center min-w-[60vw] bg-white text-black px-1 rounded text-2xl">
+                                    <div className="flex justify-center w-[60vw] lg:w-[30vw] bg-white text-black px-1 rounded text-2xl">
                                         
                                         <MatchInfoForReader
                                             matchPlan={item}
