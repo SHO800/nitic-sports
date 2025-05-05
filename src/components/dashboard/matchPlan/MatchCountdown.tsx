@@ -6,8 +6,7 @@ type MatchCountdownProps = {
 };
 
 const MatchCountdown = ({scheduledStartTime}: MatchCountdownProps) => {
-    const {formatTimeDifference, currentTime} = useCurrentTime();
-    
+    const {formatTimeDifference} = useCurrentTime();
     const {str, isPast, waiting} = formatTimeDifference(scheduledStartTime)
     
     
@@ -16,11 +15,11 @@ const MatchCountdown = ({scheduledStartTime}: MatchCountdownProps) => {
             {/* 開始時間が過ぎている場合は赤色で表示 */}
             {isPast ? (
                 <p className="text-red-500">
-                    {new Date(currentTime).toLocaleString()} 遅延: {str}
+                    遅延: {str}
                 </p>
             ) : (
                 <p className="text-green-800">
-                    {new Date(currentTime).toLocaleString()} 開始予定時刻まで: {str}
+                    {str} 後
                     {
                         waiting &&  <span className={"ml-1 text-sm"}>応答待機中 (最大1分)</span> 
                     }

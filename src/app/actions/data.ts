@@ -232,6 +232,9 @@ export async function createMatchResult(
 
     if (response) {
         revalidatePath('/dashboard')
+        // その試合のstatusをcompletedにする
+        await updateMatchPlanStatus(matchId, Status.Completed)
+        
         // 試合結果に基づいてリーグ順位を更新
         try {
             const updated = await updateLeagueRankings(eventId, matchId);
