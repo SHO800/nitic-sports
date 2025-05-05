@@ -76,7 +76,7 @@ export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan
             }
         })
         setActualTeamIds(defaultTeamIds);
-    }, [matchPlans]);
+    }, [getLeagueDataByVariableId, isFixedMatchResultOrBlockRankByVariableId, matchPlan, matchPlans, matchResults]);
 
     useEffect(() => {
         if (matchPlan && matchPlan.teamIds.length > 0) {
@@ -108,48 +108,68 @@ export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan
                         )
                         await mutateMatchResults();
                         await mutateMatchPlans();
-                        alert("試合結果を更新しました！ 反映には再読み込みが必要なことがあります。")
                     }
                     }
                 >
                     {/*チームごとに枠を用意*/}
-                    {
-                        matchPlan.teamIds.map((teamId, index) => {
-                            const actualTeamId = getActualTeamIdByVariableId(teamId)
-                            const ac = actualTeamId ? actualTeamId.toString() : teamId
-                            return (
-                                <div key={"matchResultTeam" + index}>
-                                    {getMatchDisplayStr(teamId)}: <input
-                                    type='text'
-                                    name={`matchResult${index}`}
-                                    id={`matchResult${index}`}
-                                    className='border border-gray-400 px-4 py-2 mt-1 mr-2 rounded text-black'
-                                    placeholder='スコア'
-                                    required
-                                    disabled={!canInput}
-                                    onChange={(e) => {
-                                        const newMatchScores = [...actualMatchScores]
-                                        newMatchScores[index] = e.target.value
-                                        setActualMatchScores(newMatchScores)
-                                    }}
-                                    value={actualMatchScores[index] || ""}
-                                />
-                                    <input type="radio" name={"matchResultWinner-" + matchPlan.id}
-                                           id={`matchResult-${matchPlan.id}-${index}`} required value={ac}
-                                           disabled={!canInput}
-                                           onChange={(e) => {
-                                               setActualWinnerTeamId(Number(e.target.value))
-                                           }}
-                                           checked={actualWinnerTeamId === Number(ac)}
-                                    />
-                                </div>
-                            )
-                        })
-
-                    }
+                    <table className={"mt-2 mb-4 border-separate border-spacing-y-1"}>
+                        {/*チーム名, スコア, 勝者の3列*/}
+                        <thead>
+                        
+                        <tr className={"w-full"}>
+                            <th scope={"col"} className={"w-1/6"} >所属</th>
+                            <th scope={"col"} className={"w-2/3"} >スコア</th>
+                            <th scope={"col"} className={"w-1/6"} >勝者</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {
+                            matchPlan.teamIds.map((teamId, index) => {
+                                const actualTeamId = getActualTeamIdByVariableId(teamId)
+                                const ac = actualTeamId ? actualTeamId.toString() : teamId
+                                return (
+                                    <tr key={"matchResultTeam" + index} className={"h-12"}>
+                                        <td className={"text-center"}>
+                                            <p className={"text-[1.1em]"}>{getMatchDisplayStr(teamId)}</p>
+                                        </td>
+                                        <td>
+                                            <input
+                                                type='text'
+                                                name={`matchResult${index}`}
+                                                id={`matchResult${index}`}
+                                                className='border border-gray-400 px-2 py-1 mx-2 h-8 rounded text-black w-[calc(100%-1em)]'                                                placeholder='スコア'
+                                                required
+                                                disabled={!canInput}
+                                                onChange={(e) => {
+                                                    const newMatchScores = [...actualMatchScores]
+                                                    newMatchScores[index] = e.target.value
+                                                    setActualMatchScores(newMatchScores)
+                                                }}
+                                                value={actualMatchScores[index] || ""}
+                                            />
+                                        </td>
+                                        <td>
+                                            <input type="radio" name={"matchResultWinner-" + matchPlan.id}
+                                                   id={`matchResult-${matchPlan.id}-${index}`} required value={ac}
+                                                   disabled={!canInput}
+                                                   onChange={(e) => {
+                                                       setActualWinnerTeamId(Number(e.target.value))
+                                                       const otherTeam = actualTeamIds.filter(ati => ati.toString() !== e.target.value)
+                                                       if (otherTeam.length === 1) setActualLoserTeamId(otherTeam[0])
+                                                   }}
+                                                   checked={actualWinnerTeamId === Number(ac)}
+                                                   className={"block w-full h-6 "}
+                                            />
+                                        </td>
+                                    </tr>
+                                )
+                            })
+                        }
+                        </tbody>
+                    </table>
                     <button
                         type='submit'
-                        className='bg-green-500 hover:bg-green-400 text-white mt-1 px-4 py-2 rounded'
+                        className='bg-green-500 hover:bg-green-400 text-white mt-1 px-4 py-2 rounded block mx-auto w-full'
                         disabled={!canInput}
                     >
                         更新

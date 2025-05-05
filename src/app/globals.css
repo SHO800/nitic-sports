@@ -36,7 +36,7 @@ body {
 }
 
 
-.card-progress {
+.card-green {
     border-image: repeating-conic-gradient(
             from var(--angle),
             /*#F1F1F1 0%,*/
@@ -50,26 +50,27 @@ body {
     1 stretch;
 }
 
-.card-warn {
+.card-yellow {
     border-image: repeating-conic-gradient(
             from var(--angle),
-                #171717 0deg 15deg,
-                #fbb300 15deg 30deg
+            hsl(60, 100%, 50%) 0,
+            hsl(43, 100%, 50%) 10%,
+            hsl(60, 100%, 50%) 20%
     )
     1 stretch;
 }
 
-.card-danger {
+.card-red {
     border-image: repeating-conic-gradient(
             from var(--angle),
-            hsl(0, 0%, 100%) 0,
+            hsl(20, 100%, 50%) 0,
             hsl(0, 100%, 50%) 10%,
-            hsl(0, 0%, 100%) 20%
+            hsl(20, 100%, 50%) 20%
     )
     1 stretch;
 }
 
-.card-finished {
+.card-blue {
     border-image: repeating-conic-gradient(
             from var(--angle),
             hsl(177, 100%, 50%) 0,
@@ -79,12 +80,12 @@ body {
     1 stretch;
 }
 
-.card-completed {
+.card-gray {
     opacity: .75;
 }
 
-.card-progress, .card-warn, .card-danger, .card-finished {
-    border-width: 2px;
+.card-green, .card-yellow, .card-red, .card-blue {
+    border-width: 3px;
     animation: rotate 4s linear infinite;
     
 }

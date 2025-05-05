@@ -1,11 +1,11 @@
 "use client"
 
-import {useCurrentTime} from "@/hooks/currenTime";
+import {useCurrentTimeContext} from "@/contexts/currentTimeContext";
 
 
 const Clock = () => {
-    const {currentTime} = useCurrentTime()
-    
+    const {currentTime} = useCurrentTimeContext();
+
     return (
         <div
             suppressHydrationWarning={true}

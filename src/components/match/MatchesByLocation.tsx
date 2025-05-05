@@ -3,10 +3,11 @@ import {RefObject, UIEventHandler, useEffect, useMemo, useRef, useState} from "r
 import {Event, Location, MatchPlan} from "@prisma/client";
 import MatchCard from "@/components/match/MatchCard";
 
-const MatchesByLocation = ({location, onScroll, refs}: {
+const MatchesByLocation = ({location, onScroll, refs, isShowCompletedMatch = false}: {
     location: Location,
     onScroll: UIEventHandler<HTMLDivElement>,
-    refs: RefObject<HTMLDivElement[]>
+    refs: RefObject<HTMLDivElement[]>,
+    isShowCompletedMatch: boolean 
 }) => {
     const {matchPlans, locations, events, matchResults} = useData()
     const [matchesInLocation, setMatchesInLocation] = useState<MatchPlan[]>([])
@@ -53,15 +54,13 @@ const MatchesByLocation = ({location, onScroll, refs}: {
 
     useEffect(() => {
         if (!locations || !matchPlans) return;
-        const relatedMatchPlans: MatchPlan[] = matchPlans.filter(matchPlan => matchPlan.locationId === location.id)
-
-
+        const relatedMatchPlans: MatchPlan[] = matchPlans.filter(matchPlan => (matchPlan.locationId === location.id) && (isShowCompletedMatch || matchPlan.status !== "Completed") )
         // 開始時刻で並べ替え
         relatedMatchPlans.sort((a, b) => new Date(a.scheduledStartTime).getTime() - new Date(b.scheduledStartTime).getTime())
         setMatchesInLocation(relatedMatchPlans)
 
 
-    }, [location.id, locations, matchPlans])
+    }, [isShowCompletedMatch, location.id, locations, matchPlans])
 
 
     return (
@@ -78,7 +77,7 @@ const MatchesByLocation = ({location, onScroll, refs}: {
                 ref={scrollerRef}
             >
                 {matchesInLocation.map(match =>
-                    <MatchCard key={"matches-" + match.id} match={match} location={location} eventsById={eventsById}
+                    <MatchCard key={"matches-" + match.id} match={match} eventsById={eventsById}
                                matchResults={matchResults}/>
                 )}
             </div>

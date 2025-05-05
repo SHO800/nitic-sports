@@ -80,14 +80,15 @@ export async function updateMatchPlanStatus(
     startedAt?: Date,
     endedAt?: Date,
 ) {
+    
     const response = await prisma.matchPlan.update({
         where: {
             id,
         },
         data: {
             status,
-            startedAt: startedAt ?? status === "Playing" ? new Date() : undefined,
-            endedAt: endedAt ?? status === "Finished" ? new Date() : undefined,
+            startedAt: startedAt ? startedAt : status === "Playing" ? new Date() : undefined,
+            endedAt: endedAt ? endedAt :  status === "Finished" ? new Date() : undefined,
         },
     })
 

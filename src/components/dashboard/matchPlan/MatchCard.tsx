@@ -9,7 +9,7 @@ import {
 import MatchInfo from "./MatchInfo";
 import StatusBadge from "./StatusBadge";
 import MatchCountdown from "./MatchCountdown";
-import MatchTimer from "@/components/dashboard/MatchTimer";
+import MatchTimer from "@/components/match/MatchTimer";
 import DeleteButton from "@/components/dashboard/matchPlan/DeleteButton";
 import MatchResult from "@/components/dashboard/matchPlan/MatchResult";
 
@@ -66,26 +66,15 @@ const MatchCard = ({
             }
 
             {/* タイマー表示 - Preparing（準備中）またはPlaying（試合中）の場合だけ表示 */}
-            {(status === Status.Preparing || status === Status.Playing) && 
+            {(status === Status.Playing) && 
                 <MatchTimer
-                    matchId={matchPlan.id}
-                    status={status}
-                    isRunning={status === Status.Playing}
+                    match={matchPlan}
+                    
                     onStart={() => handleStartTimer(matchPlan.id)}
                     onStop={() => handleStopTimer(matchPlan.id)}
                 />
             }
-
-            {/*/!* 試合終了した後もタイマー表示（状態が変わっても継続表示） *!/*/}
-            {/*{status === Status.Finished && matchTimers[matchPlan.id] === false && (*/}
-            {/*    <MatchTimer */}
-            {/*        matchId={matchPlan.id}*/}
-            {/*        status={status}*/}
-            {/*        isRunning={false}*/}
-            {/*        onStart={() => handleStartTimer(matchPlan.id)}*/}
-            {/*        onStop={() => handleStopTimer(matchPlan.id)}*/}
-            {/*    />*/}
-            {/*)}*/}
+            
 
             {/* 試合結果表示 */}
             <MatchResult

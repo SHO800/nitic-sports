@@ -8,10 +8,10 @@ type StatusBadgeProps = {
 
 const StatusBadge = ({status}: StatusBadgeProps) => {
     return (
-        <span
-            className={`mr-2 px-2 py-1 rounded text-sm ${statusColors[status as keyof typeof statusColors]} text-black`}>
+        <p
+            className={`mr-2 px-2 py-1 rounded text-[.8em] ${statusColors[status as keyof typeof statusColors]} text-black text-center `}>
             {statusNames[status as keyof typeof statusNames]}
-        </span>
+        </p>
     );
 };
 

@@ -7,9 +7,9 @@ export const statusNames = {
 }
 
 export const statusColors = {
-    Waiting: "bg-yellow-200",
-    Preparing: "bg-blue-200",
+    Waiting: "bg-blue-100",
+    Preparing: "bg-blue-300",
     Playing: "bg-green-200",
-    Finished: "bg-red-200",
-    Completed: "bg-gray-200",
+    Finished: "bg-yellow-200",
+    Completed: "bg-gray-300",
 }

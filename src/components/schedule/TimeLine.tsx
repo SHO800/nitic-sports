@@ -2,15 +2,15 @@
 
 // 親要素に最大化してくっつく, 開始時間と終了時間を受け取って時間に応じて上から何%かの位置に赤い横棒を引く 
 import {useState} from "react";
-import {useCurrentTime} from "@/hooks/currenTime";
+import {useCurrentTimeContext} from "@/contexts/currentTimeContext";
 
 const TimeLine = ({startTime, endTime}: { startTime: Date | string, endTime: Date | string }) => {
-    const {currentTime} = useCurrentTime()
+    const {currentTime} = useCurrentTimeContext();
     const [start] = useState<number>(new Date(startTime).getTime());
     const [totalTime] = useState<number>(new Date(endTime).getTime() - new Date(startTime).getTime());
-    
+
     // 経過時間をパーセンテージに変換
-    const time = currentTime - start;
+    const time = currentTime.getTime() - start;
     const percent = time / totalTime * 100;
 
 
