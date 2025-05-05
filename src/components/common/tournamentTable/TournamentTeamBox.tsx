@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useMemo, useRef, useState} from "react";
 import TournamentLine from "@/components/common/tournamentTable/TournamentLine";
 import {TournamentNodeTeam} from "@/utils/tournamentUtils";
 import {useData} from "@/hooks/data";
@@ -10,7 +10,7 @@ const TournamentTeamBox = ({node, rowWidth, rowHeight}: {
 }) => {
     
     
-    const {getMatchDisplayStr} = useData()
+    const {getMatchDisplayStr, getActualTeamIdByVariableId, matchResults} = useData()
     const boxRef = useRef<HTMLDivElement | null>(null);
     const [lineCoords, setlineCoords] = useState({
         startX: 0,
@@ -19,10 +19,6 @@ const TournamentTeamBox = ({node, rowWidth, rowHeight}: {
         endY: 0,
         type: "H" as "H" | "V" | "LT" | "RT" | "LB" | "RB",
     });
-    const [diffs, setDiffs] = useState({
-        rowDiff: 0,
-        colDiff: 0
-    })
 
 
     useEffect(() => {
@@ -34,7 +30,6 @@ const TournamentTeamBox = ({node, rowWidth, rowHeight}: {
 
                 const rowDiff = node.nextNode.row - node.row
                 const colDiff = node.nextNode.column - node.column // チームは常に左端に配置しているので常に正
-                setDiffs({rowDiff, colDiff})
                 
                 
                 let startX = box.width ;
@@ -76,6 +71,19 @@ const TournamentTeamBox = ({node, rowWidth, rowHeight}: {
 
 
     const displayStr = getMatchDisplayStr(node.teamId)
+    
+    const isWonInNextNode = useMemo(() => {
+        const nextNode = node.nextNode
+        if (!matchResults || !nextNode || nextNode?.type === "team") return false
+        const actualId = getActualTeamIdByVariableId(node.teamId.toString())
+        if (!actualId) return false;
+        const result = matchResults[nextNode.matchId]  
+        if (!result) return false;
+        return result.winnerTeamId === actualId
+        
+    }, [getActualTeamIdByVariableId, matchResults, node.nextNode, node.teamId])
+    
+    
     return (
         <div
             className={`flex justify-between items-center p-2 relative h-10 w-full `}
@@ -89,7 +97,8 @@ const TournamentTeamBox = ({node, rowWidth, rowHeight}: {
                                 endX={lineCoords.endX}
                                 endY={lineCoords.endY}
                                 type={lineCoords.type}
-                                color={false ? "rgb(255,0,0)" : "rgba(156, 163, 175, 1)"}
+                                color1={ "rgb(255,0,0)" }
+                                color2={ isWonInNextNode ? "rgb(255,0,0)" : "rgba(156, 163, 175, 1)"}
                                 thickness={4}
                                 animationTimingFunction={"linear"}
                                 duration={200}

@@ -133,12 +133,6 @@ const Bracket = ({eventId, matchPlans}: { eventId: number, matchPlans: MatchPlan
                 <div className="bg-white rounded-lg shadow-md p-6 overflow-hidden">
 
                     {currentType === 'tournament' && (
-                        // <TournamentBracket
-                        //     key={`bracket-tournament-${eventId}`}
-                        //     eventId={eventId}
-                        //     isFinal={isFinal}
-                        //     relatedMatchPlans={relatedMatchPlans}
-                        // />
                         <TournamentTable
                             key={`bracket-tournament-${eventId}`}
                             eventId={eventId}
@@ -148,7 +142,6 @@ const Bracket = ({eventId, matchPlans}: { eventId: number, matchPlans: MatchPlan
                     )}
 
                     {currentType === 'league' && teamData?.type === "league" && teamData.blocks && (
-
                         <div className="space-y-8">
                             {Object.keys(teamData.blocks).map((blockName) => (
                                 <div key={`league-${eventId}-${blockName}`} className="mb-6">

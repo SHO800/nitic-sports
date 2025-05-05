@@ -1,8 +1,9 @@
-import React, {CSSProperties, useCallback, useEffect, useRef, useState} from "react";
+import React, {CSSProperties, useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {TournamentNodeMatch} from "@/utils/tournamentUtils";
-import {useData} from "@/hooks/data";
-import {MatchResult} from "@prisma/client";
+import {MatchResult, Status} from "@prisma/client";
 import TournamentLine from "@/components/common/tournamentTable/TournamentLine";
+import {useData} from "@/hooks/data";
+import {statusColors} from "@/components/dashboard/matchPlan/constants";
 
 const TournamentMatchBox = ({match, boxStyle, matchResult, rowWidth, rowHeight}: {
     match: TournamentNodeMatch,
@@ -11,8 +12,8 @@ const TournamentMatchBox = ({match, boxStyle, matchResult, rowWidth, rowHeight}:
     rowWidth: number
     rowHeight: number
 }) => {
-    const {getMatchDisplayStr, getActualTeamIdByVariableId} = useData();
-    // const {boxNodes, registerNode} = useTournamentBracket();
+    
+    const {matchResults} = useData()
 
     const matchBoxRef = useRef<HTMLDivElement>(null);
     const wrapperRef = useRef<HTMLDivElement>(null);
@@ -24,46 +25,38 @@ const TournamentMatchBox = ({match, boxStyle, matchResult, rowWidth, rowHeight}:
         endY: 0,
         type: "H" as "H" | "V" | "LT" | "RT" | "LB" | "RB",
     });
-    const [diffs, setDiffs] = useState({
-        rowDiff: 0,
-        colDiff: 0
-    })
-    
+
     // リサイズ時や初回レンダリング時に座標を再計算
     const calculateLineCoordinates = useCallback(() => {
 
-        if (!match.nextNode) return;
         if (!matchBoxRef.current || !wrapperRef.current) return;
-
-
         const box = matchBoxRef.current.getBoundingClientRect();
-        const rowDiff = match.nextNode.row - match.row
-        const colDiff = match.nextNode.column - match.column
-        setDiffs({rowDiff, colDiff})
+        let rowDiff;
+        let colDiff;
+        if (match.nextNode) {
+        rowDiff = match.nextNode.row - match.row
+         colDiff = match.nextNode.column - match.column
+        }else {
+            rowDiff = 0
+            colDiff = 1
+        }
 
-        let startX = box.width;
-        let endX = box.width + (colDiff ) * rowWidth;
+        const startX = box.width;
+        const endX = box.width + (colDiff) * rowWidth;
         let startY = box.height / 2;
         let endY = box.height / 2;
-        let type = "H" as "H" | "V" | "LT" | "RT" | "LB" | "RB";
+        let type: "H" | "V" | "LT" | "RT" | "LB" | "RB";
 
 
         if (rowDiff > 0) {
-            startX = box.width;
-            endX = box.width + (colDiff) * rowWidth; 
             startY = box.height / 2;
             endY = box.height / 2 + (rowDiff) * rowHeight;
             type = "RT";
         } else if (rowDiff < 0) {
-            startX = box.width ;
-            endX = box.width + (colDiff ) * rowWidth;
             startY = box.height / 2 + (rowDiff) * rowHeight;
             endY = box.height / 2;
-            // endY += 4;
             type = "RB";
         } else {
-            startY--;
-            startX--;
             type = "H"
 
         }
@@ -91,6 +84,26 @@ const TournamentMatchBox = ({match, boxStyle, matchResult, rowWidth, rowHeight}:
             };
         }, [calculateLineCoordinates]
     );
+    
+    const isWonInNextNode = useMemo(() => {
+        if (!matchResult || !matchResults || !match.nextNode || match.nextNode?.type === "team" || !matchResults[match.nextNode.matchId]) return false
+        return (matchResults[match.nextNode.matchId].winnerTeamId === matchResult.winnerTeamId)
+    }, [match.nextNode, matchResult, matchResults])
+        
+        
+    const matchStatusColor = useMemo(() => {
+        const statusColors = {
+            Waiting: "text-blue-200",
+            Preparing: "text-blue-500",
+            Playing: "text-green-600",
+            Finished: "text-yellow-500",
+            Completed: "text-gray-300",
+            Cancelled: "text-orange-300",
+        }
+
+        return statusColors[match.tournamentMatchNode.matchPlan.status]
+    }, [match.tournamentMatchNode.matchPlan.status])
+        
 
     return (
         <div
@@ -98,37 +111,31 @@ const TournamentMatchBox = ({match, boxStyle, matchResult, rowWidth, rowHeight}:
             style={boxStyle}
             ref={wrapperRef}
         >
-            {match.matchId && (
-                <div className="text-md text-gray-500 pr-2 absolute  h-full w-full flex justify-end items-center">
-                    <p>{match.tournamentMatchNode.matchPlan.matchName}</p>
-                    
-                    {/*<p>{match.tournamentMatchNode.matchPlan.matchName} {`#${match.matchId}`} @{match.row}a*/}
-                    {/*    {match.nextNode && match.nextNode.type === "match" && match.matchId}*/}
-                    {/*    {match.tournamentMatchNode.matchPlan.matchNote && (*/}
-                    {/*        */}
-                    {/*        <span*/}
-                    {/*            className="ml-2 text-gray-400">{match.tournamentMatchNode.matchPlan.matchNote}</span>*/}
-                    {/*    )}*/}
-                    {/*    */}
-                    {/*</p>*/}
+            {!!match.matchId && (
+                <div
+                    className="text-md text-gray-500 pr-2 absolute  h-full w-full flex justify-end items-center bg-transparent">
+                    <p className={matchStatusColor + " font-bold text-[1.2em]"}>{match.tournamentMatchNode.matchPlan.matchName}</p>
                 </div>
             )}
 
             <div className="relative h-full" ref={matchBoxRef}>
                 <TournamentLine
+                    key={"match-"+match.matchId+"-line-"+(match.tournamentMatchNode.matchPlan.status === Status.Completed).toString()}
                     startX={lineCoords.startX}
                     startY={lineCoords.startY}
                     endX={lineCoords.endX}
                     endY={lineCoords.endY}
                     type={lineCoords.type}
-                    color={false ? "rgb(255,0,0)" : "rgba(156, 163, 175, 0.8)"}
+                    color1={match.tournamentMatchNode.matchPlan.status === Status.Completed ? "rgb(255,0,0)" : "rgba(156, 163, 175, 0.8)"}
+                    color2={isWonInNextNode ? "rgb(255,0,0)" : "rgba(156, 163, 175, 0.8)"}
                     thickness={4}
-                    // animationTimingFunction={"ease-out"}
                     animationTimingFunction={"linear"}
                     duration={200}
-                    timeout={(match.column) * 200 +200 }
+                    timeout={(match.column) * 200 + 200}
                 />
             </div>
+
+            
 
 
         </div>

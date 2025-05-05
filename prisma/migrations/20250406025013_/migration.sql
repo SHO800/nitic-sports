@@ -11,7 +11,7 @@ ALTER TABLE "Match" DROP CONSTRAINT "Match_eventId_fkey";
 ALTER TABLE "Match" DROP CONSTRAINT "Match_locationId_fkey";
 
 -- AlterTable
-ALTER TABLE "Team" ADD COLUMN     "color" TEXT;
+ALTER TABLE "Team" ADD COLUMN     "color1" TEXT;
 
 -- DropTable
 DROP TABLE "Match";

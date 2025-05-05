@@ -4,6 +4,7 @@ export const statusNames = {
     Playing: "試合中",
     Finished: "結果入力待機中",
     Completed: "完了",
+    Cancelled: "取消"
 }
 
 export const statusColors = {
@@ -12,4 +13,5 @@ export const statusColors = {
     Playing: "bg-green-200",
     Finished: "bg-yellow-200",
     Completed: "bg-gray-300",
+    Cancelled: "bg-orange-100",
 }

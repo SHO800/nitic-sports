@@ -11,15 +11,15 @@ const MatchCountdown = ({scheduledStartTime}: MatchCountdownProps) => {
 
 
     return (
-        <div className="text-black" suppressHydrationWarning={true}>
+        <div className="text-black" >
             {/* 開始時間が過ぎている場合は赤色で表示 */}
             {isPast ? (
-                <p className="text-red-500">
+                <p className="text-red-500" suppressHydrationWarning={true}>
                     遅延: {str}
                 </p>
             ) : (
                 // 
-                <p className="text-green-800">
+                <p className="text-green-800" suppressHydrationWarning={true}>
                     {str} 後
                     {
                         waiting && <span className={"ml-1 text-sm"}>応答待機中 (最大3分)</span>

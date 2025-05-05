@@ -130,7 +130,8 @@ export const useData = () => {
     }, [teams, events, matchPlans, matchResults, hasRequiredData]);
     
     const getActualTeamIdByVariableId = useCallback((variableId: string): number|null => {
-        if (!hasRequiredData() || !variableId.startsWith("$")) return null;
+        if (!hasRequiredData()) return null;
+        if ( !variableId.startsWith("$")) return parseInt(variableId);
 
         const variableTeamIdData = analyzeVariableTeamId(variableId);
         if (!variableTeamIdData) return null;
