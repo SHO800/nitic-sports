@@ -16,42 +16,42 @@ export const useData = () => {
         error: teamError,
         isLoading: teamLoading,
         mutate: mutateTeams
-    } = useSWR<Team[]>(`${API_BASE}/team/-1`, fetcher);
+    } = useSWR<Team[]>(`${API_BASE}/team`, fetcher);
 
     const {
         data: locations,
         error: locationError,
         isLoading: locationLoading,
         mutate: mutateLocations
-    } = useSWR<Location[]>(`${API_BASE}/location/-1`, fetcher);
+    } = useSWR<Location[]>(`${API_BASE}/location`, fetcher);
 
     const {
         data: events,
         error: eventError,
         isLoading: eventLoading,
         mutate: mutateEvents
-    } = useSWR<Event[]>(`${API_BASE}/event/-1`, fetcher);
+    } = useSWR<Event[]>(`${API_BASE}/event`, fetcher);
 
     const {
         data: matchPlans,
         error: matchPlanError,
         isLoading: matchPlanLoading,
         mutate: mutateMatchPlans
-    } = useSWR<MatchPlan[]>(`${API_BASE}/match-plan/-1`, fetcher);
+    } = useSWR<MatchPlan[]>(`${API_BASE}/match-plan`, fetcher);
 
     const {
         data: matchResults,
         error: matchResultError,
         isLoading: matchResultLoading,
         mutate: mutateMatchResults
-    } = useSWR<{ [key: string]: MatchResult }>(`${API_BASE}/match-result/-1`, fetcher);
+    } = useSWR<{ [key: string]: MatchResult }>(`${API_BASE}/match-result`, fetcher);
 
     const {
         data: scores,
         error: scoreError,
         isLoading: scoreLoading,
         mutate: mutateScores
-    } = useSWR<Score[]>(`${API_BASE}/score/-1`, fetcher);
+    } = useSWR<Score[]>(`${API_BASE}/score`, fetcher);
 
     // グループ化されたチームをメモ化
     const groupedTeams = useMemo(() => {

@@ -1,4 +1,4 @@
-import {prisma} from '@/../lib/prisma';
+import {prisma} from '../../../../lib/prisma';
 import {NextRequest} from "next/server";
 import {MatchResult} from "@prisma/client";
 import {updateLeagueRankings} from '@/utils/leagueRanking';
