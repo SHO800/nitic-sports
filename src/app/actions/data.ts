@@ -80,7 +80,7 @@ export async function updateMatchPlanStatus(
     startedAt?: Date,
     endedAt?: Date,
 ) {
-    
+
     const response = await prisma.matchPlan.update({
         where: {
             id,
@@ -88,7 +88,7 @@ export async function updateMatchPlanStatus(
         data: {
             status,
             startedAt: startedAt ? startedAt : status === "Playing" ? new Date() : undefined,
-            endedAt: endedAt ? endedAt :  status === "Finished" ? new Date() : undefined,
+            endedAt: endedAt ? endedAt : status === "Finished" ? new Date() : undefined,
         },
     })
 
@@ -235,7 +235,7 @@ export async function createMatchResult(
         revalidatePath('/dashboard')
         // その試合のstatusをcompletedにする
         await updateMatchPlanStatus(matchId, Status.Completed)
-        
+
         // 試合結果に基づいてリーグ順位を更新
         try {
             const updated = await updateLeagueRankings(eventId, matchId);

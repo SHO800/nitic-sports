@@ -34,7 +34,7 @@ model ScheduleImage {
 model Team {
   id     Int     @id @default(autoincrement())
   name   String
-  color1 String? // #000000形式
+  color  String? // #000000形式
   scores Score[]
 }
 

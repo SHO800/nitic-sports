@@ -228,8 +228,8 @@ export async function updateLeagueRankings(eventId: number, matchId: number): Pr
                                 const blockStatus = updatedBlockStatus[at.blockName];
                                 return blockStatus && blockStatus.completed;
                             } else {
-                                // 他のイベントのブロックの場合は、全て完了しているか確認する
-                                // TODO: 他のイベントに依存することは現状ないと考えられるのでpass
+                                // 他の種目のブロックの場合は、全て完了しているか確認する
+                                // TODO: 他の種目に依存することは現状ないと考えられるのでpass
                                 return true;
                             }
                         }

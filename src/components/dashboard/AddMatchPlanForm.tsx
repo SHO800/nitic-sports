@@ -1,8 +1,7 @@
-import {MatchPlan as MatchPlanSchema} from "@prisma/client"
 import ClassSelector from "@/components/common/ClassSelector";
 import {useState} from "react";
 import {useData} from "@/hooks/data";
-import {createMatchPlan} from "@/app/actions/data";
+import {createMatchPlan, updateMatchPlan} from "@/app/actions/data";
 
 
 const AddMatchPlanForm = () => {
@@ -28,7 +27,7 @@ const AddMatchPlanForm = () => {
 
             // 名前インプットフィールド取得
             const matchNameInput = document.getElementById('matchName') as HTMLInputElement;
-            
+
             // 入力内容取得
             const matchName = matchNameInput.value;
             // インクリメントするか
@@ -54,7 +53,7 @@ const AddMatchPlanForm = () => {
             // 範囲取得
             const incrementLocationRange = Number((document.getElementById('incrementLocationRange') as HTMLInputElement).value);
             const incrementLocationRangeEnd = Number((document.getElementById('incrementLocationRangeEnd') as HTMLInputElement).value);
-            
+
             // インクリメント
             const incrementedLocation = Number(location) + incrementLocationRange;
             // インクリメント範囲を超えたらリセット
@@ -63,7 +62,7 @@ const AddMatchPlanForm = () => {
             } else {
                 locationInput.value = incrementedLocation.toString();
             }
-            
+
         }
     }
 
@@ -74,31 +73,20 @@ const AddMatchPlanForm = () => {
                 key={"addMatchPlanForm" + teamCount}
                 onSubmit={async (e) => {
                     e.preventDefault()
-                    const response = await fetch(
-                        `${process.env.NEXT_PUBLIC_API_URL}/match-plan/-1`,
-                        {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                eventId: Number((document.getElementById('eventId') as HTMLInputElement).value),
-                                matchName: (document.getElementById('matchName') as HTMLInputElement).value,
-                                matchNote: (document.getElementById('teamNote') as HTMLInputElement).value,
-                                teamIds: (Array.from({length: teamCount}).map((_, index) => {
-                                    return (document.getElementById(`team${index + 1}Id`) as HTMLInputElement).value
-                                })),
-                                teamNotes: (Array.from({length: teamCount}).map((_, index) => {
-                                    return (document.getElementById(`team${index + 1}Note`) as HTMLInputElement).value
-                                })),
-                                scheduledStartTime: new Date((document.getElementById('scheduledStartTime') as HTMLInputElement).value),
-                                scheduledEndTime: new Date((document.getElementById('scheduledEndTime') as HTMLInputElement).value),
-                                locationId: Number((document.getElementById('locationId') as HTMLInputElement).value),
-
-                            } as unknown as MatchPlanSchema),
-                        }
+                    await createMatchPlan(
+                        Number((document.getElementById('eventId') as HTMLInputElement).value),
+                        (Array.from({length: teamCount}).map((_, index) => {
+                            return (document.getElementById(`team${index + 1}Id`) as HTMLInputElement).value
+                        })),
+                        (Array.from({length: teamCount}).map((_, index) => {
+                            return (document.getElementById(`team${index + 1}Note`) as HTMLInputElement).value
+                        })),
+                        new Date((document.getElementById('scheduledStartTime') as HTMLInputElement).value),
+                        new Date((document.getElementById('scheduledEndTime') as HTMLInputElement).value),
+                        Number((document.getElementById('locationId') as HTMLInputElement).value),
+                        (document.getElementById('matchName') as HTMLInputElement).value,
+                        (document.getElementById('teamNote') as HTMLInputElement).value
                     )
-                    console.log(response)
                     await mutateMatchPlans();
                     // インクリメントする場合はインクリメント
                     if (isIncrementMatchNameCapital || isIncrementMatchNameNumber) {
@@ -333,7 +321,9 @@ const AddMatchPlanForm = () => {
                 key={"editMatchPlanForm" + teamCount}
                 onSubmit={async (e) => {
                     e.preventDefault()
-                    await createMatchPlan(
+
+                    await updateMatchPlan(
+                        Number((document.getElementById('editMatchId') as HTMLInputElement).value),
                         Number((document.getElementById('eventId') as HTMLInputElement).value),
                         (Array.from({length: teamCount}).map((_, index) => {
                             return (document.getElementById(`team${index + 1}Id`) as HTMLInputElement).value
@@ -345,7 +335,7 @@ const AddMatchPlanForm = () => {
                         new Date((document.getElementById('scheduledEndTime') as HTMLInputElement).value),
                         Number((document.getElementById('locationId') as HTMLInputElement).value),
                         (document.getElementById('matchName') as HTMLInputElement).value,
-                        (document.getElementById('teamNote') as HTMLInputElement).value,
+                        (document.getElementById('teamNote') as HTMLInputElement).value
                     )
                     await mutateMatchPlans();
                 }}
