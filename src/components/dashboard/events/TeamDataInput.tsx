@@ -29,6 +29,14 @@ const TeamDataInput = ({
                 {teamData.map((key, idx) => (
                     <div key={`teamDataJsonDraft[${index}]TournamentDiv${idx}`}
                          className={""}>
+                        <button onClick={() => {
+                            const newTeamData = [...teamDataJsonDraft]
+                            const teamDataElem = newTeamData[index]
+                            if ("teams" in teamDataElem){
+                                teamDataElem.teams.splice(idx, 1)
+                                setTeamDataJsonDraft(newTeamData)
+                            }
+                        }}>削除</button>
                         <input
                             type="text"
                             name={`team${idx}`}
@@ -37,7 +45,7 @@ const TeamDataInput = ({
                             placeholder='チーム名を入力してください'
                             value={key.teamId}
                             onChange={(e) => {
-                                const newTeamData = {...teamDataJsonDraft};
+                                const newTeamData = [...teamDataJsonDraft];
                                 const teamDataElem = newTeamData[index];
 
                                 if ("teams" in teamDataElem) {
@@ -57,7 +65,8 @@ const TeamDataInput = ({
                 <button
                     type="button"
                     onClick={() => {
-                        const newTeamData = {...teamDataJsonDraft};
+                        console.log(teamDataJsonDraft)
+                        const newTeamData = [...teamDataJsonDraft];
                         const teamDataElem = newTeamData[index];
                         if ("teams" in teamDataElem) {
                             teamDataElem.teams.push({
@@ -98,7 +107,7 @@ const TeamDataInput = ({
                                     className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
                                     placeholder='IDを入力してください'
                                     onChange={(e) => {
-                                        const newTeamData = {...teamDataJsonDraft};
+                                        const newTeamData = [...teamDataJsonDraft];
                                         const teamDataElem = newTeamData[index];
                                         if ("blocks" in teamDataElem) {
                                             teamDataElem.blocks[key][teamIndex] = {
@@ -112,7 +121,7 @@ const TeamDataInput = ({
                             <button
                                 type="button"
                                 onClick={() => {
-                                    const newTeamData = {...teamDataJsonDraft};
+                                    const newTeamData = [...teamDataJsonDraft];
                                     const teamDataElem = newTeamData[index];
                                     if ("blocks" in teamDataElem) {
                                         teamDataElem.blocks[key].push({
@@ -131,7 +140,7 @@ const TeamDataInput = ({
                 <button
                     type="button"
                     onClick={() => {
-                        const newTeamData = {...teamDataJsonDraft};
+                        const newTeamData = [...teamDataJsonDraft];
                         const teamDataElem = newTeamData[index];
 
 

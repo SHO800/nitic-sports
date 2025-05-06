@@ -4,7 +4,6 @@ import {buildTournamentBracket, TournamentData} from "@/utils/tournamentUtils";
 import {useData} from "@/hooks/data";
 import TournamentTeamBox from "@/components/common/tournamentTable/TournamentTeamBox";
 import TournamentMatchBox from "@/components/common/tournamentTable/TournamentMatchBox";
-import analyzeVariableTeamId from "@/utils/analyzeVariableTeamId";
 
 
 interface TournamentBracketProps {
@@ -25,7 +24,7 @@ const TournamentTable = ({eventId, isFinal, relatedMatchPlans}: Readonly<Tournam
         teamLoading,
     } = useData();
 
-    const firstRowWidth = 70;
+    const firstRowWidth = 100;
     const rowWidth = 60;
     const rowHeight = 30;
 
@@ -80,12 +79,13 @@ const TournamentTable = ({eventId, isFinal, relatedMatchPlans}: Readonly<Tournam
             >
                 {tournamentData.nodes.map(match => {
                     return <div
-                        key={"node-" + match.nodeId}
+                        key={"node-" + match.nodeId + "-event-" + eventId + "-id-" + (match.type === "team" ? match.teamId : match.matchId)}
                         style={{
                             gridColumn: match.column,
                             gridRow: match.row
                         }}
                     >
+                        {match.row === 1 && match.column === 1}
 
                         {
                             match.type === "team" &&
@@ -105,18 +105,21 @@ const TournamentTable = ({eventId, isFinal, relatedMatchPlans}: Readonly<Tournam
                 {
                     tournamentData.nodes.filter(node => !node.nextNode).map(lastNode => {
                         if (lastNode.type === "team") return null;
-                        let text = "優勝";
-                        if (lastNode.tournamentMatchNode.teamIds.some(value => {
-                            const ati = analyzeVariableTeamId(value)
-                            if (!ati || ati.type === "L") return false;
-                            return ati.condition === "L";
-                        })) { // 戦うチームにどこかの試合の敗者という条件が含まれていたら 3位決定戦であったものとと扱う.
-                            text = "3位"
+                        if (!lastNode.tournamentMatchNode) return null
+                        let text = "";
+                        if (isFinal) {
+                            text = "優勝"
+                            if (lastNode.tournamentMatchNode.matchPlan.is3rdPlaceMatch) { 
+                                text = "3位"
+                            }
+                        } else {
+                            text = "本選"
                         }
                         return (
-                            <SpecialNode key={eventId + "-specialNode-"+lastNode.nodeId} column={lastNode.column+2} row={lastNode.row}>
-                            {text}
-                        </SpecialNode>
+                            <SpecialNode key={eventId + "-specialNode-" + lastNode.nodeId} column={lastNode.column + 2}
+                                         row={lastNode.row}>
+                                {text}
+                            </SpecialNode>
                         )
 
                     })

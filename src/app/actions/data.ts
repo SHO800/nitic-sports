@@ -1,10 +1,20 @@
 "use server";
 import {prisma} from "@/../lib/prisma";
-import {Status} from "@prisma/client";
+import {MatchPlan, Status} from "@prisma/client";
 import {revalidatePath} from "next/cache";
 import {Coordinates} from "@/types/location";
 import {updateLeagueRankings} from "@/utils/leagueRanking";
 
+
+export const isAllMatchFinished = async (eventId: number) => {
+    const eventMatches: MatchPlan[] = await prisma.matchPlan.findMany({
+        where: {
+            eventId
+        }
+    })
+
+    return Array.from(eventMatches).every(match => match.status === "Completed" || match.status === "Cancelled")
+}
 
 export async function createMatchPlan(
     eventId: number,
@@ -15,6 +25,8 @@ export async function createMatchPlan(
     locationId: number,
     matchName?: string,
     matchNote?: string,
+    isFinal: boolean = false,
+    is3rdPlaceMatch: boolean = false,
 ) {
     // もし追加された試合に依存関係が一つもないならステータスをPreparing(開始待ちの準備中)にする
 
@@ -33,6 +45,8 @@ export async function createMatchPlan(
             scheduledStartTime,
             scheduledEndTime,
             locationId,
+            isFinal,
+            is3rdPlaceMatch,
             status,
         },
     })
@@ -52,6 +66,8 @@ export async function updateMatchPlan(
     locationId: number,
     matchName?: string,
     matchNote?: string,
+    isFinal: boolean = false,
+    is3rdPlaceMatch: boolean = false,
 ) {
     const response = await prisma.matchPlan.update({
         where: {
@@ -65,6 +81,8 @@ export async function updateMatchPlan(
             teamNotes: teamNotes,
             scheduledStartTime,
             scheduledEndTime,
+            isFinal,
+            is3rdPlaceMatch,
             locationId,
         },
     })
@@ -113,13 +131,15 @@ export async function deleteMatchPlan(id: number) {
 export async function createEvent(
     name: string,
     teamData: TeamData[],
-    description?: string
+    description?: string,
+    isTimeBased: boolean = false
 ) {
     const response = await prisma.event.create({
         data: {
             name,
             description,
             teamData: JSON.parse(JSON.stringify(teamData)),
+            isTimeBased,
         },
     })
     if (response) {
@@ -131,7 +151,8 @@ export async function updateEvent(
     id: number,
     name: string,
     teamData: TeamData[],
-    description?: string
+    description?: string,
+    isTimeBased: boolean = false
 ) {
     const response = await prisma.event.update({
         where: {
@@ -141,6 +162,21 @@ export async function updateEvent(
             name,
             description,
             teamData: JSON.parse(JSON.stringify(teamData)),
+            isTimeBased,
+        },
+    })
+    if (response) {
+        revalidatePath('/dashboard')
+    }
+}
+
+export async function setIsCompleted(id: number, isCompleted: boolean) {
+    const response = await prisma.event.update({
+        where: {
+            id,
+        },
+        data: {
+            isCompleted,
         },
     })
     if (response) {
@@ -209,6 +245,7 @@ export async function deleteLocation(id: number) {
     }
 }
 
+// もしその回の登録でその種目のすべての試合が終了した場合はtrueを返す
 export async function createMatchResult(
     matchId: number,
     eventId: number,
@@ -218,7 +255,7 @@ export async function createMatchResult(
     loserTeamId?: number,
     resultNote?: string,
     resultSecretNote?: string,
-) {
+): Promise<boolean> {
     const response = await prisma.matchResult.create({
         data: {
             matchId,
@@ -243,7 +280,11 @@ export async function createMatchResult(
         } catch (error) {
             console.error('リーグ順位更新中にエラーが発生しました:', error);
         }
+        if (await isAllMatchFinished(eventId)) { // この登録によってその種目の全試合が終了したのなら
+            await setIsCompleted(eventId, true)
+        }
     }
+    return false
 }
 
 
@@ -330,3 +371,4 @@ export async function deleteTeam(id: number) {
         revalidatePath('/dashboard')
     }
 }
+

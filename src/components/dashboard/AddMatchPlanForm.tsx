@@ -20,7 +20,10 @@ const AddMatchPlanForm = () => {
     const [incrementLocationRange, setIncrementLocationRange] = useState(0)
     // 会場をどこまでインクリメントするか
     const [incrementLocationRangeEnd, setIncrementLocationRangeEnd] = useState(0)
-
+    // 決勝戦かどうか
+    const [isFinal, setIsFinal] = useState(false)
+    // 3位決定戦かどうか
+    const [is3rdPlaceMatch, setIs3rdPlaceMatch] = useState(false)
 
     const increment = () => {
         if (isIncrementMatchNameCapital || isIncrementMatchNameNumber) {
@@ -85,7 +88,9 @@ const AddMatchPlanForm = () => {
                         new Date((document.getElementById('scheduledEndTime') as HTMLInputElement).value),
                         Number((document.getElementById('locationId') as HTMLInputElement).value),
                         (document.getElementById('matchName') as HTMLInputElement).value,
-                        (document.getElementById('teamNote') as HTMLInputElement).value
+                        (document.getElementById('teamNote') as HTMLInputElement).value,
+                        isFinal,
+                        is3rdPlaceMatch
                     )
                     await mutateMatchPlans();
                     // インクリメントする場合はインクリメント
@@ -126,6 +131,30 @@ const AddMatchPlanForm = () => {
                             className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
                             placeholder='試合名'
                         />
+                        <div className="flex gap-4 items-center mt-1 mb-1">
+                            <label className='flex items-center text-black'>
+                                <input
+                                    type='checkbox'
+                                    name="isFinal"
+                                    id="isFinal"
+                                    className='border border-gray-400 mr-2'
+                                    checked={isFinal}
+                                    onChange={(e) => setIsFinal(e.target.checked)}
+                                />
+                                決勝戦
+                            </label>
+                            <label className='flex items-center text-black'>
+                                <input
+                                    type='checkbox'
+                                    name="is3rdPlaceMatch"
+                                    id="is3rdPlaceMatch"
+                                    className='border border-gray-400 mr-2'
+                                    checked={is3rdPlaceMatch}
+                                    onChange={(e) => setIs3rdPlaceMatch(e.target.checked)}
+                                />
+                                3位決定戦
+                            </label>
+                        </div>
                         <input
                             type='checkbox'
                             name="isIncrementMatchNameCapital"
@@ -335,7 +364,9 @@ const AddMatchPlanForm = () => {
                         new Date((document.getElementById('scheduledEndTime') as HTMLInputElement).value),
                         Number((document.getElementById('locationId') as HTMLInputElement).value),
                         (document.getElementById('matchName') as HTMLInputElement).value,
-                        (document.getElementById('teamNote') as HTMLInputElement).value
+                        (document.getElementById('teamNote') as HTMLInputElement).value,
+                        isFinal,
+                        is3rdPlaceMatch
                     )
                     await mutateMatchPlans();
                 }}

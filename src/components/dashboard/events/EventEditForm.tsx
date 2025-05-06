@@ -2,7 +2,13 @@
 import {useData} from "@/hooks/data";
 import {updateEvent} from "@/app/actions/data";
 
-const EventEditForm = ({teamDataJsonDraft}: {teamDataJsonDraft: TeamData[]}) => {
+const EventEditForm = ({
+                           teamDataJsonDraft,
+                           isTimeBased,
+                       }: {
+    teamDataJsonDraft: TeamData[],
+    isTimeBased: boolean,
+}) => {
     const {mutateEvents} = useData();
 
     return (
@@ -13,7 +19,8 @@ const EventEditForm = ({teamDataJsonDraft}: {teamDataJsonDraft: TeamData[]}) => 
                     Number((document.getElementById('editEventId') as HTMLInputElement).value),
                     (document.getElementById('eventName') as HTMLInputElement).value,
                     teamDataJsonDraft,
-                    (document.getElementById('eventDescription') as HTMLInputElement).value
+                    (document.getElementById('eventDescription') as HTMLInputElement).value,
+                    isTimeBased
                 );
                 await mutateEvents();
             }}

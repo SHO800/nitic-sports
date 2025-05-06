@@ -86,10 +86,10 @@ const TournamentTeamBox = ({node, rowWidth, rowHeight}: {
     
     return (
         <div
-            className={`flex justify-between items-center p-2 relative h-10 w-full `}
+            className={`flex justify-end items-center p-2 relative h-10 w-full `}
             ref={boxRef}
         >
-            <span className="truncate max-w-[180px]">{displayStr}</span>
+            <span className="max-w-[180px]">{displayStr}</span>
             
             {
                 <TournamentLine startX={lineCoords.startX}
@@ -97,7 +97,8 @@ const TournamentTeamBox = ({node, rowWidth, rowHeight}: {
                                 endX={lineCoords.endX}
                                 endY={lineCoords.endY}
                                 type={lineCoords.type}
-                                color1={ "rgb(255,0,0)" }
+                                // color1={ "rgb(255,0,0)" }
+                                color1={ isWonInNextNode ? "rgb(255,0,0)" : "rgba(156, 163, 175, 1)"}
                                 color2={ isWonInNextNode ? "rgb(255,0,0)" : "rgba(156, 163, 175, 1)"}
                                 thickness={4}
                                 animationTimingFunction={"linear"}

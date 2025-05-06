@@ -5,6 +5,7 @@ import {useRef, useState} from "react";
 import {useData} from "@/hooks/data";
 import Clock from "@/components/common/Clock";
 import LocationSelector from "@/components/match/LocationSelector";
+import CheckMatchScoresModal from "@/components/match/CheckMatchScoresModal";
 
 const MatchDashboard = () => {
     const {locations} = useData();
@@ -13,6 +14,11 @@ const MatchDashboard = () => {
     const [isSyncScroll, setIsSyncScroll] = useState<boolean>(true)
     const [isShowCompletedMatch, setIsShowCompletedMatch] = useState<boolean>(false);
     const refs = useRef<HTMLDivElement[]>([])
+
+    const [hasUnsettledScores, setHasUnsettledScores] = useState<boolean>(true)
+    
+    
+    
 
     const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
         if (!isSyncScroll) {
@@ -67,6 +73,12 @@ const MatchDashboard = () => {
                 })}
 
             </div>
+
+            {hasUnsettledScores && 
+                
+            <CheckMatchScoresModal />
+                
+            }
         </div>
     )
 }

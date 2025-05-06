@@ -19,10 +19,7 @@ type MatchCardProps = {
     events: EventType[] | undefined;
     locations: LocationType[] | undefined;
     matchResults: Record<number, MatchResultType> | undefined;
-    matchTimers: Record<number, boolean>;
     getMatchDisplayStr: (teamId: string) => string;
-    handleStartTimer: (matchId: number) => void;
-    handleStopTimer: (matchId: number) => void;
     handleDeleteMatch: (matchId: number) => Promise<void>;
 };
 
@@ -32,10 +29,8 @@ const MatchCard = ({
                        events,
                        locations,
                        matchResults,
-                       matchTimers,
+    
                        getMatchDisplayStr,
-                       handleStartTimer,
-                       handleStopTimer,
                        handleDeleteMatch
                    }: MatchCardProps) => {
 
@@ -69,9 +64,6 @@ const MatchCard = ({
             {(status === Status.Playing) && 
                 <MatchTimer
                     match={matchPlan}
-                    
-                    onStart={() => handleStartTimer(matchPlan.id)}
-                    onStop={() => handleStopTimer(matchPlan.id)}
                 />
             }
             

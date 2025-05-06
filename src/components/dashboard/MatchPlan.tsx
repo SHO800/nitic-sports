@@ -103,10 +103,7 @@ const MatchPlan = () => {
                             events={events}
                             locations={locations}
                             matchResults={matchResults}
-                            matchTimers={matchTimers}
                             getMatchDisplayStr={getMatchDisplayStr}
-                            handleStartTimer={handleStartTimer}
-                            handleStopTimer={handleStopTimer}
                             handleDeleteMatch={handleDeleteMatch}
                         />
                     </Fragment>
