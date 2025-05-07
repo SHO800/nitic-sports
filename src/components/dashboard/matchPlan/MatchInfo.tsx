@@ -3,16 +3,16 @@ import { MatchPlan as MatchPlanType } from "@prisma/client";
 
 type MatchInfoProps = {
     matchPlan: MatchPlanType;
-    events: any[] | undefined;
+    eventName: string;
     locations: any[] | undefined;
     getMatchDisplayStr: (teamId: string) => string;
 };
 
-const MatchInfo = ({ matchPlan, events, locations, getMatchDisplayStr }: MatchInfoProps) => {
+const MatchInfo = ({ matchPlan, eventName, locations, getMatchDisplayStr }: MatchInfoProps) => {
     return (
         <p className="text-black">
             {matchPlan.id} | {matchPlan.eventId} {
-                events?.find((event) => event.id === matchPlan.eventId)?.name
+                eventName
             } | {
                 matchPlan.teamIds.map((teamId, index) => {
                     let result = getMatchDisplayStr(teamId)

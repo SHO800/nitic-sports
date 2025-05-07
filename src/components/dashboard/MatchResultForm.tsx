@@ -4,7 +4,7 @@ import {useEffect, useState} from "react";
 import analyzeVariableTeamId from "@/utils/analyzeVariableTeamId";
 import {createMatchResult} from "@/app/actions/data";
 
-export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan, matchResult?: MatchResult }) => {
+export const MatchResultForm = ({matchPlan, matchResult, isTimeBased = false}: { matchPlan: MatchPlan, matchResult?: MatchResult, isTimeBased: boolean}) => {
     const {
         matchPlans,
         mutateMatchPlans,
@@ -96,11 +96,25 @@ export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan
                 <form
                     onSubmit={async (e) => {
                         e.preventDefault()
+                        let scores = actualMatchScores
+                        if (isTimeBased) {
+                            scores = scores.map(score => {
+                                const splitStr = score.split(":")
+                                splitStr[0] = splitStr[0].padStart(2, "0")
+                                splitStr[1] = splitStr[1].padStart(2, "0")
+                                const splitStrSplitSec = splitStr[2].split(".")
+                                splitStrSplitSec[0] = splitStrSplitSec[0].padStart(2, "0")
+                                splitStrSplitSec[1] = splitStrSplitSec[1].padEnd(3, "0")
+                                splitStr[2] = splitStrSplitSec.join(".")
+                                return splitStr.join(":")
+                            })
+                        }
+                        
                         await createMatchResult(
                             matchPlan.id,
                             matchPlan.eventId,
                             actualTeamIds,
-                            actualMatchScores,
+                            scores,
                             actualWinnerTeamId,
                             actualLoserTeamId ?? undefined,
                             actualResultNote,
@@ -113,12 +127,12 @@ export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan
                 >
                     {/*チームごとに枠を用意*/}
                     <table className={"mt-2 mb-4 border-separate border-spacing-y-1"}>
-                        {/*チーム名, スコア, 勝者の3列*/}
+                        {/*チーム名, スコアorタイム, 勝者の3列*/}
                         <thead>
                         
                         <tr className={"w-full"}>
                             <th scope={"col"} className={"w-1/6"} >所属</th>
-                            <th scope={"col"} className={"w-2/3"} >スコア</th>
+                            <th scope={"col"} className={"w-2/3"} >{isTimeBased ? "タイム" : "スコア"}</th>
                             <th scope={"col"} className={"w-1/6"} >勝者</th>
                         </tr>
                         </thead>
@@ -132,12 +146,95 @@ export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan
                                         <td className={"text-center"}>
                                             <p className={"text-[1.1em]"}>{getMatchDisplayStr(teamId)}</p>
                                         </td>
-                                        <td>
+                                        <td className={"whitespace-nowrap text-center"}>
+                                            {isTimeBased ?
+                                                <>
+                                                    <input 
+                                                        type="tel"
+                                                        name={`matchResult-${matchPlan.eventId}-${index}-hh`}
+                                                        id={`matchResult-${matchPlan.eventId}-${index}-hh`}
+                                                        className='border border-gray-400 px-0 mx-2 h-8 rounded text-black w-[10%] text-sm '
+                                                        placeholder={'時間'}
+                                                        disabled={!canInput}
+                                                        onChange={(e) => {
+                                                            const newMatchScores = [...actualMatchScores]
+                                                            if (!newMatchScores[index]) newMatchScores[index] = "::."
+                                                            const splitStr =  newMatchScores[index].split(":")
+                                                            splitStr[0] = e.target.value
+                                                            newMatchScores[index] = splitStr.join(":")// 結合
+                                                            setActualMatchScores(newMatchScores)
+                                                        }}
+                                                        value={actualMatchScores[index] ? actualMatchScores[index].split(":")[0] : ""}
+                                                    />
+                                                    :
+                                                    <input
+                                                        type="tel"
+                                                        maxLength={2}
+                                                        name={`matchResult-${matchPlan.eventId}-${index}-mm`}
+                                                        id={`matchResult-${matchPlan.eventId}-${index}-mm`}
+                                                        className='border border-gray-400 px-0 mx-2 h-8 rounded text-black w-[15%] text-sm '
+                                                        placeholder={'分'}
+                                                        disabled={!canInput}
+                                                        onChange={(e) => {
+                                                            const newMatchScores = [...actualMatchScores]
+                                                            if (!newMatchScores[index]) newMatchScores[index] = "::."
+                                                            const splitStr =  newMatchScores[index].split(":")
+                                                            splitStr[1] = e.target.value
+                                                            newMatchScores[index] = splitStr.join(":")// 結合
+                                                            setActualMatchScores(newMatchScores)
+                                                        }}
+                                                        value={actualMatchScores[index] ? actualMatchScores[index].split(":")[1] : ""}
+                                                    />
+                                                    :
+                                                    <input
+                                                        type="tel"
+                                                        maxLength={2}
+                                                        name={`matchResult-${matchPlan.eventId}-${index}-ss`}
+                                                        id={`matchResult-${matchPlan.eventId}-${index}-ss`}
+                                                        className='border border-gray-400 px-0 mx-2 h-8 rounded text-black w-[15%] text-sm '
+                                                        placeholder={'秒'}
+                                                        disabled={!canInput}
+                                                        onChange={(e) => {
+                                                            const newMatchScores = [...actualMatchScores]
+                                                            if (!newMatchScores[index]) newMatchScores[index] = "::."
+                                                            const splitStr =  newMatchScores[index].split(":")
+                                                            const splitStrSplitSec = splitStr[2].split(".")
+                                                            splitStrSplitSec[0] = e.target.value
+                                                            splitStr[2] = splitStrSplitSec.join(".")
+                                                            newMatchScores[index] = splitStr.join(":")// 結合
+                                                            setActualMatchScores(newMatchScores)
+                                                        }}
+                                                        value={actualMatchScores[index] ? actualMatchScores[index].split(":")[2].split(".")[0] : ""}
+                                                    />
+                                                    .
+                                                    <input
+                                                        type="tel"
+                                                        maxLength={3}
+                                                        name={`matchResult-${matchPlan.eventId}-${index}-ss`}
+                                                        id={`matchResult-${matchPlan.eventId}-${index}-ss`}
+                                                        className='border border-gray-400 px-0 mx-2 h-8 rounded text-black w-[20%] text-sm '
+                                                        placeholder={'ミリ秒'}
+                                                        disabled={!canInput}
+                                                        onChange={(e) => {
+                                                            const newMatchScores = [...actualMatchScores]
+                                                            if (!newMatchScores[index]) newMatchScores[index] = "::."
+                                                            const splitStr =  newMatchScores[index].split(":")
+                                                            const splitStrSplitSec = splitStr[2].split(".")
+                                                            splitStrSplitSec[1] = e.target.value
+                                                            splitStr[2] = splitStrSplitSec.join(".")
+                                                            newMatchScores[index] = splitStr.join(":")// 結合
+                                                            setActualMatchScores(newMatchScores)
+                                                        }}
+                                                        value={actualMatchScores[index] ? actualMatchScores[index].split(":")[2].split(".")[1] : ""}
+                                                    />
+                                                </>
+                                                :
                                             <input
-                                                type='text'
-                                                name={`matchResult${index}`}
-                                                id={`matchResult${index}`}
-                                                className='border border-gray-400 px-2 py-1 mx-2 h-8 rounded text-black w-[calc(100%-1em)]'                                                placeholder='スコア'
+                                                type='number'
+                                                name={`matchResult-${matchPlan.eventId}-${index}`}
+                                                id={`matchResult-${matchPlan.eventId}-${index}`}
+                                                className='border border-gray-400 px-2 py-1 mx-2 h-8 rounded text-black w-[calc(100%-1em)]'
+                                                placeholder={'スコア'}
                                                 required
                                                 disabled={!canInput}
                                                 onChange={(e) => {
@@ -147,6 +244,7 @@ export const MatchResultForm = ({matchPlan, matchResult}: { matchPlan: MatchPlan
                                                 }}
                                                 value={actualMatchScores[index] || ""}
                                             />
+                                            }
                                         </td>
                                         <td>
                                             <input type="radio" name={"matchResultWinner-" + matchPlan.id}

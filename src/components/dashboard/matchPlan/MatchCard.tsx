@@ -16,7 +16,7 @@ import MatchResult from "@/components/dashboard/matchPlan/MatchResult";
 type MatchCardProps = {
     matchPlan: MatchPlanType;
     status: Status;
-    events: EventType[] | undefined;
+    events: EventType[]
     locations: LocationType[] | undefined;
     matchResults: Record<number, MatchResultType> | undefined;
     getMatchDisplayStr: (teamId: string) => string;
@@ -33,14 +33,14 @@ const MatchCard = ({
                        getMatchDisplayStr,
                        handleDeleteMatch
                    }: MatchCardProps) => {
-
+const event = events.find(event => event.id === matchPlan.eventId)!;
     return (
         <div className="flex flex-col justify-start items-start bg-gray-200 p-2 rounded mb-2 w-full">
             <div className="flex items-center justify-between w-full">
                 <div className="flex items-center bg-amber-100">
                     <MatchInfo
                         matchPlan={matchPlan}
-                        events={events}
+                        eventName={event.name}
                         locations={locations}
                         getMatchDisplayStr={getMatchDisplayStr}
                     />
@@ -72,6 +72,7 @@ const MatchCard = ({
             <MatchResult
                 matchPlan={matchPlan}
                 matchResults={matchResults}
+                event={event}
                 getMatchDisplayStr={getMatchDisplayStr}
             />
         </div>

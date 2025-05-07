@@ -1,14 +1,15 @@
 "use client"
-import {MatchPlan as MatchPlanType, MatchResult as MatchResultType} from "@prisma/client";
+import {MatchPlan as MatchPlanType, MatchResult as MatchResultType, Event} from "@prisma/client";
 import {MatchResultForm} from "@/components/dashboard/MatchResultForm";
 
 type MatchResultProps = {
     matchPlan: MatchPlanType;
     matchResults: Record<number, MatchResultType> | undefined;
+    event: Event
     getMatchDisplayStr: (teamId: string) => string;
 };
 
-const MatchResult = ({matchPlan, matchResults, getMatchDisplayStr}: MatchResultProps) => {
+const MatchResult = ({matchPlan, matchResults, event, getMatchDisplayStr}: MatchResultProps) => {
     const matchResult = matchResults ? matchResults[matchPlan.id] : undefined;
     const matchTime = matchPlan.startedAt && matchPlan.endedAt ?
         Math.floor((new Date(matchPlan.endedAt).getTime() - new Date(matchPlan.startedAt).getTime()) / 1000 / 60) : 0;
@@ -24,7 +25,7 @@ const MatchResult = ({matchPlan, matchResults, getMatchDisplayStr}: MatchResultP
                             <thead>
                             <tr className={"w-full "}>
                                 <th scope={"col"} className={"w-1/3 "}>所属</th>
-                                <th scope={"col"} className={"w-1/3 "}>スコア</th>
+                                <th scope={"col"} className={"w-1/3 "}>{event.isTimeBased ? "タイム" : "スコア"}</th>
                                 <th scope={"col"} className={"w-1/3 "}>勝者</th>
                             </tr>
                             </thead>
@@ -68,6 +69,7 @@ const MatchResult = ({matchPlan, matchResults, getMatchDisplayStr}: MatchResultP
                 <MatchResultForm
                     matchPlan={matchPlan}
                     matchResult={matchResult}
+                    isTimeBased={event.isTimeBased}
                 />
             }
         </>

@@ -92,7 +92,7 @@ const MatchPlan = () => {
 
     return (
         <>
-            {matchPlans?.map((matchPlan) => {
+            {events && matchPlans?.map((matchPlan) => {
                 const status = getMatchStatus(matchPlan);
 
                 return (
