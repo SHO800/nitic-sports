@@ -1,21 +1,26 @@
 import {useState} from "react";
 import {useData} from "@/hooks/data";
+import {Event} from "@prisma/client";
 
-const CheckMatchScoresModal = ({}: {}) => {
-    const {matchResults} = useData()
+const CheckMatchScoresModal = ({unSettledEvents}: {unSettledEvents: Event[]}) => {
+    const {matchResults, scores} = useData()
     
-
-
     const [isOpen, setIsOpen] = useState<boolean>(false)
-
+    
 
     return (
         <>
             <ModalTab isOpen={isOpen} setIsOpen={setIsOpen}/>
             <div
-                className={`fixed w-screen h-screen top-0 overflow-hidden ${isOpen ? "block" : "hidden"} py-18 bg-black opacity-50 z-20`}
+                className={`fixed w-screen h-screen top-0 overflow-hidden ${isOpen ? "block" : "hidden"} py-18 bg-[rgba(0,0,0,.5)] z-20 border-gray-400 border-2`}
+                onClick={() => setIsOpen(false)}
             >
-                <p>{}</p>
+                <div className="flex flex-col items-center justify-center w-[calc(100%-12em)] h-[calc(100%-12em)] m-24  bg-white">
+                    {unSettledEvents.map(event => (
+                        <ModalEventContainer key={"scoreSetModal-"+event.id} unsettledEvent={event} />
+                    ))}
+                    
+                </div>
 
             </div>
         </>
@@ -40,3 +45,12 @@ const ModalTab = ({isOpen, setIsOpen}: { isOpen: boolean, setIsOpen: (value: boo
 
 
 export default CheckMatchScoresModal;
+
+const ModalEventContainer = ({unsettledEvent}: {unsettledEvent: Event}) => {
+    
+    return (
+        <div className={""}>
+            {unsettledEvent.name}
+        </div>
+    )
+}

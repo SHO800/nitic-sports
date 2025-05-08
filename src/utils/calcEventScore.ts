@@ -1,4 +1,5 @@
 import {Event, MatchPlan, MatchResult} from "@prisma/client";
+import {evaluateScore} from "../../public/EvaluateScore";
 
 const isSameWinWeight = (a: completedLeagueTeamInfo, b: completedLeagueTeamInfo): boolean => {
     return (
@@ -9,79 +10,79 @@ const isSameWinWeight = (a: completedLeagueTeamInfo, b: completedLeagueTeamInfo)
     )
 }
 
-/**
- * リーグ順位を計算する関数
- * 優先順位：勝ち点 > 得失点差 > 総得点数
- */
-const calculateTotalLeagueRankings = (teamStats: Record<string, LeagueTeamInfo[]>): {
-    result: completedLeagueTeamInfo[],
-    conflictedTeam?: completedLeagueTeamInfo[][]
-} => {
-    const teamsArray = Object.values(teamStats).flat()
-    const teamsStrictArray: completedLeagueTeamInfo[] =
-        teamsArray
-            .filter(team => team.rank !== undefined && team.points !== undefined && team.goalDifference !== undefined && team.goalsFor !== undefined && team.wins !== undefined)
-            .map(team => ({
-                ...team,
-                wins: team.wins ?? 0,
-                losses: team.losses ?? 0,
-                draws: team.draws ?? 0,
-                points: team.points ?? 0,
-                goalsFor: team.goalsFor ?? 0,
-                goalsAgainst: team.goalsAgainst ?? 0,
-                goalDifference: team.goalDifference ?? 0,
-                teamId: team.teamId,
-                rank: team.rank!,
-                provisionalRank: team.provisionalRank ?? 0,
-            }));
+// /**
+//  * リーグ順位を計算する関数
+//  * 優先順位：勝ち点 > 得失点差 > 総得点数
+//  */
+// const calcTotalLeagueRankings = (teamStats: Record<string, LeagueTeamInfo[]>): {
+//     result: completedLeagueTeamInfo[],
+//     conflictedTeam?: completedLeagueTeamInfo[][]
+// } => {
+//     const teamsArray = Object.values(teamStats).flat()
+//     const teamsStrictArray: completedLeagueTeamInfo[] =
+//         teamsArray
+//             .filter(team => team.rank !== undefined && team.points !== undefined && team.goalDifference !== undefined && team.goalsFor !== undefined && team.wins !== undefined)
+//             .map(team => ({
+//                 ...team,
+//                 wins: team.wins ?? 0,
+//                 losses: team.losses ?? 0,
+//                 draws: team.draws ?? 0,
+//                 points: team.points ?? 0,
+//                 goalsFor: team.goalsFor ?? 0,
+//                 goalsAgainst: team.goalsAgainst ?? 0,
+//                 goalDifference: team.goalDifference ?? 0,
+//                 teamId: team.teamId,
+//                 rank: team.rank!,
+//                 provisionalRank: team.provisionalRank ?? 0,
+//             }));
+//
+//     const conflictedTeam: completedLeagueTeamInfo[][] = []
+//
+//     // チームをソート
+//     teamsStrictArray.sort((a, b) => {
+//         // ① 勝ち点の数で順位を決める
+//         // ② 各チームの勝ち点（勝利：3点、引き分け：1点、敗北：0点）の合計で順位を決める
+//         if (a.points !== b.points) {
+//             return b.points - a.points;
+//         }
+//
+//         // ③ 勝ち点が同じ場合は得失点差で順位を決める
+//         // ④ 勝ち点が同じ場合は、各チームの得失点差の合計で順位を決める。得失点差は、総得点から総失点を引いた数である
+//         if (a.goalDifference !== b.goalDifference) {
+//             return b.goalDifference - a.goalDifference;
+//         }
+//
+//         // ⑤ 得失点差も同じ場合は総得点数で順位を決める
+//         // ⑥ 勝ち点と得失点差が同じ場合は、各チームの総得点数で順位を決める
+//         if (a.goalsFor !== b.goalsFor) {
+//             return b.goalsFor - a.goalsFor;
+//         }
+//
+//         // ⑦ 総得点差も同じ場合は、じゃんけんをして順位を決める
+//         if (a.RockPaperScissors !== undefined && b.RockPaperScissors !== undefined) {
+//             return b.RockPaperScissors - a.RockPaperScissors;
+//         }
+//
+//         // じゃんけんも未実施の場合は重複したまま返してクライアントで重複を示す
+//         conflictedTeam.push([a, b])
+//         return 0;
+//     });
+//
+//     // 順位を付ける
+//     teamsStrictArray.forEach((team, index) => {
+//         if (index > 0 && isSameWinWeight(team, teamsStrictArray[index - 1])) {
+//             team.rank = teamsStrictArray[index - 1].rank;
+//         } else {
+//             team.rank = index + 1;
+//         }
+//     });
+//
+//
+//     return {result: teamsStrictArray, conflictedTeam: conflictedTeam.length === 0 ? undefined : conflictedTeam};
+// }
 
-    const conflictedTeam: completedLeagueTeamInfo[][] = []
 
-    // チームをソート
-    teamsStrictArray.sort((a, b) => {
-        // ① 勝ち点の数で順位を決める
-        // ② 各チームの勝ち点（勝利：3点、引き分け：1点、敗北：0点）の合計で順位を決める
-        if (a.points !== b.points) {
-            return b.points - a.points;
-        }
-
-        // ③ 勝ち点が同じ場合は得失点差で順位を決める
-        // ④ 勝ち点が同じ場合は、各チームの得失点差の合計で順位を決める。得失点差は、総得点から総失点を引いた数である
-        if (a.goalDifference !== b.goalDifference) {
-            return b.goalDifference - a.goalDifference;
-        }
-
-        // ⑤ 得失点差も同じ場合は総得点数で順位を決める
-        // ⑥ 勝ち点と得失点差が同じ場合は、各チームの総得点数で順位を決める
-        if (a.goalsFor !== b.goalsFor) {
-            return b.goalsFor - a.goalsFor;
-        }
-
-        // ⑦ 総得点差も同じ場合は、じゃんけんをして順位を決める
-        if (a.RockPaperScissors !== undefined && b.RockPaperScissors !== undefined) {
-            return b.RockPaperScissors - a.RockPaperScissors;
-        }
-
-        // じゃんけんも未実施の場合は重複したまま返してクライアントで重複を示す
-        conflictedTeam.push([a, b])
-        return 0;
-    });
-
-    // 順位を付ける
-    teamsStrictArray.forEach((team, index) => {
-        if (index > 0 && isSameWinWeight(team, teamsStrictArray[index - 1])) {
-            team.rank = teamsStrictArray[index - 1].rank;
-        } else {
-            team.rank = index + 1;
-        }
-    });
-
-
-    return {result: teamsStrictArray, conflictedTeam: conflictedTeam.length === 0 ? undefined : conflictedTeam};
-}
-
-
-const calculateTotalTournamentRankings = (relatedMatchPlans: MatchPlan[], relatedMatchResults: MatchResult[], isTimeBased: boolean): Rank[] => {
+const calcTotalTournamentRankings = (relatedMatchPlans: MatchPlan[], relatedMatchResults: MatchResult[], isTimeBased: boolean): Rank[] => {
     // チームのIDリストを取得（重複を排除）
     const teamIds = new Set<number>();
     relatedMatchResults.forEach(result => {
@@ -236,40 +237,46 @@ const calculateTotalTournamentRankings = (relatedMatchPlans: MatchPlan[], relate
     }
 }
 
-interface Rank {
-    teamId: number,
-    rank: number,
-    detail?: completedLeagueTeamInfo | string
-}
 
-export const calculateEventTotalRankings = ({event, allMatchPlans, allMatchResults}: {
-    event: Event,
+export const calcEventTotalRankings = (event: Event,
     allMatchPlans: MatchPlan[],
     allMatchResults: MatchResult[]
-}) => {
+): [Rank[][], boolean] => {
 
     const eventMatches = allMatchPlans.filter(match => match.eventId === event.id)
     const eventMatchResults = allMatchResults.filter(result => eventMatches.some(match => match.id === result.matchId))
-    if (!eventMatches || !eventMatchResults) return
+    if (!eventMatches || !eventMatchResults) return [[[]], false];
 
     // 予選のデータを取得
     const teamDataArray = event.teamData as unknown as TeamData[];
-    if (!teamDataArray || teamDataArray.length === 0) return;
+    if (!teamDataArray || teamDataArray.length === 0) return [[[]], false];
 
     let hasConflict = false
     const ranking: Rank[][] = teamDataArray.map(teamData => {
             if (teamData.type === "league") { // 方式がリーグなら
                 const leagueBlocks = teamData.blocks // 予選のブロック情報を取得
-                const {result, conflictedTeam} = calculateTotalLeagueRankings(leagueBlocks)
-                if (conflictedTeam) hasConflict = true;
-                return result.map(leagueTeamInfo => {
-                    return {
-                        teamId: parseInt(leagueTeamInfo.teamId),
-                        rank: leagueTeamInfo.rank,
-                        detail: leagueTeamInfo
-                    }
+                // const {result, conflictedTeam} = calculateTotalLeagueRankings(leagueBlocks)
+                // if (conflictedTeam) hasConflict = true;
+                // return result.map(leagueTeamInfo => {
+                //     return {
+                //         teamId: parseInt(leagueTeamInfo.teamId),
+                //         rank: leagueTeamInfo.rank,
+                //         detail: leagueTeamInfo
+                //     }
+                // })
+                
+                let results: Rank[] = []
+                 Object.entries(leagueBlocks).forEach(([blockName, teams]) => {
+                    results = [...teams.map(team => {
+                        return {
+                            teamId: parseInt(team.teamId),
+                            rank: team.rank!,
+                            detail: `${blockName}ブロック${team.rank}位`
+                        }}), ...results
+                    ]
                 })
-    
+                return results
+                
             } else { // 方式がトーナメントなら
                 const matchPlanIdRange = teamData.matchPlanIdRange
                 if (!matchPlanIdRange) return {} as Rank[];
@@ -279,14 +286,34 @@ export const calculateEventTotalRankings = ({event, allMatchPlans, allMatchResul
                 const relatedMatchPlanIds = relatedMatchPlans.map(plan => plan.id)
                 const relatedMatchResults = eventMatchResults.filter(result => result.matchId in relatedMatchPlanIds)
     
-                return calculateTotalTournamentRankings(relatedMatchPlans, relatedMatchResults, event.isTimeBased)
+                return calcTotalTournamentRankings(relatedMatchPlans, relatedMatchResults, event.isTimeBased)
             }
     })
     
-    return {ranking, hasConflict}
+    return [ranking, hasConflict]
 }
 
 
-
+export const calcEventScore = (event: Event, allMatchPlans: MatchPlan[], allMatchResults: MatchResult[]): RankWithEventScore[] => {
+    const [ranking, hasConflict] = calcEventTotalRankings(event, allMatchPlans, allMatchResults)
+    const results: RankWithEventScore[] = []
+    ranking.forEach((roundData, index) => {
+        if (ranking.length === 2 && index === 0) { // 予選
+            const qualifyResults = roundData.map(team => {
+                const teamEventScore = evaluateScore(event.id, team, true)
+                return {
+                    ...team,
+                    score: teamEventScore
+                } as RankWithEventScore
+            })
+        //     重複チームじゃないか検証してマージしてからresultsに入れる
+        }else { // 本戦
+            
+            
+        }
+        
+    })
+    
+}
 
 
