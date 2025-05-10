@@ -29,6 +29,7 @@ const EventForm = () => {
         const teams = teamIds.map((teamId) => {
             return {
                 teamId: teamId,
+                seedCount: 0,
             };
         });
         setTeamDataJsonDraft((prevState) => {
@@ -250,7 +251,7 @@ const EventForm = () => {
                             </div>
                         </>
                     }
-
+                    
                     <button
                         type='submit'
                         className='bg-blue-500 hover:bg-blue-600 text-black px-4 py-2 rounded'

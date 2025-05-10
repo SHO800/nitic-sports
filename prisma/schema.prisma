@@ -42,9 +42,9 @@ model Event {
   //  {
   //     "type": "tournament",
   //     "teams": [
-  //       {"teamId": 1 },
-  //       {"teamId": 3 },
-  //       {"teamId": 2 },
+  //       {"teamId": 1, seedCount: 0 },
+  //       {"teamId": 3, seedCount: 0 },
+  //       {"teamId": 2, seedCount: 1 },
   //   ]
   // ]
   // 最終的な順位はこの配列の-1番目のオブジェクトの値を参照すればよい。

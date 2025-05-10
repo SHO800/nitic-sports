@@ -5,6 +5,7 @@ type CompetitionType = 'tournament' | 'league';
 interface TeamInfo {
     teamId: string;
     rank?: number;
+    seedCount: number; // シードとして何回勝利したことにするかのカウント. 0は一般チーム, 1は1階分シード, 2は2階分シード, ...
 }
 
 // リーグ形式のチーム情報を拡張したインターフェース
@@ -56,17 +57,11 @@ interface LeagueTeamData extends BaseTeamData {
 interface TournamentTeamData extends BaseTeamData {
     type: 'tournament';
     teams: TeamInfo[];
-    seedLowerFlag?: boolean; // シードがある場合、trueなら下側に、falseなら上側にチームを配置
 }
 
 // 共用体型として定義（discriminated union）
 type TeamData = LeagueTeamData | TournamentTeamData;
 
-// 既存コードとの互換性のために元のTeamInfoも維持
-interface BasicTeamInfo {
-    teamId: string;
-    rank?: number;
-}
 
 // すべての試合が終わって埋まった後のLeagueTeamInfo
 interface completedLeagueTeamInfo extends Required<LeagueTeamInfo> {

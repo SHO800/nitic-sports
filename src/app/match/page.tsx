@@ -34,10 +34,9 @@ const MatchDashboard = () => {
     useEffect(() => {
         if (!events || !scores) return;
         const scoreEventIds = new Set(scores.map(score => score.eventId));
-        const completedEventIds = events.filter(event => event.isCompleted).map(event => event.id);
-        console.log(completedEventIds)
-        if (completedEventIds.length === 0) return
-        const unsettledEvents = completedEventIds.filter(id => !scoreEventIds.has(id))
+        const completedEvents = events.filter(event => event.isCompleted);
+        if (completedEvents.length === 0) return
+        const unsettledEvents = completedEvents.filter(event => !scoreEventIds.has(event.id))
         setScoreUnsettledEvents(unsettledEvents as unknown as Event[])
             
     }, [events, scores]);
@@ -84,9 +83,9 @@ const MatchDashboard = () => {
 
             </div>
             
-            {/*{scoreUnsettledEvents.length!==0 && events && */}
-            {/*    <CheckMatchScoresModal unSettledEvents={scoreUnsettledEvents}/>*/}
-            {/*}*/}
+            {scoreUnsettledEvents.length!==0 && events && 
+                <CheckMatchScoresModal unSettledEvents={scoreUnsettledEvents}/>
+            }
         </div>
     )
 }

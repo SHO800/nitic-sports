@@ -14,6 +14,7 @@ enum EventCorresponding { // eventにstringを置ければ本来不要で冗長�
 export const evaluateScore = (eventId: number, rankDetail: Rank, isQualifying: boolean) => {
     const rank = rankDetail.rank
     let score = 0;
+    
     switch (eventId) {
         // ①	バドミントン、ソフトテニス
         // 1位	1000点

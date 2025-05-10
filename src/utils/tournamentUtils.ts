@@ -1,6 +1,7 @@
-import {Event, MatchPlan, Team} from '@prisma/client';
+import {Event, MatchPlan, MatchResult, Team} from '@prisma/client';
 import analyzeVariableTeamId from "@/utils/analyzeVariableTeamId";
 import {TeamIdVariableDataType} from "@/types/variableTeamId";
+import matchPlan from "@/components/dashboard/MatchPlan";
 
 export type TournamentMatchNode = {
     matchId: number;
@@ -17,7 +18,7 @@ export type TournamentNodeTeam = {
     row: number
     column: number
     nextNode?: TournamentNode | null
-} 
+}
 
 export type TournamentNodeMatch = {
     nodeId: number
@@ -29,8 +30,8 @@ export type TournamentNodeMatch = {
     nextNode?: TournamentNode | null
 }
 
-export type TournamentNode = TournamentNodeTeam | TournamentNodeMatch 
-    
+export type TournamentNode = TournamentNodeTeam | TournamentNodeMatch
+
 
 export const implementsTournamentNode = (obj: any): obj is TournamentNode => {
     return (
@@ -117,6 +118,7 @@ export const buildTournamentBracket = (
         teamNodes,
         tournamentMatches, // このトーナメントに関係している試合情報
         allMatchPlans,
+        tournamentData.teams || [],
     );
 
 
@@ -256,6 +258,7 @@ function constructTournament(
     teamNodes: TournamentNode[],
     relatedMatchPlans: MatchPlan[],
     allMatchPlans: MatchPlan[],
+    TeamInfos: TeamInfo[],
     canContain3rdMatch: boolean = true
 ): TournamentNode[] {
     const nodes: TournamentNode[] = [...teamNodes];
@@ -280,7 +283,7 @@ function constructTournament(
             nodeId: nodes.length,
             matchId: matchPlan.id,
             row: 0, // 初期値
-            column: calculateRound(matchPlan, relatedMatchPlans, true) + 1,
+            column: calculateRound(matchPlan, relatedMatchPlans, true, TeamInfos) + 1,
             tournamentMatchNode: {
                 matchId: matchPlan.id,
                 teamIds: matchPlan.teamIds,
@@ -303,7 +306,7 @@ function constructTournament(
                             nodeId: nodes.length,  // しかしもしすでにある場合はそれ+1にしたい
                             type: "match",
                             row: 0, // 初期値
-                            column: calculateRound(referencedMatch, relatedMatchPlans, true) + 1,
+                            column: calculateRound(referencedMatch, relatedMatchPlans, true, TeamInfos) + 1,
                             nextNode: matchNode,
                             tournamentMatchNode: {
                                 matchId: referencedMatch.id,
@@ -343,14 +346,14 @@ function constructTournament(
                     matchNode.tournamentMatchNode.premiseNode![index] = [teamId];
                     // そのチーム名のノードの次のノードに自分を指定
                     const teamNode = nodes.find(node => node.type === "team" && node.teamId === teamId);
-                    if  (teamNode) {
+                    if (teamNode) {
                         teamNode.nextNode = matchNode;
                     }
                 }
             } else { // なにかの試合を前提としていない (直接チームidが指定されている) 場合は依存関係がない そのチームノードの次のノードに自分を指定
                 // そのチーム名のノードの次のノードに自分を指定
                 const teamNode = nodes.find(node => node.type === "team" && node.teamId === teamId);
-                if  (teamNode) {
+                if (teamNode) {
                     teamNode.nextNode = matchNode;
                 }
             }
@@ -359,7 +362,7 @@ function constructTournament(
         nodes.push(matchNode); // 試合ノードを追加
 
     });
-    
+
 
     return nodes;
 }
@@ -368,14 +371,15 @@ function constructTournament(
 /**
  * 試合のラウンドを計算
  */
-function calculateRound(match: MatchPlan, allMatches: MatchPlan[], detect3rdMatch: boolean = false): number {
+function calculateRound(match: MatchPlan, allMatches: MatchPlan[], detect3rdMatch: boolean = false, teamInfos: TeamInfo[] = []): number {
     // 参照関係からラウンド数を推定
-
+    
     const dependencies = match.teamIds.map(teamId => analyzeVariableTeamId(teamId)).filter(node => node !== null)
-    if (!dependencies) return 1;
-
+    const minSeedCount = Math.min(...match.teamIds.map(teamId => getSeedCount(teamId, teamInfos)));
+    if (!dependencies) return 1 + minSeedCount;
+    
     if (dependencies.length === 0 || (detect3rdMatch && dependencies.every(a => a.type === "T" && a.condition === "L"))) {
-        return 1; // 初戦
+        return 1 + minSeedCount; // 初戦
     } else {
         // 参照している試合から最大ラウンドを計算
         let maxRound = 0;
@@ -383,12 +387,12 @@ function calculateRound(match: MatchPlan, allMatches: MatchPlan[], detect3rdMatc
             if (dep.type == "T") {
                 const referencedMatch = allMatches.find(m => m.id === dep.matchId);
                 if (referencedMatch) {
-                    const round = calculateRound(referencedMatch, allMatches, detect3rdMatch);
+                    const round = calculateRound(referencedMatch, allMatches, detect3rdMatch, teamInfos);
                     maxRound = Math.max(maxRound, round);
                 }
             }
         });
-        return maxRound + 1;
+        return maxRound + 1 + minSeedCount;
     }
 }
 
@@ -400,4 +404,19 @@ function calculatePosition(match: MatchPlan, allMatches: MatchPlan[]): number {
         calculateRound(m, allMatches) === calculateRound(match, allMatches), true);
     return sameRoundMatches.indexOf(match);
 }
+
+export function getSeedCount(teamId: string, teamInfo: TeamInfo[]) {
+    if (teamInfo.length === 0) return 0;
+    let foundSeed = teamInfo.find(t => t.teamId === teamId)?.seedCount
+    if (foundSeed === undefined || foundSeed === Infinity || isNaN(foundSeed)) return 0;
+    return foundSeed;
+}
     
+export function findVariableIdFromNumberId(numberId: number, relatedMatchPlans: MatchPlan[], relatedMatchResults: MatchResult[]): string | null {
+    const matchResult = relatedMatchResults.find(matchResult => matchResult.teamIds.includes(numberId));
+    if (!matchResult) return null;
+    const index = matchResult.teamIds.indexOf(numberId);
+    const matchPlan = relatedMatchPlans.find(matchPlan => matchPlan.id === matchResult.matchId);
+    if (!matchPlan) return null;
+    return matchPlan.teamIds[index];
+}

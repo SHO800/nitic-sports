@@ -1,5 +1,7 @@
 import {Event, MatchPlan, MatchResult} from "@prisma/client";
 import {evaluateScore} from "../../public/EvaluateScore";
+import {findVariableIdFromNumberId, getSeedCount} from "@/utils/tournamentUtils";
+import matchResult from "@/components/dashboard/matchPlan/MatchResult";
 
 const isSameWinWeight = (a: completedLeagueTeamInfo, b: completedLeagueTeamInfo): boolean => {
     return (
@@ -82,7 +84,14 @@ const isSameWinWeight = (a: completedLeagueTeamInfo, b: completedLeagueTeamInfo)
 // }
 
 
-const calcTotalTournamentRankings = (relatedMatchPlans: MatchPlan[], relatedMatchResults: MatchResult[], isTimeBased: boolean): Rank[] => {
+const calcTotalTournamentRankings = (
+    relatedMatchPlans: MatchPlan[],
+    relatedMatchResults: MatchResult[],
+    isTimeBased: boolean,
+    teamInfos: TeamInfo[]
+): Rank[] => {
+    console.log("calcTotalTOurnamentRankings:", relatedMatchPlans, relatedMatchResults, matchResult
+    )
     // チームのIDリストを取得（重複を排除）
     const teamIds = new Set<number>();
     relatedMatchResults.forEach(result => {
@@ -92,6 +101,8 @@ const calcTotalTournamentRankings = (relatedMatchPlans: MatchPlan[], relatedMatc
             });
         }
     });
+    console.log("relatedMatchResults:", relatedMatchResults,)
+    console.log("teamIds:", teamIds)
 
     // チームの統計情報を初期化
     const teamStats: Record<string, {
@@ -101,10 +112,10 @@ const calcTotalTournamentRankings = (relatedMatchPlans: MatchPlan[], relatedMatc
         bestTime?: string;
         bestTimeMs?: number;
     }> = {};
-    
+
     if (isTimeBased) {
         // 時間制の場合 matchScoresには "hh:mm:ss.sss" (.以下はミリ秒) が入っている
-        
+
         // チームの初期化（最良タイム用の変数を含む）
         Array.from(teamIds).forEach(teamId => {
             teamStats[teamId] = {
@@ -115,18 +126,18 @@ const calcTotalTournamentRankings = (relatedMatchPlans: MatchPlan[], relatedMatc
                 bestTimeMs: Number.MAX_SAFE_INTEGER
             };
         });
-        
+
         // 各チームの最良タイムを取得
         relatedMatchResults.forEach(result => {
             result.teamIds.forEach((teamId, index) => {
                 const timeString = result.matchScores[index];
                 if (!timeString || !teamStats[teamId]) return;
-                
+
                 // timeString形式 "hh:mm:ss.sss" からミリ秒に変換
                 const [time, millis] = timeString.split('.');
                 const [hours, minutes, seconds] = time.split(':').map(Number);
                 const totalMs = (hours * 3600000) + (minutes * 60000) + (seconds * 1000) + (millis ? parseInt(millis) : 0);
-                
+
                 // 現在のベストタイムよりも良い（短い）場合は更新
                 if (totalMs < teamStats[teamId].bestTimeMs!) {
                     teamStats[teamId].bestTime = timeString;
@@ -134,17 +145,17 @@ const calcTotalTournamentRankings = (relatedMatchPlans: MatchPlan[], relatedMatc
                 }
             });
         });
-        
+
         // チームをタイムの短い順にソート
         const sortedTeams = Object.values(teamStats)
             .filter(team => team.bestTimeMs !== Number.MAX_SAFE_INTEGER)
             .sort((a, b) => a.bestTimeMs! - b.bestTimeMs!);
-        
+
         // 順位を付ける
         sortedTeams.forEach((team, index) => {
             team.rank = index + 1;
         });
-        
+
         // 結果を返す（タイムをdetailに含める）
         return sortedTeams.map(team => ({
             teamId: team.teamId,
@@ -161,6 +172,8 @@ const calcTotalTournamentRankings = (relatedMatchPlans: MatchPlan[], relatedMatc
             };
         });
 
+        console.log(teamStats)
+
         // 勝利数をカウント
         relatedMatchResults.forEach(result => {
             const winnerTeamId = result.winnerTeamId?.toString();
@@ -172,7 +185,7 @@ const calcTotalTournamentRankings = (relatedMatchPlans: MatchPlan[], relatedMatc
         // 決勝戦と3位決定戦を特定
         const finalMatch = relatedMatchPlans.find(match => match.isFinal === true);
         const thirdPlaceMatch = relatedMatchPlans.find(match => match.is3rdPlaceMatch === true);
-
+        console.log(finalMatch, thirdPlaceMatch, relatedMatchPlans, relatedMatchResults, teamStats,)
         // 決勝戦の結果から1位と2位を決定
         if (finalMatch) {
             const finalResult = relatedMatchResults.find(result => result.matchId === finalMatch.id);
@@ -213,8 +226,25 @@ const calcTotalTournamentRankings = (relatedMatchPlans: MatchPlan[], relatedMatc
 
         // 上位4チーム以外のチームを勝利数で順位付け
         const remainingTeams = Object.values(teamStats).filter(team => team.rank === Number.MAX_SAFE_INTEGER);
-        remainingTeams.sort((a, b) => b.wins - a.wins);
+        console.log("remainingTeams:", remainingTeams,
+            "teamInfos:", teamInfos,
+            "relatedMatchPlans:", relatedMatchPlans,
+            "relatedMatchResults:", relatedMatchResults,
+            "teamStats:", teamStats,)
+        let remainingTeamIdsInVariableId: { [key: number]: string | null } = {};
+        remainingTeams.forEach(team => {
+            remainingTeamIdsInVariableId[team.teamId] = findVariableIdFromNumberId(team.teamId, relatedMatchPlans, relatedMatchResults)
+        });
+        remainingTeams.sort((a, b) => {
+            const aInVariableId = remainingTeamIdsInVariableId[a.teamId];
+            const aTotalWinPoint = a.wins + (aInVariableId ? getSeedCount(aInVariableId, teamInfos) : 0);
+            const bInVariableId = remainingTeamIdsInVariableId[b.teamId];
+            const bTotalWinPoint = b.wins + (bInVariableId ? getSeedCount(bInVariableId, teamInfos) : 0);
+            return bTotalWinPoint - aTotalWinPoint;
+        });
 
+        console.log("remainingTeams:", remainingTeams,)
+        
         // 5位以降を割り当て
         let currentRank = 5;
         let prevWins = -1;
@@ -238,7 +268,8 @@ const calcTotalTournamentRankings = (relatedMatchPlans: MatchPlan[], relatedMatc
 }
 
 
-export const calcEventTotalRankings = (event: Event,
+export const calcEventTotalRankings = (
+    event: Event,
     allMatchPlans: MatchPlan[],
     allMatchResults: MatchResult[]
 ): [Rank[][], boolean] => {
@@ -253,67 +284,53 @@ export const calcEventTotalRankings = (event: Event,
 
     let hasConflict = false
     const ranking: Rank[][] = teamDataArray.map(teamData => {
-            if (teamData.type === "league") { // 方式がリーグなら
-                const leagueBlocks = teamData.blocks // 予選のブロック情報を取得
-                // const {result, conflictedTeam} = calculateTotalLeagueRankings(leagueBlocks)
-                // if (conflictedTeam) hasConflict = true;
-                // return result.map(leagueTeamInfo => {
-                //     return {
-                //         teamId: parseInt(leagueTeamInfo.teamId),
-                //         rank: leagueTeamInfo.rank,
-                //         detail: leagueTeamInfo
-                //     }
-                // })
-                
-                let results: Rank[] = []
-                 Object.entries(leagueBlocks).forEach(([blockName, teams]) => {
-                    results = [...teams.map(team => {
-                        return {
-                            teamId: parseInt(team.teamId),
-                            rank: team.rank!,
-                            detail: `${blockName}ブロック${team.rank}位`
-                        }}), ...results
-                    ]
-                })
-                return results
-                
-            } else { // 方式がトーナメントなら
-                const matchPlanIdRange = teamData.matchPlanIdRange
-                if (!matchPlanIdRange) return {} as Rank[];
-                const relatedMatchPlans = eventMatches.filter(plan => {
-                    return (matchPlanIdRange.start <= plan.id && plan.id <= matchPlanIdRange.end) || (matchPlanIdRange.additional && plan.id in matchPlanIdRange.additional)
-                })
-                const relatedMatchPlanIds = relatedMatchPlans.map(plan => plan.id)
-                const relatedMatchResults = eventMatchResults.filter(result => result.matchId in relatedMatchPlanIds)
-    
-                return calcTotalTournamentRankings(relatedMatchPlans, relatedMatchResults, event.isTimeBased)
-            }
+        if (teamData.type === "league") { // 方式がリーグなら
+            const leagueBlocks = teamData.blocks // 予選のブロック情報を取得
+            let results: Rank[] = []
+            Object.entries(leagueBlocks).forEach(([blockName, teams]) => {
+                results = [...teams.map(team => {
+                    return {
+                        teamId: parseInt(team.teamId),
+                        rank: team.rank!,
+                        detail: `${blockName}ブロック${team.rank}位`
+                    }
+                }), ...results
+                ]
+            })
+            return results
+
+        } else { // 方式がトーナメントなら
+            const matchPlanIdRange = teamData.matchPlanIdRange
+            if (!matchPlanIdRange) return {} as Rank[];
+            const relatedMatchPlans = eventMatches.filter(plan => {
+                return (matchPlanIdRange.start <= plan.id && plan.id <= matchPlanIdRange.end) || (matchPlanIdRange.additional && matchPlanIdRange.additional.includes(plan.id))
+            })
+            const relatedMatchPlanIds = relatedMatchPlans.map(plan => plan.id)
+            const relatedMatchResults = eventMatchResults.filter(result => relatedMatchPlanIds.includes(result.matchId))
+            
+            return calcTotalTournamentRankings(relatedMatchPlans, relatedMatchResults, event.isTimeBased, teamData.teams)
+        }
     })
-    
+
     return [ranking, hasConflict]
 }
 
 
-export const calcEventScore = (event: Event, allMatchPlans: MatchPlan[], allMatchResults: MatchResult[]): RankWithEventScore[] => {
+export const calcEventScore = (event: Event, allMatchPlans: MatchPlan[], allMatchResults: MatchResult[]): RankWithEventScore[][] => {
     const [ranking, hasConflict] = calcEventTotalRankings(event, allMatchPlans, allMatchResults)
-    const results: RankWithEventScore[] = []
+    const results: RankWithEventScore[][] = []
     ranking.forEach((roundData, index) => {
-        if (ranking.length === 2 && index === 0) { // 予選
-            const qualifyResults = roundData.map(team => {
-                const teamEventScore = evaluateScore(event.id, team, true)
-                return {
-                    ...team,
-                    score: teamEventScore
-                } as RankWithEventScore
-            })
-        //     重複チームじゃないか検証してマージしてからresultsに入れる
-        }else { // 本戦
-            
-            
-        }
-        
+        const isQualify = (ranking.length === 2 && index === 0)
+        results[index] = roundData.map(team => {
+            const teamEventScore = evaluateScore(event.id, team, isQualify)
+            return {
+                ...team,
+                score: teamEventScore
+            } as RankWithEventScore
+        })
     })
-    
+    console.log("calc", results)
+    return results
 }
 
 
