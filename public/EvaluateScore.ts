@@ -22,19 +22,19 @@ export const evaluateScore = (eventId: number, rankDetail: Rank, isQualifying: b
         // 3位	600点
         // 4位	500点
         // ベスト8	400点
-        // 予選2位	200点
-        // 予選3位	100点
+        // 予選1位	200点
+        // 予選2位	100点
         case EventCorresponding.Badminton:
         case EventCorresponding.SoftTennis:
             if (isQualifying) { // 予選
-                if (rank === 2) score = 200;
-                else if (rank === 3) score = 100;
+                if (rank === 1) score = 200;
+                else if (rank === 2) score = 100;
             } else { // 本戦
                 if (rank === 1) score = 1000;
                 else if (rank === 2) score = 800;
                 else if (rank === 3) score = 600;
                 else if (rank === 4) score = 500;
-                else if (rank >= 8) score = 400;
+                else if (rank <= 8) score = 400;
             }
             break;
 
@@ -52,8 +52,8 @@ export const evaluateScore = (eventId: number, rankDetail: Rank, isQualifying: b
             } else { // 本戦
                 if (rank === 1) score = 1000;
                 else if (rank === 2) score = 800;
-                else if (rank >= 4) score = 500;
-                else if (rank >= 8) score = 300;
+                else if (rank <= 4) score = 500;
+                else if (rank <= 8) score = 300;
             }
             break;
 
@@ -86,9 +86,9 @@ export const evaluateScore = (eventId: number, rankDetail: Rank, isQualifying: b
             // 予選なし
             if (rank === 1) score = 1000;
             else if (rank === 2) score = 800;
-            else if (rank >= 4) score = 500;
-            else if (rank >= 8) score = 300;
-            else if (rank >= 16) score = 100;
+            else if (rank <= 4) score = 500;
+            else if (rank <= 8) score = 300;
+            else if (rank <= 16) score = 100;
             break;
 
         // ⑤	ソフトボール、サッカー、卓球
@@ -106,8 +106,8 @@ export const evaluateScore = (eventId: number, rankDetail: Rank, isQualifying: b
             else if (rank === 2) score = 800;
             else if (rank === 3) score = 600;
             else if (rank === 4) score = 500;
-            else if (rank >= 8) score = 300;
-            else if (rank >= 16) score = 100;
+            else if (rank <= 8) score = 300;
+            else if (rank <= 16) score = 100;
             break;
     }
     // 該当がない場合は0のまま.
