@@ -416,6 +416,7 @@ export function findVariableIdFromNumberId(numberId: number, relatedMatchPlans: 
     const matchResult = relatedMatchResults.find(matchResult => matchResult.teamIds.includes(numberId));
     if (!matchResult) return null;
     const index = matchResult.teamIds.indexOf(numberId);
+    
     const matchPlan = relatedMatchPlans.find(matchPlan => matchPlan.id === matchResult.matchId);
     if (!matchPlan) return null;
     return matchPlan.teamIds[index];

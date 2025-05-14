@@ -90,8 +90,6 @@ const calcTotalTournamentRankings = (
     isTimeBased: boolean,
     teamInfos: TeamInfo[]
 ): Rank[] => {
-    console.log("calcTotalTOurnamentRankings:", relatedMatchPlans, relatedMatchResults, matchResult
-    )
     // チームのIDリストを取得（重複を排除）
     const teamIds = new Set<number>();
     relatedMatchResults.forEach(result => {
@@ -101,9 +99,6 @@ const calcTotalTournamentRankings = (
             });
         }
     });
-    console.log("relatedMatchResults:", relatedMatchResults,)
-    console.log("teamIds:", teamIds)
-
     // チームの統計情報を初期化
     const teamStats: Record<string, {
         teamId: number;
@@ -150,7 +145,7 @@ const calcTotalTournamentRankings = (
         const sortedTeams = Object.values(teamStats)
             .filter(team => team.bestTimeMs !== Number.MAX_SAFE_INTEGER)
             .sort((a, b) => a.bestTimeMs! - b.bestTimeMs!);
-
+        
         // 順位を付ける
         sortedTeams.forEach((team, index) => {
             team.rank = index + 1;
@@ -171,8 +166,13 @@ const calcTotalTournamentRankings = (
                 rank: Number.MAX_SAFE_INTEGER // 初期値は大きな数値
             };
         });
-
-        console.log(teamStats)
+        let teamIdsForVariableId: { [key: number]: string | null } = {};
+        Object.values(teamStats).forEach(team => {
+            teamIdsForVariableId[team.teamId] = findVariableIdFromNumberId(team.teamId, relatedMatchPlans, relatedMatchResults)
+        });
+        // キーとバリューを逆転
+        const  variableIdsForTeamId: { [key: string]: number} = Object.fromEntries(Object.entries(teamIdsForVariableId).map(a => a.reverse()))
+        
 
         // 勝利数をカウント
         relatedMatchResults.forEach(result => {
@@ -181,23 +181,29 @@ const calcTotalTournamentRankings = (
                 teamStats[winnerTeamId].wins += 1;
             }
         });
+        
+        // seedCountをwinsに加算
+        teamInfos.forEach(teamInfo => {
+            const teamIdStr = teamInfo.teamId;
+            const teamIdNum: number | undefined = variableIdsForTeamId[teamIdStr];
+            if (teamIdNum && teamStats[teamIdNum]) teamStats[teamIdNum].wins += getSeedCount(teamIdStr, teamInfos);
+        })
 
         // 決勝戦と3位決定戦を特定
         const finalMatch = relatedMatchPlans.find(match => match.isFinal === true);
         const thirdPlaceMatch = relatedMatchPlans.find(match => match.is3rdPlaceMatch === true);
-        console.log(finalMatch, thirdPlaceMatch, relatedMatchPlans, relatedMatchResults, teamStats,)
         // 決勝戦の結果から1位と2位を決定
         if (finalMatch) {
             const finalResult = relatedMatchResults.find(result => result.matchId === finalMatch.id);
             if (finalResult && finalResult.winnerTeamId) {
                 // 優勝チーム（1位）
-                const winnerTeamId = finalResult.winnerTeamId.toString();
+                const winnerTeamId = finalResult.winnerTeamId;
                 if (teamStats[winnerTeamId]) {
                     teamStats[winnerTeamId].rank = 1;
                 }
 
                 // 準優勝チーム（2位）
-                finalMatch.teamIds.forEach(teamId => {
+                finalResult.teamIds.forEach(teamId => {
                     if (teamId !== winnerTeamId && teamStats[teamId]) {
                         teamStats[teamId].rank = 2;
                     }
@@ -210,13 +216,13 @@ const calcTotalTournamentRankings = (
             const thirdPlaceResult = relatedMatchResults.find(result => result.matchId === thirdPlaceMatch.id);
             if (thirdPlaceResult && thirdPlaceResult.winnerTeamId) {
                 // 3位のチーム
-                const thirdPlaceTeamId = thirdPlaceResult.winnerTeamId.toString();
+                const thirdPlaceTeamId = thirdPlaceResult.winnerTeamId;
                 if (teamStats[thirdPlaceTeamId]) {
                     teamStats[thirdPlaceTeamId].rank = 3;
                 }
 
                 // 4位のチーム
-                thirdPlaceMatch.teamIds.forEach(teamId => {
+                thirdPlaceResult.teamIds.forEach(teamId => {
                     if (teamId !== thirdPlaceTeamId && teamStats[teamId]) {
                         teamStats[teamId].rank = 4;
                     }
@@ -226,37 +232,28 @@ const calcTotalTournamentRankings = (
 
         // 上位4チーム以外のチームを勝利数で順位付け
         const remainingTeams = Object.values(teamStats).filter(team => team.rank === Number.MAX_SAFE_INTEGER);
-        console.log("remainingTeams:", remainingTeams,
-            "teamInfos:", teamInfos,
-            "relatedMatchPlans:", relatedMatchPlans,
-            "relatedMatchResults:", relatedMatchResults,
-            "teamStats:", teamStats,)
-        let remainingTeamIdsInVariableId: { [key: number]: string | null } = {};
-        remainingTeams.forEach(team => {
-            remainingTeamIdsInVariableId[team.teamId] = findVariableIdFromNumberId(team.teamId, relatedMatchPlans, relatedMatchResults)
-        });
         remainingTeams.sort((a, b) => {
-            const aInVariableId = remainingTeamIdsInVariableId[a.teamId];
+            const aInVariableId = teamIdsForVariableId[a.teamId];
             const aTotalWinPoint = a.wins + (aInVariableId ? getSeedCount(aInVariableId, teamInfos) : 0);
-            const bInVariableId = remainingTeamIdsInVariableId[b.teamId];
+            const bInVariableId = teamIdsForVariableId[b.teamId];
             const bTotalWinPoint = b.wins + (bInVariableId ? getSeedCount(bInVariableId, teamInfos) : 0);
             return bTotalWinPoint - aTotalWinPoint;
         });
-
-        console.log("remainingTeams:", remainingTeams,)
         
         // 5位以降を割り当て
         let currentRank = 5;
         let prevWins = -1;
+        
 
         remainingTeams.forEach((team, index) => {
-            if (index === 0 || team.wins !== prevWins) {
+            const teamInVariableId = teamIdsForVariableId[team.teamId];
+            if (index === 0 || (team.wins + (teamInVariableId ? getSeedCount(teamInVariableId, teamInfos): 0)) !== prevWins) {
                 // 勝利数が異なる場合、新しい順位
                 currentRank = 5 + index;
             }
 
             team.rank = currentRank;
-            prevWins = team.wins;
+            prevWins = team.wins + (teamInVariableId ? getSeedCount(teamInVariableId, teamInfos): 0);
         });
 
         return Object.values(teamStats).map(team => ({
@@ -329,7 +326,6 @@ export const calcEventScore = (event: Event, allMatchPlans: MatchPlan[], allMatc
             } as RankWithEventScore
         })
     })
-    console.log("calc", results)
     return results
 }
 
