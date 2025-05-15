@@ -5,7 +5,7 @@ export default async function Home() {
     return (
 
         <div className="min-h-screen">
-            <MatchesWrapper title={"WIP"}>
+            <MatchesWrapper title={"Work In Progress"}>
                 <p>(実行委員用に公開中)</p>
             </MatchesWrapper>
 
@@ -37,6 +37,5 @@ export default async function Home() {
                 試合情報
             </Link>
         </div>
-
     );
 }
