@@ -47,13 +47,6 @@ const EventForm = () => {
             <form
                 onSubmit={async (e) => {
                     e.preventDefault();
-                    await createEvent(
-                        (document.getElementById('eventName') as HTMLInputElement).value,
-                        teamDataJsonDraft,
-                        (document.getElementById('eventDescription') as HTMLInputElement).value,
-                        isTimeBased,
-                    )
-                    await mutateEvents();
                 }}
                 className='flex items-center mt-4'
             >
@@ -253,8 +246,18 @@ const EventForm = () => {
                     }
                     
                     <button
-                        type='submit'
+                        type='button'
                         className='bg-blue-500 hover:bg-blue-600 text-black px-4 py-2 rounded'
+                        onClick={async (e) => {
+                            e.preventDefault()
+                            await createEvent(
+                                (document.getElementById('eventName') as HTMLInputElement).value,
+                                teamDataJsonDraft,
+                                (document.getElementById('eventDescription') as HTMLInputElement).value,
+                                isTimeBased,
+                            )
+                            await mutateEvents();
+                        }}
                     >
                         追加
                     </button>

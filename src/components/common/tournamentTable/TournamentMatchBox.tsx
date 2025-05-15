@@ -126,8 +126,7 @@ const TournamentMatchBox = ({match, boxStyle, matchResult, rowWidth, rowHeight}:
                     endX={lineCoords.endX}
                     endY={lineCoords.endY}
                     type={lineCoords.type}
-                    // color1={match.tournamentMatchNode.matchPlan.status === Status.Completed ? "rgb(255,0,0)" : "rgba(156, 163, 175, 0.8)"}
-                    color1={isWonInNextNode ? "rgb(255,0,0)" : "rgba(156, 163, 175, 0.8)"}
+                    color1={match.tournamentMatchNode.matchPlan.status === Status.Completed ? "rgb(255,0,0)" : "rgba(156, 163, 175, 0.8)"}
                     color2={isWonInNextNode ? "rgb(255,0,0)" : "rgba(156, 163, 175, 0.8)"}
                     thickness={4}
                     animationTimingFunction={"linear"}

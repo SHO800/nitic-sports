@@ -108,7 +108,7 @@ export const useData = () => {
                 if (!teamData) return planStr;
 
                 const teamDataIndex = variableTeamIdData.teamDataIndex;
-                if (teamData[teamDataIndex].type !== "league" ) return planStr;
+                if (!teamData[teamDataIndex] || teamData[teamDataIndex].type !== "league" ) return planStr;
 
                 const block = teamData[teamDataIndex].blocks[variableTeamIdData.blockName];
                 if (!block) return planStr;
