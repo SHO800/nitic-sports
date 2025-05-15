@@ -5,8 +5,8 @@ export default async function Home() {
     return (
 
         <div className="min-h-screen">
-            <MatchesWrapper title={"進行中の試合"}>
-                <p>a</p>
+            <MatchesWrapper title={"WIP"}>
+                <p>(実行委員用に公開中)</p>
             </MatchesWrapper>
 
             <p className="flex justify-center mt-4">

@@ -21,16 +21,16 @@ const EventList = () => {
                                 {event.id} {event.name} {event.description}
                             </p>
                         </div>
-                        <button
-                            onClick={async (e) => {
-                                e.preventDefault()
-                                await deleteEvent(event.id);
-                                await mutateEvents()
-                            }}
-                            className='bg-red-500 hover:bg-red-600 text-black px-4 py-2 rounded'
-                        >
-                            削除
-                        </button>
+                        {/*<button*/}
+                        {/*    onClick={async (e) => {*/}
+                        {/*        e.preventDefault()*/}
+                        {/*        await deleteEvent(event.id);*/}
+                        {/*        await mutateEvents()*/}
+                        {/*    }}*/}
+                        {/*    className='bg-red-500 hover:bg-red-600 text-black px-4 py-2 rounded'*/}
+                        {/*>*/}
+                        {/*    削除*/}
+                        {/*</button>*/}
                     </div>
                     {event.description && (
                         <div className='flex items-center'>

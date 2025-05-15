@@ -25,7 +25,7 @@ const TournamentTable = ({eventId, isFinal, relatedMatchPlans}: Readonly<Tournam
     } = useData();
 
     const firstRowWidth = 100;
-    const rowWidth = 60;
+    const rowWidth = 70;
     const rowHeight = 30;
 
     // データ取得後にトーナメント構造を構築

@@ -48,10 +48,10 @@ const event = events.find(event => event.id === matchPlan.eventId)!;
 
                 <div className="flex items-center">
                     <StatusBadge status={status}/>
-                    <DeleteButton
-                        matchId={matchPlan.id}
-                        onDelete={() => handleDeleteMatch(matchPlan.id)}
-                    />
+                    {/*<DeleteButton*/}
+                    {/*    matchId={matchPlan.id}*/}
+                    {/*    onDelete={() => handleDeleteMatch(matchPlan.id)}*/}
+                    {/*/>*/}
                 </div>
             </div>
 

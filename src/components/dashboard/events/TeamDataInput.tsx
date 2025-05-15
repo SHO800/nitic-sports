@@ -88,7 +88,6 @@ const TeamDataInput = ({
                 <button
                     type="button"
                     onClick={() => {
-                        console.log(teamDataJsonDraft)
                         const newTeamData = [...teamDataJsonDraft];
                         const teamDataElem = newTeamData[index];
                         if ("teams" in teamDataElem) {

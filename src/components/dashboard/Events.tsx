@@ -51,8 +51,8 @@ const Events = () => {
     return (
         <>
             <EventList />
-            <EventForm />
-            <MinPlanIdInput />
+            {/*<EventForm />*/}
+            {/*<MinPlanIdInput />*/}
         </>
     );
 };
