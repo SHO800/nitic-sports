@@ -5,7 +5,7 @@ import { useData } from "@/hooks/data";
 import MatchInfoForReader from "../reader/MatchInfoForReader";
 import { Status, MatchPlan as MatchPlanType } from "@prisma/client";
 import MatchCountdownForReader from "../reader/MatchCountdownForReader";
-import { useCurrentTime } from "@/hooks/currenTime";
+import { useCurrentTime } from "@/hooks/currentTime";
 
 type Props =
     | {eventId: number | string | null; eventIds?: undefined}

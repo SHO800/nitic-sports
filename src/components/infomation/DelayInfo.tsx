@@ -1,5 +1,5 @@
 import { useData } from "@/hooks/data";
-import { useCurrentTime } from "@/hooks/currenTime";
+import { useCurrentTime } from "@/hooks/currentTime";
 import MatchInfoForReader from "../reader/MatchInfoForReader";
 
 type Props = {

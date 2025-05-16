@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useData } from "@/hooks/data";
 import MatchCountdownForReader from "../reader/MatchCountdownForReader";
 import { Status, MatchPlan as MatchPlanType, $Enums } from "@prisma/client";
-// import { useCurrentTime } from "@/hooks/currenTime";
+// import { useCurrentTime } from "@/hooks/currentTime";
 import MatchInfoOnModal from "./MatchInfoOnModal";
 import MatchTimer from "../dashboard/MatchTimer";
 

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { MatchPlan as MatchPlanType } from "@prisma/client";
-import { useCurrentTime } from "@/hooks/currenTime";
+import { useCurrentTime } from "@/hooks/currentTime";
 import { judgeDay12String } from "@/utils/judgeDay12";
 import InfoModal from "../infomation/InfoModal";
 import clsx from "clsx";

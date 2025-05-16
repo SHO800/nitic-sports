@@ -1,4 +1,4 @@
-import { useCurrentTime } from "@/hooks/currenTime";
+import { useCurrentTime } from "@/hooks/currentTime";
 import { useData } from "@/hooks/data";
 
 type Props ={

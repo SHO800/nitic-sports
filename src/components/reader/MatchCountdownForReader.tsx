@@ -1,5 +1,5 @@
 "use client"
-import {useCurrentTime} from "@/hooks/currenTime";
+import {useCurrentTime} from "@/hooks/currentTime";
 
 type MatchCountdownProps = {
     scheduledStartTime: Date | string;
