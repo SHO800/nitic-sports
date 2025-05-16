@@ -43,7 +43,8 @@ const NextMatch: React.FC<Props> = (props) => {
         const SortedByStartTime = AddedMatchTime?.sort((a,b) => a.scheduledStartTime.getTime() - b.scheduledStartTime.getTime())    
         
         const filteredByStatus = SortedByStartTime?.filter((item) =>
-            (item.status === "Preparing" || item.status === "Waiting") && item.scheduledStartTime.getTime() > currentTime.currentTime
+            (item.status === "Preparing" || item.status === "Waiting") 
+        // && item.scheduledStartTime.getTime() < currentTime.currentTime
         )
         const NextThree = filteredByStatus?.slice(0,3);
 
@@ -126,7 +127,8 @@ const NextMatch: React.FC<Props> = (props) => {
         const SortedByStartTime = AddedMatchTime?.sort((a,b) => a.scheduledStartTime.getTime() - b.scheduledStartTime.getTime())    
         
         const filteredByStatus = SortedByStartTime?.filter((item) =>
-            (item.status === "Preparing" || item.status === "Waiting") && item.scheduledStartTime.getTime() > currentTime.currentTime
+            (item.status === "Preparing" || item.status === "Waiting")
+        //  && item.scheduledStartTime.getTime() > currentTime.currentTime
         )
         const NextThree = filteredByStatus?.slice(0,3);
 
@@ -178,7 +180,6 @@ const NextMatch: React.FC<Props> = (props) => {
                                             getMatchDisplayStr={getMatchDisplayStr}
                                         />
                                         
-                                        <p>{item.matchTime}</p>
                                     </div>
                                     {/*
                                     <p  className="flex justify-center bg-white text-black px-1 rounded text-2xl">
