@@ -29,39 +29,71 @@ const TeamDataInput = ({
                 {teamData.map((key, idx) => (
                     <div key={`teamDataJsonDraft[${index}]TournamentDiv${idx}`}
                          className={""}>
+                        <button onClick={() => {
+                            const newTeamData = [...teamDataJsonDraft]
+                            const teamDataElem = newTeamData[index]
+                            if ("teams" in teamDataElem){
+                                teamDataElem.teams.splice(idx, 1)
+                                setTeamDataJsonDraft(newTeamData)
+                            }
+                        }}>×</button>
                         <input
                             type="text"
-                            name={`team${idx}`}
-                            id={`team${idx}`}
-                            className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
+                            name={`team-input-${idx}-${key.teamId}`}
+                            id={`team-input-${idx}-${key.teamId}`}
+                            className='border border-gray-400 px-4 py-2 mr-2 rounded text-black w-36'
                             placeholder='チーム名を入力してください'
                             value={key.teamId}
                             onChange={(e) => {
-                                const newTeamData = {...teamDataJsonDraft};
+                                const newTeamData = [...teamDataJsonDraft];
                                 const teamDataElem = newTeamData[index];
 
                                 if ("teams" in teamDataElem) {
                                     teamDataElem.teams[idx] = {
                                         teamId: e.target.value,
+                                        seedCount: key.seedCount,
                                     };
                                 }
                                 setTeamDataJsonDraft(newTeamData);
                             }}
                         />
+                        <span>チームID</span>
                         <span
                             className={`text-black `}>
                             {getMatchDisplayStr(key.teamId)}
                         </span>
+                        <input
+                            type="tel"
+                            name={`isSead-input-${idx}-${key.teamId}`}
+                            id={`isSead-input-${idx}-${key.teamId}`}
+                            className='border border-gray-400 px-4 py-2 mr-2 rounded text-black w-24'
+                            placeholder='何階シード? (0: 普通, 1: 一試合スキップ, 2: 二試合スキップ...)'
+                            value={key.seedCount}
+                            onChange={(e) => {
+                                const newTeamData = [...teamDataJsonDraft];
+                                const teamDataElem = newTeamData[index];
+
+                                if ("teams" in teamDataElem) {
+                                    teamDataElem.teams[idx] = {
+                                        teamId: key.teamId,
+                                        seedCount: Number(e.target.value),
+                                    };
+                                }
+                                setTeamDataJsonDraft(newTeamData);
+                            }}
+                        />
+                        <span>何階シード? (0: 普通, 1: 一試合スキップ, 2: 二試合スキップ...)</span>
                     </div>
                 ))}
                 <button
                     type="button"
                     onClick={() => {
-                        const newTeamData = {...teamDataJsonDraft};
+                        const newTeamData = [...teamDataJsonDraft];
                         const teamDataElem = newTeamData[index];
                         if ("teams" in teamDataElem) {
                             teamDataElem.teams.push({
                                 teamId: "0",
+                                seedCount: 0,
                             });
                         }
                         setTeamDataJsonDraft(newTeamData);
@@ -98,11 +130,12 @@ const TeamDataInput = ({
                                     className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
                                     placeholder='IDを入力してください'
                                     onChange={(e) => {
-                                        const newTeamData = {...teamDataJsonDraft};
+                                        const newTeamData = [...teamDataJsonDraft];
                                         const teamDataElem = newTeamData[index];
                                         if ("blocks" in teamDataElem) {
                                             teamDataElem.blocks[key][teamIndex] = {
                                                 teamId: e.target.value,
+                                                seedCount: 0,
                                             };
                                         }
                                         setTeamDataJsonDraft(newTeamData);
@@ -112,11 +145,12 @@ const TeamDataInput = ({
                             <button
                                 type="button"
                                 onClick={() => {
-                                    const newTeamData = {...teamDataJsonDraft};
+                                    const newTeamData = [...teamDataJsonDraft];
                                     const teamDataElem = newTeamData[index];
                                     if ("blocks" in teamDataElem) {
                                         teamDataElem.blocks[key].push({
                                             teamId: "0",
+                                            seedCount: 0,
                                         });
                                     }
                                     setTeamDataJsonDraft(newTeamData);
@@ -131,10 +165,10 @@ const TeamDataInput = ({
                 <button
                     type="button"
                     onClick={() => {
-                        const newTeamData = {...teamDataJsonDraft};
+                        const newTeamData = [...teamDataJsonDraft];
                         const teamDataElem = newTeamData[index];
-
-
+                        
+                        
                         if ("blocks" in teamDataElem) {
                             const blockName = String.fromCharCode(65 + Object.keys(teamDataElem.blocks).length);
                             teamDataElem.blocks[blockName] = [];

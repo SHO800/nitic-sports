@@ -10,7 +10,8 @@ interface TournamentLineProps {
     endX: number;
     endY: number;
     type: "H" | "V" | "LT" | "RT" | "LB" | "RB" | "DIRECT";
-    color?: string;
+    color1?: string;
+    color2?: string;
     thickness?: number;
     animationTimingFunction?: AnimationTimingFunction
     duration?: number;
@@ -23,7 +24,8 @@ export const TournamentLine: React.FC<TournamentLineProps> = ({
                                                                   endX,
                                                                   endY,
                                                                   type = 'H',
-                                                                  color = 'rgba(156, 163, 175, 0.8)',
+                                                                  color1 = 'rgba(156, 163, 175, 0.8)',
+                                                                  color2 = 'rgba(156, 163, 175, 0.8)',
                                                                   thickness = 2,
                                                                   animationTimingFunction = "linear",
                                                                   duration = 500,
@@ -53,7 +55,7 @@ export const TournamentLine: React.FC<TournamentLineProps> = ({
                       x2={0}
                       y2={endY < startY ? 0 : endY - startY}
                       strokeWidth={thickness}
-                      stroke={color}
+                      stroke={color1}
                 />
             </svg>
 
@@ -81,7 +83,7 @@ export const TournamentLine: React.FC<TournamentLineProps> = ({
                       x2={endX - startX}
                       y2={0}
                       strokeWidth={thickness}
-                      stroke={color}
+                      stroke={color1}
                 />
             </svg>
         );
@@ -108,7 +110,7 @@ export const TournamentLine: React.FC<TournamentLineProps> = ({
                       x2={0}
                       y2={endY - startY}
                       strokeWidth={thickness}
-                      stroke={color}
+                      stroke={color1}
                 />
                 <line style={{
                     strokeDasharray: `${endX - startX}px`,
@@ -121,7 +123,7 @@ export const TournamentLine: React.FC<TournamentLineProps> = ({
                       x2={endX - startX}
                       y2={endY - startY}
                       strokeWidth={thickness}
-                      stroke={color}
+                      stroke={color2}
                 />
             </svg>
 
@@ -149,7 +151,7 @@ export const TournamentLine: React.FC<TournamentLineProps> = ({
                       x2={endX - startX}
                       y2={0}
                       strokeWidth={thickness}
-                      stroke={color}
+                      stroke={color1}
                 />
                 <line style={{
                     strokeDasharray: `${endY - startY}px`,
@@ -161,7 +163,7 @@ export const TournamentLine: React.FC<TournamentLineProps> = ({
                       x2={endX - startX}
                       y2={endY - startY}
                       strokeWidth={thickness}
-                      stroke={color}
+                      stroke={color2}
                 />
             </svg>
         );
@@ -189,7 +191,7 @@ export const TournamentLine: React.FC<TournamentLineProps> = ({
                       x2={0}
                       y2={0}
                       strokeWidth={thickness}
-                      stroke={color}
+                      stroke={color1}
                 />
                 <line style={{
                     strokeDasharray: `${endY - startY}px`,
@@ -201,7 +203,7 @@ export const TournamentLine: React.FC<TournamentLineProps> = ({
                       x2={endX - startX}
                       y2={0}
                       strokeWidth={thickness}
-                      stroke={color}
+                      stroke={color2}
                 />
             </svg>
         );
@@ -229,7 +231,7 @@ export const TournamentLine: React.FC<TournamentLineProps> = ({
                       x2={endX - startX}
                       y2={endY - startY}
                       strokeWidth={thickness}
-                      stroke={color}
+                      stroke={color1}
                 />
                 <line style={{
                     strokeDasharray: `${endY - startY}px`,
@@ -241,7 +243,7 @@ export const TournamentLine: React.FC<TournamentLineProps> = ({
                       x2={endX - startX}
                       y2={0}
                       strokeWidth={thickness}
-                      stroke={color}
+                      stroke={color2}
                 />
             </svg>
         );
@@ -266,7 +268,7 @@ export const TournamentLine: React.FC<TournamentLineProps> = ({
                       x2={endX - startX}
                       y2={endY - startY}
                       strokeWidth={thickness}
-                      stroke={color}
+                      stroke={color2}
                 />
             </svg>
         );

@@ -1,90 +1,78 @@
 "use client"
-import { Status, MatchPlan as MatchPlanType } from "@prisma/client";
+import {
+    Event as EventType,
+    Location as LocationType,
+    MatchPlan as MatchPlanType,
+    MatchResult as MatchResultType,
+    Status
+} from "@prisma/client";
 import MatchInfo from "./MatchInfo";
 import StatusBadge from "./StatusBadge";
 import MatchCountdown from "./MatchCountdown";
-import MatchTimer from "@/components/dashboard/MatchTimer";
-import {MatchResult as MatchResultType, Location as LocationType, Event as EventType} from "@prisma/client";
+import MatchTimer from "@/components/match/MatchTimer";
 import DeleteButton from "@/components/dashboard/matchPlan/DeleteButton";
 import MatchResult from "@/components/dashboard/matchPlan/MatchResult";
 
 type MatchCardProps = {
     matchPlan: MatchPlanType;
     status: Status;
-    events: EventType[] | undefined;
+    events: EventType[]
     locations: LocationType[] | undefined;
     matchResults: Record<number, MatchResultType> | undefined;
-    matchTimers: Record<number, boolean>;
     getMatchDisplayStr: (teamId: string) => string;
-    handleStartTimer: (matchId: number) => void;
-    handleStopTimer: (matchId: number) => void;
     handleDeleteMatch: (matchId: number) => Promise<void>;
 };
 
 const MatchCard = ({
-    matchPlan,
-    status,
-    events,
-    locations,
-    matchResults,
-    matchTimers,
-    getMatchDisplayStr,
-    handleStartTimer,
-    handleStopTimer,
-    handleDeleteMatch
-}: MatchCardProps) => {
+                       matchPlan,
+                       status,
+                       events,
+                       locations,
+                       matchResults,
+    
+                       getMatchDisplayStr,
+                       handleDeleteMatch
+                   }: MatchCardProps) => {
+const event = events.find(event => event.id === matchPlan.eventId)!;
     return (
         <div className="flex flex-col justify-start items-start bg-gray-200 p-2 rounded mb-2 w-full">
             <div className="flex items-center justify-between w-full">
                 <div className="flex items-center bg-amber-100">
-                    <MatchInfo 
+                    <MatchInfo
                         matchPlan={matchPlan}
-                        events={events}
+                        eventName={event.name}
                         locations={locations}
                         getMatchDisplayStr={getMatchDisplayStr}
                     />
                 </div>
 
                 <div className="flex items-center">
-                    <StatusBadge status={status} />
-                    <DeleteButton 
-                        matchId={matchPlan.id}
-                        onDelete={() => handleDeleteMatch(matchPlan.id)}
-                    />
+                    <StatusBadge status={status}/>
+                    {/*<DeleteButton*/}
+                    {/*    matchId={matchPlan.id}*/}
+                    {/*    onDelete={() => handleDeleteMatch(matchPlan.id)}*/}
+                    {/*/>*/}
                 </div>
             </div>
 
             {/* 開始前なら予定時間との差を表示 */}
-            {(status === Status.Waiting || status === Status.Preparing) && (
-                <MatchCountdown scheduledStartTime={matchPlan.scheduledStartTime} />
-            )}
+            {(status === Status.Waiting || status === Status.Preparing) && 
+                <MatchCountdown scheduledStartTime={matchPlan.scheduledStartTime}/>
+            }
 
             {/* タイマー表示 - Preparing（準備中）またはPlaying（試合中）の場合だけ表示 */}
-            {(status === Status.Preparing || status === Status.Playing) && (
-                <MatchTimer 
-                    matchId={matchPlan.id}
-                    status={status}
-                    isRunning={status === Status.Playing}
-                    onStart={() => handleStartTimer(matchPlan.id)}
-                    onStop={() => handleStopTimer(matchPlan.id)}
+            {(status === Status.Playing) && 
+                <MatchTimer
+                    match={matchPlan}
                 />
-            )}
+            }
             
-            {/*/!* 試合終了した後もタイマー表示（状態が変わっても継続表示） *!/*/}
-            {/*{status === Status.Finished && matchTimers[matchPlan.id] === false && (*/}
-            {/*    <MatchTimer */}
-            {/*        matchId={matchPlan.id}*/}
-            {/*        status={status}*/}
-            {/*        isRunning={false}*/}
-            {/*        onStart={() => handleStartTimer(matchPlan.id)}*/}
-            {/*        onStop={() => handleStopTimer(matchPlan.id)}*/}
-            {/*    />*/}
-            {/*)}*/}
 
             {/* 試合結果表示 */}
-            <MatchResult 
+            <MatchResult
                 matchPlan={matchPlan}
                 matchResults={matchResults}
+                event={event}
                 getMatchDisplayStr={getMatchDisplayStr}
             />
         </div>

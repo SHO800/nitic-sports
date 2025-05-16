@@ -1,5 +1,14 @@
 @import "tailwindcss";
-
+@layer utilities {
+    .hidden-scrollbar {
+        -ms-overflow-style: none; /* IE, Edge 対応 */
+        scrollbar-width: none; /* Firefox 対応 */
+    }
+    .hidden-scrollbar::-webkit-scrollbar {
+        /* Chrome, Safari 対応 */
+        display: none;
+    }
+}
 :root {
     --background: #ffffff;
     --foreground: #171717;
@@ -23,5 +32,72 @@ body {
 @keyframes stroke-dashoffset-animation {
     100% {
         stroke-dashoffset: 0;
+    }
+}
+
+
+.card-green {
+    border-image: repeating-conic-gradient(
+            from var(--angle),
+            /*#F1F1F1 0%,*/
+            /*#F1F1F1 10%,*/
+            /*darkgreen 45%,*/
+            /*lightgreen 50%*/
+            hsl(133, 82%, 80%) 0,
+            hsl(125, 80%, 72%) 10%,
+            hsl(133, 100%, 48%) 20%
+    )
+    1 stretch;
+}
+
+.card-yellow {
+    border-image: repeating-conic-gradient(
+            from var(--angle),
+            hsl(60, 100%, 50%) 0,
+            hsl(43, 100%, 50%) 10%,
+            hsl(60, 100%, 50%) 20%
+    )
+    1 stretch;
+}
+
+.card-red {
+    border-image: repeating-conic-gradient(
+            from var(--angle),
+            hsl(20, 100%, 50%) 0,
+            hsl(0, 100%, 50%) 10%,
+            hsl(20, 100%, 50%) 20%
+    )
+    1 stretch;
+}
+
+.card-blue {
+    border-image: repeating-conic-gradient(
+            from var(--angle),
+            hsl(177, 100%, 50%) 0,
+            hsl(232, 100%, 50%) 10%,
+            hsl(177, 100%, 50%) 20%
+    )
+    1 stretch;
+}
+
+.card-gray {
+    opacity: .75;
+}
+
+.card-green, .card-yellow, .card-red, .card-blue {
+    border-width: 3px;
+    animation: rotate 4s linear infinite;
+    
+}
+
+@property --angle {
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
+}
+
+@keyframes rotate {
+    to {
+        --angle: 360deg;
     }
 }

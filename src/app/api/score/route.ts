@@ -1,4 +1,4 @@
-import {prisma} from "../../../../../lib/prisma";
+import {prisma} from "../../../../lib/prisma";
 import {Score} from "@prisma/client";
 
 export async function GET() {

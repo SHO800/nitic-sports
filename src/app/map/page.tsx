@@ -100,7 +100,7 @@ const Map = () => {
                             <p id="gym-2" className="pl-2">第2体育館</p>
                             <button onClick={() => setIsGym2Open(!isGym2Open)} className="border rounded mt-0.5 ml-8 px-1">パターン1表示</button>
                         </div>
-                        <div onClick={() => openModal(6)} className="absolute z-50 w-[266px] h-[220px] ml-5.5 mt-19 bg-white opacity-50 hover:opacity-70 rounded flex justify-center items-center">バレー決勝</div>
+                        <div onClick={() => openModal(6)} className="absolute z-50 w-[266px] h-[220px] ml-5.5 mt-19 bg-white opacity-50 hover:opacity-70 rounded flex justify-center items-center">バレー{matches.find(m => m.id === 6)?.isFinal ? '決勝' : '試合'}</div>
                         <MapContainer tag={4}/>
                     </div>
 

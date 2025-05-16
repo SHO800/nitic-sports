@@ -3,16 +3,20 @@ import {useData} from "@/hooks/data";
 import {useState} from "react";
 import TeamDataInput from "@/components/dashboard/events/TeamDataInput";
 import EventEditForm from "@/components/dashboard/events/EventEditForm";
+import {createEvent} from "@/app/actions/data";
 
 const EventForm = () => {
     const {mutateEvents, matchPlans} = useData();
     const [isTwoStageCompetition, setIsTwoStageCompetition] = useState(false);
+    const [isTimeBased, setIsTimeBased] = useState(false);
     const [eventType1, setEventType1] = useState<string | null>("tournament");
     const [eventType2, setEventType2] = useState<string | null>(null);
-    const [teamDataJsonDraft, setTeamDataJsonDraft] = useState<TeamData[]>([{
+    const [teamDataJsonDraft, setTeamDataJsonDraft] = useState<TeamData[]>([
+        {
         type: "tournament",
         teams: [],
-    }]);
+    }
+    ]);
 
     const addTournamentTeamsFromPlans = (teamDataIndex: number) => {
         const eventId = Number((document.getElementById('editEventId') as HTMLInputElement).value);
@@ -25,6 +29,7 @@ const EventForm = () => {
         const teams = teamIds.map((teamId) => {
             return {
                 teamId: teamId,
+                seedCount: 0,
             };
         });
         setTeamDataJsonDraft((prevState) => {
@@ -36,27 +41,12 @@ const EventForm = () => {
         });
     };
 
+
     return (
         <>
             <form
                 onSubmit={async (e) => {
                     e.preventDefault();
-                    const response = await fetch(
-                        `${process.env.NEXT_PUBLIC_API_URL}/event/-1`,
-                        {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                name: (document.getElementById('eventName') as HTMLInputElement).value,
-                                description: (document.getElementById('eventDescription') as HTMLInputElement).value,
-                                teamData: JSON.stringify(teamDataJsonDraft),
-                            }),
-                        }
-                    );
-                    console.log(response);
-                    await mutateEvents();
                 }}
                 className='flex items-center mt-4'
             >
@@ -107,6 +97,22 @@ const EventForm = () => {
                             className='text-black mr-2'
                         >予選と本選で形式を区別</label>
                     </div>
+
+                    <div>
+                        <input
+                            name={"isTimeBased"}
+                            id={"isTimeBased"}
+                            type="checkbox"
+                            onChange={(e) => setIsTimeBased(e.target.checked)}
+                            checked={isTimeBased}
+                            className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
+                        />
+                        <label
+                            htmlFor={"isTimeBased"}
+                            className='text-black mr-2'
+                        >タイムレース制</label>
+                    </div>
+
                     {isTwoStageCompetition &&
                         <p>予選</p>
                     }
@@ -123,7 +129,7 @@ const EventForm = () => {
                                 // teamDataJsonDraft[0]を初期値にする
                                 if (e.target.value === "tournament")
                                     setTeamDataJsonDraft((prevState) => {
-                                        const newState = {...prevState};
+                                        const newState = [...prevState];
                                         newState[0] = {
                                             type: "tournament",
                                             teams: []
@@ -147,7 +153,7 @@ const EventForm = () => {
                                 // teamDataJsonDraft[0]を初期値にする
                                 if (e.target.value === "league")
                                     setTeamDataJsonDraft((prevState) => {
-                                        const newState = {...prevState};
+                                        const newState = [...prevState];
                                         newState[0] = {
                                             type: "league",
                                             blocks: {},
@@ -162,6 +168,7 @@ const EventForm = () => {
                         >リーグ戦</label>
                         <div>
                             <p>チーム入力</p>
+                            
                             <TeamDataInput
                                 index={0}
                                 eventType={eventType1}
@@ -187,7 +194,7 @@ const EventForm = () => {
                                         // teamDataJsonDraft[1]を初期値にする
                                         if (e.target.value === "tournament")
                                             setTeamDataJsonDraft((prevState) => {
-                                                const newState = {...prevState};
+                                                const newState = [...prevState];
                                                 newState[1] = {
                                                     type: "tournament",
                                                     teams: []
@@ -211,7 +218,7 @@ const EventForm = () => {
                                         // teamDataJsonDraft[1]を初期値にする
                                         if (e.target.value === "league")
                                             setTeamDataJsonDraft((prevState) => {
-                                                const newState = {...prevState};
+                                                const newState = [...prevState];
                                                 newState[1] = {
                                                     type: "league",
                                                     blocks: {},
@@ -237,16 +244,26 @@ const EventForm = () => {
                             </div>
                         </>
                     }
-
+                    
                     <button
-                        type='submit'
+                        type='button'
                         className='bg-blue-500 hover:bg-blue-600 text-black px-4 py-2 rounded'
+                        onClick={async (e) => {
+                            e.preventDefault()
+                            await createEvent(
+                                (document.getElementById('eventName') as HTMLInputElement).value,
+                                teamDataJsonDraft,
+                                (document.getElementById('eventDescription') as HTMLInputElement).value,
+                                isTimeBased,
+                            )
+                            await mutateEvents();
+                        }}
                     >
                         追加
                     </button>
                 </div>
             </form>
-            <EventEditForm teamDataJsonDraft={teamDataJsonDraft}/>
+            <EventEditForm teamDataJsonDraft={teamDataJsonDraft} isTimeBased={isTimeBased}/>
         </>
     );
 };

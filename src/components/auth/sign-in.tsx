@@ -1,10 +1,12 @@
 'use client';
 
-import { signIn } from '@/session'
+import {isLoggedIn, signIn} from '@/session'
 import { useState } from 'react';
+import {useRouter} from "next/navigation";
 
 const SignIn = () => {
     const [username, setUsername] = useState('');
+    const router = useRouter();
 
     return (
         <div>
@@ -18,11 +20,14 @@ const SignIn = () => {
             />
             <button
                 disabled={!username}
-                onClick={() => {
-                    signIn(username);
+                onClick={async () => {
+                    await signIn(username);
+                    if (await isLoggedIn()) {
+                        router.push('/match');
+                    }
                 }}
             >
-                サインイン
+                サインイン(仮)
             </button>
         </div>
     );

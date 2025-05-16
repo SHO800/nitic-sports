@@ -40,7 +40,7 @@ const ClassSelector = ({groupedData, callback}: ClassSelectorProps) => {
 
     return (
         <div
-            className={"absolute top-0 left-0 w-fit h-fit px-1 bg-gray-800 bg-opacity-50 z-50 flex flex-col items-center justify-between"}>
+            className={"absolute top-24 left-0 w-fit h-fit px-1 bg-gray-800 bg-opacity-50 z-50 flex flex-col items-center justify-between"}>
             {
                 groupedData ?
                     <table>

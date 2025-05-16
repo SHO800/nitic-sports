@@ -1,7 +1,7 @@
-import {MatchPlan as MatchPlanSchema} from "@prisma/client"
 import ClassSelector from "@/components/common/ClassSelector";
 import {useState} from "react";
 import {useData} from "@/hooks/data";
+import {createMatchPlan, updateMatchPlan} from "@/app/actions/data";
 
 
 const AddMatchPlanForm = () => {
@@ -20,14 +20,17 @@ const AddMatchPlanForm = () => {
     const [incrementLocationRange, setIncrementLocationRange] = useState(0)
     // 会場をどこまでインクリメントするか
     const [incrementLocationRangeEnd, setIncrementLocationRangeEnd] = useState(0)
-
+    // 決勝戦かどうか
+    const [isFinal, setIsFinal] = useState(false)
+    // 3位決定戦かどうか
+    const [is3rdPlaceMatch, setIs3rdPlaceMatch] = useState(false)
 
     const increment = () => {
         if (isIncrementMatchNameCapital || isIncrementMatchNameNumber) {
 
             // 名前インプットフィールド取得
             const matchNameInput = document.getElementById('matchName') as HTMLInputElement;
-            
+
             // 入力内容取得
             const matchName = matchNameInput.value;
             // インクリメントするか
@@ -53,7 +56,7 @@ const AddMatchPlanForm = () => {
             // 範囲取得
             const incrementLocationRange = Number((document.getElementById('incrementLocationRange') as HTMLInputElement).value);
             const incrementLocationRangeEnd = Number((document.getElementById('incrementLocationRangeEnd') as HTMLInputElement).value);
-            
+
             // インクリメント
             const incrementedLocation = Number(location) + incrementLocationRange;
             // インクリメント範囲を超えたらリセット
@@ -62,7 +65,7 @@ const AddMatchPlanForm = () => {
             } else {
                 locationInput.value = incrementedLocation.toString();
             }
-            
+
         }
     }
 
@@ -73,31 +76,22 @@ const AddMatchPlanForm = () => {
                 key={"addMatchPlanForm" + teamCount}
                 onSubmit={async (e) => {
                     e.preventDefault()
-                    const response = await fetch(
-                        `${process.env.NEXT_PUBLIC_API_URL}/match-plan/-1`,
-                        {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                eventId: Number((document.getElementById('eventId') as HTMLInputElement).value),
-                                matchName: (document.getElementById('matchName') as HTMLInputElement).value,
-                                matchNote: (document.getElementById('teamNote') as HTMLInputElement).value,
-                                teamIds: (Array.from({length: teamCount}).map((_, index) => {
-                                    return (document.getElementById(`team${index + 1}Id`) as HTMLInputElement).value
-                                })),
-                                teamNotes: (Array.from({length: teamCount}).map((_, index) => {
-                                    return (document.getElementById(`team${index + 1}Note`) as HTMLInputElement).value
-                                })),
-                                scheduledStartTime: new Date((document.getElementById('scheduledStartTime') as HTMLInputElement).value),
-                                scheduledEndTime: new Date((document.getElementById('scheduledEndTime') as HTMLInputElement).value),
-                                locationId: Number((document.getElementById('locationId') as HTMLInputElement).value),
-
-                            } as unknown as MatchPlanSchema),
-                        }
+                    await createMatchPlan(
+                        Number((document.getElementById('eventId') as HTMLInputElement).value),
+                        (Array.from({length: teamCount}).map((_, index) => {
+                            return (document.getElementById(`team${index + 1}Id`) as HTMLInputElement).value
+                        })),
+                        (Array.from({length: teamCount}).map((_, index) => {
+                            return (document.getElementById(`team${index + 1}Note`) as HTMLInputElement).value
+                        })),
+                        new Date((document.getElementById('scheduledStartTime') as HTMLInputElement).value),
+                        new Date((document.getElementById('scheduledEndTime') as HTMLInputElement).value),
+                        Number((document.getElementById('locationId') as HTMLInputElement).value),
+                        (document.getElementById('matchName') as HTMLInputElement).value,
+                        (document.getElementById('teamNote') as HTMLInputElement).value,
+                        isFinal,
+                        is3rdPlaceMatch
                     )
-                    console.log(response)
                     await mutateMatchPlans();
                     // インクリメントする場合はインクリメント
                     if (isIncrementMatchNameCapital || isIncrementMatchNameNumber) {
@@ -137,6 +131,30 @@ const AddMatchPlanForm = () => {
                             className='border border-gray-400 px-4 py-2 mr-2 rounded text-black'
                             placeholder='試合名'
                         />
+                        <div className="flex gap-4 items-center mt-1 mb-1">
+                            <label className='flex items-center text-black'>
+                                <input
+                                    type='checkbox'
+                                    name="isFinal"
+                                    id="isFinal"
+                                    className='border border-gray-400 mr-2'
+                                    checked={isFinal}
+                                    onChange={(e) => setIsFinal(e.target.checked)}
+                                />
+                                決勝戦
+                            </label>
+                            <label className='flex items-center text-black'>
+                                <input
+                                    type='checkbox'
+                                    name="is3rdPlaceMatch"
+                                    id="is3rdPlaceMatch"
+                                    className='border border-gray-400 mr-2'
+                                    checked={is3rdPlaceMatch}
+                                    onChange={(e) => setIs3rdPlaceMatch(e.target.checked)}
+                                />
+                                3位決定戦
+                            </label>
+                        </div>
                         <input
                             type='checkbox'
                             name="isIncrementMatchNameCapital"
@@ -332,31 +350,24 @@ const AddMatchPlanForm = () => {
                 key={"editMatchPlanForm" + teamCount}
                 onSubmit={async (e) => {
                     e.preventDefault()
-                    const response = await fetch(
-                        `${process.env.NEXT_PUBLIC_API_URL}/match-plan/${(document.getElementById('editMatchId') as HTMLInputElement).value}`,
-                        {
-                            method: 'PUT',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                eventId: Number((document.getElementById('eventId') as HTMLInputElement).value),
-                                matchName: (document.getElementById('matchName') as HTMLInputElement).value,
-                                teamNote: (document.getElementById('teamNote') as HTMLInputElement).value,
-                                teamIds: (Array.from({length: teamCount}).map((_, index) => {
-                                    return (document.getElementById(`team${index + 1}Id`) as HTMLInputElement).value
-                                })),
-                                teamNotes: (Array.from({length: teamCount}).map((_, index) => {
-                                    return (document.getElementById(`team${index + 1}Note`) as HTMLInputElement).value
-                                })),
-                                scheduledStartTime: new Date((document.getElementById('scheduledStartTime') as HTMLInputElement).value),
-                                scheduledEndTime: new Date((document.getElementById('scheduledEndTime') as HTMLInputElement).value),
-                                locationId: Number((document.getElementById('locationId') as HTMLInputElement).value),
-                                
-                            } as unknown as MatchPlanSchema),
-                        }
+
+                    await updateMatchPlan(
+                        Number((document.getElementById('editMatchId') as HTMLInputElement).value),
+                        Number((document.getElementById('eventId') as HTMLInputElement).value),
+                        (Array.from({length: teamCount}).map((_, index) => {
+                            return (document.getElementById(`team${index + 1}Id`) as HTMLInputElement).value
+                        })),
+                        (Array.from({length: teamCount}).map((_, index) => {
+                            return (document.getElementById(`team${index + 1}Note`) as HTMLInputElement).value
+                        })),
+                        new Date((document.getElementById('scheduledStartTime') as HTMLInputElement).value),
+                        new Date((document.getElementById('scheduledEndTime') as HTMLInputElement).value),
+                        Number((document.getElementById('locationId') as HTMLInputElement).value),
+                        (document.getElementById('matchName') as HTMLInputElement).value,
+                        (document.getElementById('teamNote') as HTMLInputElement).value,
+                        isFinal,
+                        is3rdPlaceMatch
                     )
-                    console.log(response)
                     await mutateMatchPlans();
                 }}
                 className='flex items-center mt-1'
