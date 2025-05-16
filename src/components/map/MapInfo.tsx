@@ -21,6 +21,8 @@ const MapInfo = ({placeId}:Props) => {
     } = useData();
 
     const filteredItems = matchPlans?.filter((item) => item.locationId === placeId)
+    const filteredByStatus = filteredItems?.filter((item) =>
+        item.status === "Waiting" || item.status === "Preparing" || item.status === "Playing")
 
     {/*
     const getMatchStatus = (matchPlan: MatchPlanType): Status => {
@@ -39,12 +41,12 @@ const MapInfo = ({placeId}:Props) => {
     };
     */}
 
-    if(filteredItems?.length === 0){
+    if(filteredByStatus?.length === 0){
         return(
             <div className="flex flex-col min-w-[94vw] lg:min-w-[58vw] justify-center">
                 <div className="flex lg:mx-20 px-1 py-2 min-h-[30vh] bg-gray-100 rounded overflow-auto">
                     <div className="flex justify-center items-center w-full h-full bg-gray-100 rounded">
-                        本日の営業は終了いたしました
+                        全試合終了しました
                     </div>
                 </div>
             </div>
@@ -54,14 +56,14 @@ const MapInfo = ({placeId}:Props) => {
     return(
         <div className="flex flex-col min-w-[94vw] lg:min-w-[58vw] justify-center">
                 <div className="flex flex-col lg:mx-20 px-1 py-2 h-[50vh] min-h-[30vh] bg-gray-100 rounded overflow-auto">
-                    {filteredItems?.map((item) => {
+                    {filteredByStatus?.map((item) => {
                         
                         // const status = getMatchStatus(item);
 
                         return(
                         <div className="flex justify-center bg-gray-100 px-10 rounded">
-                            <div key={item.id} className="flex flex-col bg-white mb-1 border rounded">
-                                <div className="flex justify-center bg-white text-black px-1 rounded text-2xl">
+                            <div key={item.id} className="flex flex-col bg-white w-[70vw] lg:w-[30vw] mb-1 border rounded">
+                                <div className="flex justify-center bg-white px-1 rounded">
 
                                     <MatchInfoForReader
                                         matchPlan={item}

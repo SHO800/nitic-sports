@@ -30,7 +30,7 @@ const Map = () => {
             <div className="flex flex-col items-center min-h-screen">
                 
                 <div className="text-2xl mt-2 bg-blue-100 rounded">
-                    <p className="pl-2">全体マップ(南側)</p>    
+                    <p className="pl-2 font-bold">全体マップ(南側)</p>    
                     <div onClick={() => openModal(1)} className="absolute z-50 w-[36px] h-[44px] ml-29.5 mt-29.5 bg-white opacity-50 hover:opacity-70 text-[9px] rounded flex items-center justify-center">第一<br/>体育館</div>
                     <div onClick={() => openModal(2)} className="absolute z-50 w-[37px] h-[38px] ml-7 mt-35.5 bg-white opacity-50 hover:opacity-70 text-[9px] rounded flex items-center justify-center">第二<br/>体育館</div>
                     <div onClick={() => openModal(4)} className="absolute z-50 w-[186px] h-[64px] ml-37.5 mt-7 rounded-full bg-white opacity-50 hover:opacity-70 text-[12px] flex justify-center items-center">陸上グラウンド</div>
@@ -38,7 +38,7 @@ const Map = () => {
                 </div>
         
                 <div className="text-2xl my-2 bg-blue-100 rounded">
-                    <p className="pl-2">全体マップ(北側)</p>
+                    <p className="pl-2 font-bold">全体マップ(北側)</p>
                     <div onClick={() => openModal(4)} className="absolute z-50 w-[94px] h-[61px] ml-4 mt-10 rounded-r-full bg-white opacity-50 hover:opacity-70 text-[12px] flex items-center justify-center">陸上グラウンド</div>
                     <div onClick={() => openModal(5)} className="absolute z-50 w-[140px] h-[100px] ml-54 mt-60 bg-white opacity-50 hover:opacity-70 text-[12px] rounded flex justify-center items-center"> 野球場グラウンド</div>
                     <div onClick={() => openModal(3)} className="absolute z-50 w-[54px] h-[60px] ml-55.5 mt-44.5 bg-white opacity-50 hover:opacity-70 text-[9px] rounded flex items-center">テニスコート</div>

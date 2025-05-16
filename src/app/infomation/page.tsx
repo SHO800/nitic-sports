@@ -4,11 +4,28 @@ import { useState } from "react";
 import { useData } from "@/hooks/data";
 import NowHot from "@/components/infomation/NowHot";
 import DelayInfo from "@/components/infomation/DelayInfo";
+import NextMatch from "@/components/infomation/NextMatch";
 import InfoModal from "@/components/infomation/InfoModal";
+import EventSwitch from "@/components/infomation/EventSwitch";
+import ResultInfo from "@/components/infomation/ResulteInfo";
 
 const Infomation = () => {
     
-    const [selectedId, setSelectedId] = useState(1);
+    const [selectedNowId, setSelectedNowId] = useState<number | "all">(1);
+    const [selectedNextId, setSelectedNextId] = useState<number | "all">(1);
+    const [selectedDelayId, setSelectedDelayId] = useState<number | "all">(1);
+
+    const setNowId = (id:number | "all") => {
+        setSelectedNowId(id);
+    }
+
+    const setNextId = (id:number | "all") => {
+        setSelectedNextId(id);
+    }
+
+    const setDelayId = (id:number | "all") => {
+        setSelectedDelayId(id);
+    }
 
     return(
         <>
@@ -21,38 +38,37 @@ const Infomation = () => {
             <div>
                 <h1 className="flex justify-center mx-2 my-1 bg-amber-500 rounded"><p className="text-6xl text-white animate-pulse">NOW HOT!!</p></h1>
 
-                <div className="flex justify-center bg-blue-300 mx-1 lg:mx-20 mb-2 p-1 rounded">
-                        <NowHot eventIds="all"/>
+                <EventSwitch selectedId={selectedNowId} setSelectedId={setNowId} />
+
+                <div className="flex justify-center bg-blue-200 mx-1 lg:mx-20 mb-2 p-1 rounded">
+                    <NowHot eventId={selectedNowId} />
                 </div>
             </div>
 
             
             <div>
-                <div className="flex justify-center mx-2 mb-1 bg-amber-500 rounded"><p className="text-4xl text-white animate-pulse">競技別NOW HOT!!</p></div>
-                
-                <div className="flex flex-row px-1 justify-center">
-                    <button onClick={() => setSelectedId(1)} className={`text-sm rounded-t px-2 py-1 border-r border-black ${selectedId === 1 ? "bg-blue-300 text-black" : "bg-blue-400 text-white border-b"}`}>バド</button>
-                    <button onClick={() => setSelectedId(2)} className={`text-sm rounded-t px-2 py-1 border-r border-black ${selectedId === 2 ? "bg-blue-300 text-black" : "bg-blue-400 text-white border-b"}`}>卓球</button>
-                    <button onClick={() => setSelectedId(3)} className={`text-sm rounded-t px-2 py-1 border-r border-black ${selectedId === 3 ? "bg-blue-300 text-black" : "bg-blue-400 text-white border-b"}`}>バレー</button>
-                    <button onClick={() => setSelectedId(4)} className={`text-sm rounded-t px-2 py-1 border-r border-black ${selectedId === 4 ? "bg-blue-300 text-black" : "bg-blue-400 text-white border-b"}`}>バスケ</button>
-                    <button onClick={() => setSelectedId(5)} className={`text-sm rounded-t px-2 py-1 border-r border-black ${selectedId === 5 ? "bg-blue-300 text-black" : "bg-blue-400 text-white border-b"}`}>テニス</button>
-                    <button onClick={() => setSelectedId(6)} className={`text-sm rounded-t px-2 py-1 border-r border-black ${selectedId === 6 ? "bg-blue-300 text-black" : "bg-blue-400 text-white border-b"}`}>ソフボ</button>
-                    <button onClick={() => setSelectedId(7)} className={`text-sm rounded-t px-2 py-1 border-r border-black ${selectedId === 7 ? "bg-blue-300 text-black" : "bg-blue-400 text-white border-b"}`}>サッカー</button>
-                    <button onClick={() => setSelectedId(8)} className={`text-sm rounded-t px-2 py-1 border-r border-black ${selectedId === 8 ? "bg-blue-300 text-black" : "bg-blue-400 text-white border-b"}`}>リレー</button>
-                </div>
+                <div className="flex justify-center mx-2 mb-1 bg-amber-500 rounded"><p className="text-4xl text-white animate-pulse">NEXT MATCH!!</p></div>
 
-                <div className="flex justify-center bg-blue-300 mx-1 lg:mx-20 mb-2 p-1 rounded">
-                    <NowHot eventId={selectedId} />
+                <EventSwitch selectedId={selectedNextId} setSelectedId={setNextId} />
+
+                <div className="flex justify-center bg-blue-200 mx-1 lg:mx-20 mb-2 p-1 rounded">
+                    <NextMatch eventId={selectedNextId} />
                 </div>
             </div>
             
             <div>
                 <div className="flex justify-center mx-2 mb-1 bg-red-500 rounded"><p className="text-4xl text-white animate-pulse">遅延情報</p></div>
-                
-                <div className="flex justify-center bg-blue-300 mx-1 lg:mx-20 mb-2 p-1 rounded">
-                    <DelayInfo/>
-                    
+
+                <EventSwitch selectedId={selectedDelayId} setSelectedId={setDelayId} />
+
+                <div className="flex justify-center bg-blue-200 mx-1 lg:mx-20 mb-2 p-1 rounded">
+                    <DelayInfo eventId={selectedDelayId} />
                 </div>
+            </div>
+            
+            <div>
+                <div className="flex justify-center mx-2 mb-1 bg-lime-600 rounded"><p className="text-4xl text-white animate-pulse">試合結果</p></div>
+                <ResultInfo />
             </div>
         </div>
         </>

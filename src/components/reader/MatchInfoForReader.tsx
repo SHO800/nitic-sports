@@ -5,6 +5,7 @@ import { MatchPlan as MatchPlanType } from "@prisma/client";
 import { useCurrentTime } from "@/hooks/currenTime";
 import { judgeDay12String } from "@/utils/judgeDay12";
 import InfoModal from "../infomation/InfoModal";
+import clsx from "clsx";
 
 type MatchInfoProps = {
     matchPlan: MatchPlanType;
@@ -50,7 +51,7 @@ const MatchInfoForReader = ({ matchPlan, events, locations, getMatchDisplayStr }
             
             <div className="relative bg-black h-[0.5px] mx-2"></div>
             
-            <div onClick={() => OpenModal()} className="flex bg-white text-4xl py-1 justify-center">
+            <div onClick={() => OpenModal()} className={`flex bg-white py-1 justify-center ${(matchPlan.teamIds.length > 2) ? "text-2xl" : "text-4xl" }`}>
                 {
                     matchPlan.teamIds.map((teamId, index) => {
                         let result = getMatchDisplayStr(teamId)
@@ -65,11 +66,32 @@ const MatchInfoForReader = ({ matchPlan, events, locations, getMatchDisplayStr }
             
             <div className="relative bg-black h-[0.5px] mx-2"></div>
             
-            <div onClick={() => OpenModal()} className="flex px-2 bg-white text-[17px] justify-between">
+            <div onClick={() => OpenModal()} className="flex px-2 bg-white text-[18px] justify-between">
+                {/*
                 <div className={`flex ml-1 ${(isPast) ? "text-red-500" : "text-black"} `}>
                     <div className="mr-1.5">
                         {JudgedSchedule}
                     </div>
+                    
+                    <div>
+                    {
+                        new Date(matchPlan.scheduledStartTime).toLocaleString('ja-JP', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                        })
+                    }~ 
+                    </div>
+                </div>
+                */}
+                <div className={clsx(
+                    "flex ml-1",
+                    isPast ? "text-red-500" : "",
+                    matchPlan.status === "Playing" ? "text-blue-500" : ""
+                )}>
+                    <div className="mr-1.5">
+                        {JudgedSchedule}
+                    </div>
+                    
                     <div>
                     {
                         new Date(matchPlan.scheduledStartTime).toLocaleString('ja-JP', {

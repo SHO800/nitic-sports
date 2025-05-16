@@ -8,20 +8,31 @@ type Props = {
 const MapZoom = ({locationId}: Props) => {
     
     const mapIdJudge = (placeId: number | null) =>{
-        if(placeId === 1 || 2 || 3 || 4 || 5 || 6 || 7 || 8 || 9 || 16) return 1;
-        if(placeId === 10 || 11 || 12 || 13 || 14 || 15) return 2;
-        else return 0;
+        if (placeId === null || placeId > 16)  return 0;
+        if( 1 <= placeId  && placeId <= 9 || placeId === 16) return 1;
+        if( 10 <=  placeId && placeId <= 15) return 2;
     }
     
     const MapId = mapIdJudge(locationId);
 
     const locationJudge = (placeId: number | null) => {
-        if(placeId === 1 || 2 || 3 || 4 || 5) return "第1体育館"
-        if(placeId === 6 || 7 ) return "第2体育館"
-        if(placeId === 8 || 9 || 16) return "陸上グラウンド"
-        if(placeId === 10 || 11) return "テニスコートAB"
-        if(placeId === 12 || 13) return "テニスコートCD"
-        if(placeId === 14 || 15) return "野球グラウンド"
+        if(placeId === null || placeId > 16) return "地球"
+        if(placeId === 1) return "第1体育館 Aコート"
+        if(placeId === 2) return "第1体育館 Bコート"
+        if(placeId === 3) return "第1体育館 Cコート"
+        if(placeId === 4) return "第1体育館 Dコート"
+        if(placeId === 5) return "第1体育館 Eコート"
+        if(placeId === 6) return "第2体育館 Aコート"
+        if(placeId === 7) return "第2体育館 Bコート"
+        if(placeId === 8) return "陸上グラウンド Aコート"
+        if(placeId === 9) return "陸上グラウンド Bコート"
+        if(placeId === 16) return "陸上グラウンド"
+        if(placeId === 10) return "テニスコートA"
+        if(placeId === 11) return "テニスコートB"
+        if(placeId === 12) return "テニスコートC"
+        if(placeId === 13) return "テニスコートD"
+        if(placeId === 14) return "野球グラウンド A"
+        if(placeId === 15) return "野球グラウンド B"
 
     }
 
@@ -40,6 +51,7 @@ const MapZoom = ({locationId}: Props) => {
                 <div>
                     <p className="mt-2 ml-4">試合会場</p>
                     <MapContainer tag={1} />
+                    <MapPin location={locationJudge(locationId)}/>
                 </div>
             )}
             {MapId === 0 && (

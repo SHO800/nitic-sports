@@ -1,5 +1,3 @@
-"use client"
-
 import { useState } from "react";
 import { useData } from "@/hooks/data";
 import MatchInfoForReader from "../reader/MatchInfoForReader";
@@ -11,7 +9,7 @@ type Props =
     | {eventId: number | string | null; eventIds?: undefined}
     | {eventIds: string; eventId?: undefined};
 
-const NowHot: React.FC<Props> = (props) => {
+const NextMatch: React.FC<Props> = (props) => {
 
     const [matchStatuses, setMatchStatuses] = useState<Record<number, Status>>({});
     
@@ -33,20 +31,21 @@ const NowHot: React.FC<Props> = (props) => {
             scheduledEndTime: new Date(item.scheduledEndTime),
         }));
 
+
         const filteredByEvent = MatchPlans?.filter((item) => item.eventId === props.eventId)
+
 
         const AddedMatchTime = filteredByEvent?.map((item) => ({
             ...item,
             matchTime: (item.scheduledEndTime.getTime() - item.scheduledStartTime.getTime()),
         }));
 
-
         const SortedByStartTime = AddedMatchTime?.sort((a,b) => a.scheduledStartTime.getTime() - b.scheduledStartTime.getTime())    
         
         const filteredByStatus = SortedByStartTime?.filter((item) =>
-            item.status === "Playing" && item.scheduledStartTime.getTime() + item.matchTime * 2/3 > currentTime.currentTime
+            (item.status === "Preparing" || item.status === "Waiting") && item.scheduledStartTime.getTime() > currentTime.currentTime
         )
-        const NowhotThree = filteredByStatus?.slice(0,3);
+        const NextThree = filteredByStatus?.slice(0,3);
 
         const getMatchStatus = (matchPlan: MatchPlanType): Status => {
             // すでにローカル状態にステータスがある場合はそれを返す
@@ -63,12 +62,12 @@ const NowHot: React.FC<Props> = (props) => {
             return matchPlan.status || Status.Preparing;
         };
 
-        if(NowhotThree?.length === 0){
+        if(NextThree?.length === 0){
             return(
                 <div className="flex min-w-[94vw] justify-center">
                     <div className="flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[30vh] bg-gray-100 rounded overflow-auto">
-                        {/* <div className="flex justify-center items-center h-full bg-gray-100 px-10 rounded"> */}
-                        進行中の試合はありません
+                        {/* <div className="flex justify-center items-center h-full bg-gray-500 px-10 rounded"> */}
+                            全試合終了しました
                         {/* </div> */}
                     </div>
                 </div>         
@@ -78,7 +77,7 @@ const NowHot: React.FC<Props> = (props) => {
         return(
             <div className="flex flex-col min-w-[94vw] justify-center">
                 <div className="flex flex-col lg:mx-20 px-1 py-2 min-h-[30vh] bg-gray-100 rounded overflow-auto">
-                    {NowhotThree?.map((item) => {
+                    {NextThree?.map((item) => {
                         
                         const status = getMatchStatus(item);
 
@@ -127,14 +126,9 @@ const NowHot: React.FC<Props> = (props) => {
         const SortedByStartTime = AddedMatchTime?.sort((a,b) => a.scheduledStartTime.getTime() - b.scheduledStartTime.getTime())    
         
         const filteredByStatus = SortedByStartTime?.filter((item) =>
-            item.status === "Playing" && item.scheduledStartTime.getTime() + item.matchTime * 2/3 > currentTime.currentTime
+            (item.status === "Preparing" || item.status === "Waiting") && item.scheduledStartTime.getTime() > currentTime.currentTime
         )
-        
-        // 本番用
-        const NowhotThree = filteredByStatus?.slice(0,3);
-
-        //練習用
-        // const NowhotThree = AddedMatchTime?.slice(0,3);
+        const NextThree = filteredByStatus?.slice(0,3);
 
         {/*
         const getMatchStatus = (matchPlan: MatchPlanType): Status => {
@@ -153,12 +147,12 @@ const NowHot: React.FC<Props> = (props) => {
         };
         */}
 
-        if(NowhotThree?.length === 0){
+        if(NextThree?.length === 0){
             return(
                 <div className="flex min-w-[94vw] justify-center">
                     <div className="flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[30vh] bg-gray-100 rounded overflow-auto">
                         {/* <div className="flex justify-center items-center bg-gray-100 px-10 rounded"> */}
-                            進行中の試合はありません
+                            全試合終了しました
                         {/* </div> */}
                     </div>
                 </div>
@@ -168,7 +162,7 @@ const NowHot: React.FC<Props> = (props) => {
         return(
             <div className="flex flex-col min-w-[94vw] justify-center">
                     <div className="flex flex-col lg:mx-20 px-1 py-2 min-h-[30vh] bg-gray-100 rounded overflow-auto">
-                        {NowhotThree?.map((item) => {
+                        {NextThree?.map((item) => {
                             
                             // const status = getMatchStatus(item);
 
@@ -183,6 +177,8 @@ const NowHot: React.FC<Props> = (props) => {
                                             locations={locations}
                                             getMatchDisplayStr={getMatchDisplayStr}
                                         />
+                                        
+                                        <p>{item.matchTime}</p>
                                     </div>
                                     {/*
                                     <p  className="flex justify-center bg-white text-black px-1 rounded text-2xl">
@@ -202,4 +198,4 @@ const NowHot: React.FC<Props> = (props) => {
 
 }
 
-export default NowHot;
+export default NextMatch;

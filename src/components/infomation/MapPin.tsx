@@ -5,7 +5,7 @@ type Props ={
 const MapPin = ({location}: Props) => {
     return (
         <>
-            {(location === "第1体育館") &&(
+            {(location?.includes("第1体育館")) &&(
                 <>
                     <div className="absolute inset-0 w-5 h-5 bg-red-400 rounded-[50%_50%_50%_0] rotate-[-45deg] animate-ping opacity-75 mt-30 ml-31.5"></div>
                     
@@ -14,7 +14,7 @@ const MapPin = ({location}: Props) => {
                     </div>
                 </>
             )}
-            {location === "第2体育館" &&(
+            {(location?.includes("第2体育館")) &&(
                 <>
                     <div className="absolute inset-0 w-5 h-5 bg-red-400 rounded-[50%_50%_50%_0] rotate-[-45deg] animate-ping opacity-75 mt-36 ml-9"></div>
 
@@ -23,7 +23,7 @@ const MapPin = ({location}: Props) => {
                     </div>
                 </>
             )}
-            {(location === "陸上グラウンド") &&(
+            {(location?.includes("陸上グラウンド")) &&(
                 <>
                     <div className="absolute inset-0 w-5 h-5 bg-red-400 rounded-[50%_50%_50%_0] rotate-[-45deg] animate-ping opacity-75 mt-10 ml-57.5"></div>
 
@@ -33,7 +33,7 @@ const MapPin = ({location}: Props) => {
                 </>
             )}
 
-            {(location === "テニスコートAB") &&(
+            {(location === "テニスコートA" || location === "テニスコートB") &&(
                 <>
                     <div className="absolute inset-0 w-5 h-5 bg-red-400 rounded-[50%_50%_50%_0] rotate-[-45deg] animate-ping opacity-75 mt-51 ml-40"></div>
 
@@ -43,7 +43,7 @@ const MapPin = ({location}: Props) => {
                 </>
             )}
 
-            {(location === "テニスコートCD") &&(
+            {(location === "テニスコートC" || location === "テニスコートD") &&(
                 <>
                     <div className="absolute inset-0 w-5 h-5 bg-red-400 rounded-[50%_50%_50%_0] rotate-[-45deg] animate-ping opacity-75 mt-47.5 ml-60"></div>
 
@@ -53,7 +53,7 @@ const MapPin = ({location}: Props) => {
                 </>
             )}
             
-            {(location === "野球グラウンド") &&(
+            {(location?.includes("野球グラウンド")) &&(
                 <>
                     <div className="absolute inset-0 w-5 h-5 bg-red-400 rounded-[50%_50%_50%_0] rotate-[-45deg] animate-ping opacity-75 mt-67 ml-69"></div>
 

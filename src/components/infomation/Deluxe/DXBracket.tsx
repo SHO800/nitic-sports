@@ -131,7 +131,7 @@ const DXBracket = ({eventId, matchPlans, teamIds}: { eventId: number, matchPlans
             )}
             
             {(hasPreliminary || hasFinal) ? (
-                <div className="bg-white rounded-lg shadow-md p-6 overflow-hidden">
+                <div className="bg-white max-w-[95vw] rounded-lg shadow-md p-6 overflow-auto">
 
                     {currentType === 'tournament' && (
                         // <TournamentBracket

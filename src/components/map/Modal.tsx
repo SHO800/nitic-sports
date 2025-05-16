@@ -40,7 +40,7 @@ const Modal = ({placeId}: Props) => {
         <div>
             <div className="">
                 <div className="flex flex-row px-1 justify-center">                    
-                    <button onClick={() => setSelectedId(6)} className={`text-sm rounded-t px-2 py-1 border-r border-black ${selectedId === 6 ? "bg-blue-300 text-black" : "bg-blue-400 text-white border-b"}`}>全面</button>
+                    {/* <button onClick={() => setSelectedId(6)} className={`text-sm rounded-t px-2 py-1 border-r border-black ${selectedId === 6 ? "bg-blue-300 text-black" : "bg-blue-400 text-white border-b"}`}>全面</button> */}
                     <button onClick={() => setSelectedId(6)} className={`text-sm rounded-t px-2 py-1 border-r border-black ${selectedId === 6 ? "bg-blue-300 text-black" : "bg-blue-400 text-white border-b"}`}>A面</button>
                     <button onClick={() => setSelectedId(7)} className={`text-sm rounded-t px-2 py-1 border-r border-black ${selectedId === 7 ? "bg-blue-300 text-black" : "bg-blue-400 text-white border-b"}`}>B面</button>
                 </div>

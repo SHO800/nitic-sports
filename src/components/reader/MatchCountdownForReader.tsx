@@ -20,9 +20,9 @@ const MatchCountdownForReader = ({scheduledStartTime}: MatchCountdownProps) => {
                 </p>
             ) : (
                 <p className="text-green-800 text-[20px]">
-                    あと {str} で開始
+                    {str} 後に開始予定です
                     {
-                        waiting &&  <span className={"ml-1 text-sm"}>応答待機中 (最大1分)</span> 
+                        waiting &&  <span className={"ml-1 text-sm"}>応答待機中 (最大3分)</span> 
                     }
                 </p>
             )}
