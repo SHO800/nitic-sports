@@ -372,21 +372,26 @@ export async function deleteTeam(id: number) {
     }
 }
 
-export async function createScores(rankWithEventScore: RankWithEventScore[]) {
+export async function createScores(eventId: number, rankWithEventScore: RankWithEventScore[]) {
     const eventScores = rankWithEventScore.map(rankObj => {
         return {
+            eventId,
             teamId: rankObj.teamId,
             score: rankObj.score,
             note: typeof rankObj.detail === "string" ? rankObj.detail : undefined,
         }
     }) 
     
-    const responce = await prisma.score.createMany({
-        data: [
-            ...eventScores
-        ]
-    })
-    if (response) {
-        revalidatePath('/dashboard')
+    try {
+        
+        await prisma.score.createMany({
+            data: [
+                ...eventScores
+            ]
+        })
+    
+    }catch {
+        
     }
+    revalidatePath('/dashboard')
 }

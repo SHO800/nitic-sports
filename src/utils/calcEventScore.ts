@@ -1,7 +1,6 @@
 import {Event, MatchPlan, MatchResult} from "@prisma/client";
 import {evaluateScore} from "../../public/EvaluateScore";
 import {findVariableIdFromNumberId, getSeedCount} from "@/utils/tournamentUtils";
-import matchResult from "@/components/dashboard/matchPlan/MatchResult";
 
 const isSameWinWeight = (a: completedLeagueTeamInfo, b: completedLeagueTeamInfo): boolean => {
     return (
@@ -141,22 +140,45 @@ const calcTotalTournamentRankings = (
             });
         });
 
+
         // チームをタイムの短い順にソート
-        const sortedTeams = Object.values(teamStats)
+        let sortedTeams = Object.values(teamStats)
             .filter(team => team.bestTimeMs !== Number.MAX_SAFE_INTEGER)
             .sort((a, b) => a.bestTimeMs! - b.bestTimeMs!);
-        
+
+        // 応急処置... もしタイムレース制でかつ関係のあるマッチが5つ(学年分)なら学年ごとにグループ化する
         // 順位を付ける
         sortedTeams.forEach((team, index) => {
             team.rank = index + 1;
         });
+        if (relatedMatchPlans.length === 5) {
+            const classCount = 4
+            const length = Math.ceil(teamInfos.length / classCount)
+            const equallyDividedByFour = new Array(length).fill(0).map((_, i) =>
+                teamInfos.slice(i * classCount, (i + 1) * classCount)
+            )
+            const result = equallyDividedByFour.map(teamsByGrade => {
+                return teamsByGrade.map((team) => {
+                    return sortedTeams.find(teamWithRank => teamWithRank.teamId.toString() === team.teamId)
 
+                })
+                    .filter(e => e !== undefined)
+                    .map((teamsByGradeWithRank, index) => {
+                        if (teamsByGradeWithRank) teamsByGradeWithRank.rank = index + 1
+                        return teamsByGradeWithRank
+                    })
+            })
+            
+            sortedTeams = result.flat(1)
+        }
+        
         // 結果を返す（タイムをdetailに含める）
         return sortedTeams.map(team => ({
             teamId: team.teamId,
             rank: team.rank,
             detail: `タイム: ${team.bestTime}`
         }));
+
     } else {
         // チームの初期化
         Array.from(teamIds).forEach(teamId => {
@@ -171,8 +193,10 @@ const calcTotalTournamentRankings = (
             teamIdsForVariableId[team.teamId] = findVariableIdFromNumberId(team.teamId, relatedMatchPlans, relatedMatchResults)
         });
         // キーとバリューを逆転
-        const  variableIdsForTeamId: { [key: string]: number} = Object.fromEntries(Object.entries(teamIdsForVariableId).map(a => a.reverse()))
-        
+        const variableIdsForTeamId: {
+            [key: string]: number
+        } = Object.fromEntries(Object.entries(teamIdsForVariableId).map(a => a.reverse()))
+
 
         // 勝利数をカウント
         relatedMatchResults.forEach(result => {
@@ -181,7 +205,7 @@ const calcTotalTournamentRankings = (
                 teamStats[winnerTeamId].wins += 1;
             }
         });
-        
+
         // seedCountをwinsに加算
         teamInfos.forEach(teamInfo => {
             const teamIdStr = teamInfo.teamId;
@@ -239,21 +263,21 @@ const calcTotalTournamentRankings = (
             const bTotalWinPoint = b.wins + (bInVariableId ? getSeedCount(bInVariableId, teamInfos) : 0);
             return bTotalWinPoint - aTotalWinPoint;
         });
-        
+
         // 5位以降を割り当て
         let currentRank = 5;
         let prevWins = -1;
-        
+
 
         remainingTeams.forEach((team, index) => {
             const teamInVariableId = teamIdsForVariableId[team.teamId];
-            if (index === 0 || (team.wins + (teamInVariableId ? getSeedCount(teamInVariableId, teamInfos): 0)) !== prevWins) {
+            if (index === 0 || (team.wins + (teamInVariableId ? getSeedCount(teamInVariableId, teamInfos) : 0)) !== prevWins) {
                 // 勝利数が異なる場合、新しい順位
                 currentRank = 5 + index;
             }
 
             team.rank = currentRank;
-            prevWins = team.wins + (teamInVariableId ? getSeedCount(teamInVariableId, teamInfos): 0);
+            prevWins = team.wins + (teamInVariableId ? getSeedCount(teamInVariableId, teamInfos) : 0);
         });
 
         return Object.values(teamStats).map(team => ({
@@ -304,7 +328,7 @@ export const calcEventTotalRankings = (
             })
             const relatedMatchPlanIds = relatedMatchPlans.map(plan => plan.id)
             const relatedMatchResults = eventMatchResults.filter(result => relatedMatchPlanIds.includes(result.matchId))
-            
+
             return calcTotalTournamentRankings(relatedMatchPlans, relatedMatchResults, event.isTimeBased, teamData.teams)
         }
     })

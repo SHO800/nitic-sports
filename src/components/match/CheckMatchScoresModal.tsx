@@ -6,8 +6,6 @@ import {createScores} from "@/app/actions/data";
 import LoadingButton from "@/components/common/LoadingButton";
 
 const CheckMatchScoresModal = ({unSettledEvents}: { unSettledEvents: Event[] }) => {
-    const {matchResults, scores} = useData()
-
     const [isOpen, setIsOpen] = useState<boolean>(false)
 
 
@@ -24,7 +22,7 @@ const CheckMatchScoresModal = ({unSettledEvents}: { unSettledEvents: Event[] }) 
                     onClick={(e) => e.stopPropagation()}
                 >
                     {unSettledEvents.map(event => (
-                        <ModalEventContainer key={"scoreSetModal-" + event.id} unsettledEvent={event}/>
+                        <ModalEventContainer key={"scoreSetModal-" + event.id} unsettledEvent={event} setIsOpen={setIsOpen}/>
                     ))}
 
                 </div>
@@ -53,8 +51,8 @@ const ModalTab = ({isOpen, setIsOpen}: { isOpen: boolean, setIsOpen: (value: boo
 
 export default CheckMatchScoresModal;
 
-const ModalEventContainer = ({unsettledEvent}: { unsettledEvent: Event }) => {
-    const {matchPlans, matchResults, getMatchDisplayStr} = useData()
+const ModalEventContainer = ({unsettledEvent, setIsOpen}: { unsettledEvent: Event, setIsOpen: (state: boolean) => void }) => {
+    const {matchPlans, matchResults, getMatchDisplayStr, scores, mutateScores} = useData()
     const [calculatedScore, setCalculatedScore] = useState<RankWithEventScore[][]>([])
     const [mergedScore, setMergedScore] = useState<RankWithEventScore[]>([])
     const [isConfirming, setIsConfirming] = useState<boolean>(false) 
@@ -65,7 +63,6 @@ const ModalEventContainer = ({unsettledEvent}: { unsettledEvent: Event }) => {
         setCalculatedScore(separatedScore)
         const mergedScore = structuredClone(calculatedScore).flat().reduce((acc: RankWithEventScore[], curr: RankWithEventScore) => {
             // idが同じものを結合
-            console.log("マージ前", acc, curr)
             const existing = acc.find(item => item.teamId === curr.teamId);
             if (existing) {
                 existing.score += curr.score;
@@ -75,18 +72,17 @@ const ModalEventContainer = ({unsettledEvent}: { unsettledEvent: Event }) => {
                 return [...acc, curr]
             }
         }, [])
+        
+        const notZeroScores = mergedScore.filter(score => score.score !== 0)
+        if (notZeroScores) setMergedScore(notZeroScores)
 
-        setMergedScore(mergedScore)
-
-        console.log("マージド", mergedScore)
-
-    }, [matchPlans, matchResults, unsettledEvent]);
-    
+    }, [matchPlans, matchResults, unsettledEvent, scores]);
     
     const confirmEventScores = useCallback(async ()=>{
-        await createScores(mergedScore)
-        
-    }, []) 
+        await createScores(unsettledEvent.id, mergedScore)
+        await mutateScores()
+        setIsOpen(false)
+    }, [mergedScore]) 
     
     return (
         <div className={"flex flex-col"}>

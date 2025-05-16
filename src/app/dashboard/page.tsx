@@ -6,6 +6,7 @@ import MatchPlan from "@/components/dashboard/MatchPlan";
 import Location from "@/components/dashboard/Location";
 import SignOut from "@/components/auth/sign-out";
 import SignIn from "@/components/auth/sign-in";
+import TotalScore from "@/components/dashboard/TotalScore";
 
 const Dashboard = () => {
     return (
@@ -28,6 +29,10 @@ const Dashboard = () => {
                 <details className='container mx-auto p-4' >
                     <summary className='text-3xl font-bold mb-4 px-3 py-2 rounded-2xl bg-blue-900  text-white'>試合</summary>
                     <MatchPlan/>
+                </details>
+                <details className='container mx-auto p-4' >
+                    <summary className='text-3xl font-bold mb-4 px-3 py-2 rounded-2xl bg-blue-900  text-white'>全体スコア</summary>
+                    <TotalScore/>
                 </details>
                 <details className='container mx-auto p-4' >
                     <summary className='text-3xl font-bold mb-4 px-3 py-2 rounded-2xl bg-blue-900  text-white'>会場</summary>
