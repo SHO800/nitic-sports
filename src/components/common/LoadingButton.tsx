@@ -1,3 +1,5 @@
+
+import {ReactNode} from "react";
 const LoadingButton = ({children, onClick, bgColor, textColor = "white", isLoading}: {children: ReactNode, onClick: () => void, bgColor: string, textColor: string, isLoading}) => {
     
     return (
