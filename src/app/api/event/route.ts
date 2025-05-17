@@ -1,14 +1,8 @@
-import {prisma} from '../../../../lib/prisma';
 import {Event} from "@prisma/client";
+import {getAllEvents} from "../../../../lib/readQueries";
 
 
 export async function GET() {
-    const events: Event[] = await prisma.event.findMany().then((events) => {
-        //     id順にソート
-        events.sort((a, b) => {
-            return a.id - b.id;
-        })
-        return events
-    })
+    const events: Event[] = await getAllEvents()
     return Response.json(events)
 }

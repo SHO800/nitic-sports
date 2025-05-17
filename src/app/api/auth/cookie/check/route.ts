@@ -1,6 +1,7 @@
 import { Session } from "@/session";
 import { decrypt } from "@/session/encrypts";
 
+export const dynamicParams = true
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
         const { id } = await request.json();

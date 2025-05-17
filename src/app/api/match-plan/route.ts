@@ -1,13 +1,6 @@
-import {prisma} from '../../../../lib/prisma';
-import {MatchPlan} from "@prisma/client";
+import {getAllMatchPlans} from "../../../../lib/readQueries";
 
 export async function GET() {
-    const matchPlans: MatchPlan[] = await prisma.matchPlan.findMany().then((matchPlans) => {
-        //     id順にソート
-        matchPlans.sort((a, b) => {
-            return a.id - b.id;
-        })
-        return matchPlans
-    })
+    const matchPlans = await getAllMatchPlans()
     return Response.json(matchPlans)
 }

@@ -3,6 +3,6 @@ import {Location} from "@prisma/client";
 
 
 export async function GET() {
-    const locations: Location[] = await prisma.location.findMany()
+    const locations: Location[] = await 
     return Response.json(locations)
 }

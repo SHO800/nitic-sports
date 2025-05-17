@@ -1,7 +1,8 @@
+"use client"
 import {useCallback, useEffect, useRef, useState} from "react";
 
 export const useCurrentTime = () => {
-    const [currentTime, setCurrentTime] = useState(new Date());
+    const [currentTime, setCurrentTime] = useState(new Date(0));
     const callBacksRef = useRef<((currentTime: Date) => void)[]>([]);
     const plusTime = parseInt(process.env.NEXT_PUBLIC_PLUS_TIME ?? "0");
 
