@@ -1,7 +1,7 @@
 "use server";
 import {prisma} from "@/../lib/prisma";
 import {MatchPlan, Status} from "@prisma/client";
-import {revalidatePath} from "next/cache";
+import {revalidatePath, revalidateTag} from "next/cache";
 import {Coordinates} from "@/types/location";
 import {updateLeagueRankings} from "@/utils/leagueRanking";
 
@@ -52,7 +52,7 @@ export async function createMatchPlan(
     })
 
     if (response) {
-        revalidatePath('/dashboard')
+        revalidateTag('matchPlans')
     }
 }
 
@@ -88,7 +88,7 @@ export async function updateMatchPlan(
     })
 
     if (response) {
-        revalidatePath('/dashboard')
+        revalidateTag('matchPlans')
     }
 }
 
@@ -111,7 +111,7 @@ export async function updateMatchPlanStatus(
     })
 
     if (response) {
-        revalidatePath('/dashboard')
+        revalidateTag('matchPlans')
     }
 }
 
@@ -124,7 +124,7 @@ export async function deleteMatchPlan(id: number) {
     })
 
     if (response) {
-        revalidatePath('/dashboard')
+        revalidateTag('matchPlans')
     }
 }
 
@@ -143,7 +143,7 @@ export async function createEvent(
         },
     })
     if (response) {
-        revalidatePath('/dashboard')
+        revalidateTag('events')
     }
 }
 
@@ -166,7 +166,7 @@ export async function updateEvent(
         },
     })
     if (response) {
-        revalidatePath('/dashboard')
+        revalidateTag('events')
     }
 }
 
@@ -180,7 +180,7 @@ export async function setIsCompleted(id: number, isCompleted: boolean) {
         },
     })
     if (response) {
-        revalidatePath('/dashboard')
+        revalidateTag('events')
     }
 }
 
@@ -192,7 +192,7 @@ export async function deleteEvent(id: number) {
         },
     })
     if (response) {
-        revalidatePath('/dashboard')
+        revalidateTag('events')
     }
 }
 
@@ -209,7 +209,7 @@ export async function createLocation(
         },
     })
     if (response) {
-        revalidatePath('/dashboard')
+        revalidateTag('locations')
     }
 }
 
@@ -230,7 +230,7 @@ export async function updateLocation(
         },
     })
     if (response) {
-        revalidatePath('/dashboard')
+        revalidateTag('locations')
     }
 }
 
@@ -241,7 +241,7 @@ export async function deleteLocation(id: number) {
         },
     })
     if (response) {
-        revalidatePath('/dashboard')
+        revalidateTag('locations')
     }
 }
 
@@ -269,7 +269,7 @@ export async function createMatchResult(
     })
 
     if (response) {
-        revalidatePath('/dashboard')
+        revalidateTag('matchResults')
         // その試合のstatusをcompletedにする
         await updateMatchPlanStatus(matchId, Status.Completed)
 
@@ -313,7 +313,7 @@ export async function updateMatchResult(
     })
 
     if (response) {
-        revalidatePath('/dashboard')
+        revalidateTag('matchResults')
         // 試合結果に基づいてリーグ順位を更新
         try {
             const updated = await updateLeagueRankings(eventId, matchId);
@@ -332,7 +332,7 @@ export async function deleteMatchResult(matchId: number) {
     })
 
     if (response) {
-        revalidatePath('/dashboard')
+        revalidateTag('matchResults')
     }
 }
 
@@ -343,7 +343,7 @@ export async function createTeam(name: string) {
         },
     })
     if (response) {
-        revalidatePath('/dashboard')
+        revalidateTag('teams')
     }
 }
 
@@ -357,7 +357,7 @@ export async function updateTeam(id: number, name: string) {
         },
     })
     if (response) {
-        revalidatePath('/dashboard')
+        revalidateTag('teams')
     }
 }
 
@@ -368,7 +368,7 @@ export async function deleteTeam(id: number) {
         },
     })
     if (response) {
-        revalidatePath('/dashboard')
+        revalidateTag('teams')
     }
 }
 
@@ -393,5 +393,5 @@ export async function createScores(eventId: number, rankWithEventScore: RankWith
     }catch {
         
     }
-    revalidatePath('/dashboard')
+    revalidateTag('scores')
 }

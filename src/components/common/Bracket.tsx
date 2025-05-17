@@ -1,11 +1,112 @@
 "use client";
 
-import {useCallback, useEffect, useState, useMemo} from 'react';
+import {useCallback, useEffect, useState, useMemo, Suspense, memo} from 'react';
 import LeagueTable from '@/components/common/leagueTable/LeagueTable';
 import {MatchPlan} from "@prisma/client";
 import TournamentTable from "@/components/common/tournamentTable/TournamentTable";
 import {useData} from '@/hooks/data';
 
+// トーナメント部分を別コンポーネントに分離
+const TournamentSection = memo(({
+    eventId,
+    isFinal,
+    relatedMatchPlans
+}: {
+    eventId: number,
+    isFinal: boolean,
+    relatedMatchPlans: MatchPlan[]
+}) => (
+    <TournamentTable
+        key={`bracket-tournament-${eventId}-${isFinal}`}
+        eventId={eventId}
+        isFinal={isFinal}
+        relatedMatchPlans={relatedMatchPlans}
+    />
+));
+
+TournamentSection.displayName = 'TournamentSection';
+
+// リーグ部分を別コンポーネントに分離 - すべてのブロックを同時表示
+const LeagueSection = memo(({
+    eventId,
+    teamData
+}: {
+    eventId: number,
+    teamData: LeagueTeamData
+}) => {
+    const blockNames = useMemo(() => Object.keys(teamData.blocks), [teamData.blocks]);
+    
+    return (
+        <div className="space-y-8">
+            {blockNames.map((blockName) => (
+                <div key={`league-${eventId}-${blockName}`} className="mb-6">
+                    <h3 className="text-xl font-semibold mb-4">
+                        {blockName}ブロック
+                    </h3>
+                    <LeagueTable
+                        key={`league-table-${eventId}-${blockName}`}
+                        i_key={`bracket-league-${eventId}-${blockName}`}
+                        eventId={eventId}
+                        blockName={blockName}
+                        block={teamData.blocks[blockName]}
+                    />
+                </div>
+            ))}
+        </div>
+    );
+});
+
+LeagueSection.displayName = 'LeagueSection';
+
+// タブボタン部分を別コンポーネントに分離
+const TabButtons = memo(({
+    hasPreliminary,
+    hasFinal,
+    isFinal,
+    preliminaryType,
+    finalType,
+    setIsFinal
+}: {
+    hasPreliminary: boolean,
+    hasFinal: boolean,
+    isFinal: boolean,
+    preliminaryType: 'tournament' | 'league' | null,
+    finalType: 'tournament' | 'league' | null,
+    setIsFinal: (value: boolean) => void
+}) => (
+    <div className="mb-8">
+        <div className="flex space-x-4">
+            {hasPreliminary && (
+                <button
+                    className={`px-6 py-2 rounded-lg transition-colors ${
+                        !isFinal
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                    onClick={() => setIsFinal(false)}
+                >
+                    {hasFinal ? "予選" : "本選"} ({preliminaryType === 'tournament' ? 'トーナメント' : 'リーグ'})
+                </button>
+            )}
+            {hasFinal && (
+                <button
+                    className={`px-6 py-2 rounded-lg transition-colors ${
+                        isFinal
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                    onClick={() => setIsFinal(true)}
+                >
+                    本選 ({finalType === 'tournament' ? 'トーナメント' : 'リーグ'})
+                </button>
+            )}
+        </div>
+    </div>
+));
+
+TabButtons.displayName = 'TabButtons';
+
+// メインのBracketコンポーネント
 const Bracket = ({eventId, matchPlans}: { eventId: number, matchPlans: MatchPlan[] }) => {
     const [isFinal, setIsFinal] = useState(false);
     const {
@@ -84,6 +185,7 @@ const Bracket = ({eventId, matchPlans}: { eventId: number, matchPlans: MatchPlan
         }
     }, [teamData, matchPlans]);
 
+    // ローディング中の表示
     if (eventLoading || !eventId) {
         return (
             <div className="flex justify-center items-center h-64">
@@ -96,65 +198,37 @@ const Bracket = ({eventId, matchPlans}: { eventId: number, matchPlans: MatchPlan
         <div className="container mx-auto px-4 py-8">
             <h1 className="text-2xl font-bold mb-6 text-gray-800">{eventName} - 対戦表</h1>
 
+            {/* タブボタン */}
             {(hasPreliminary || hasFinal) && (
-                <div className="mb-8">
-                    <div className="flex space-x-4">
-                        {hasPreliminary && (
-                            <button
-                                className={`px-6 py-2 rounded-lg transition-colors ${
-                                    !isFinal
-                                        ? 'bg-blue-600 text-white'
-                                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                                }`}
-                                onClick={() => setIsFinal(false)}
-                            >
-                                {hasFinal ? "予選" : "本選"} ({preliminaryType === 'tournament' ? 'トーナメント' : 'リーグ'})
-                            </button>
-                        )}
-                        {hasFinal && (
-                            <button
-                                className={`px-6 py-2 rounded-lg transition-colors ${
-                                    isFinal
-                                        ? 'bg-blue-600 text-white'
-                                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                                }`}
-                                onClick={() => setIsFinal(true)}
-                            >
-                                本選 ({finalType === 'tournament' ? 'トーナメント' : 'リーグ'})
-                            </button>
-                        )}
-                    </div>
-                </div>
+                <TabButtons 
+                    hasPreliminary={hasPreliminary}
+                    hasFinal={hasFinal}
+                    isFinal={isFinal}
+                    preliminaryType={preliminaryType}
+                    finalType={finalType}
+                    setIsFinal={setIsFinal}
+                />
             )}
 
+            {/* 対戦表コンテンツ */}
             {(hasPreliminary || hasFinal) ? (
                 <div className="bg-white rounded-lg shadow-md p-6 overflow-hidden">
+                    <Suspense fallback={<div className="h-40 flex items-center justify-center">読み込み中...</div>}>
+                        {currentType === 'tournament' && (
+                            <TournamentSection 
+                                eventId={eventId}
+                                isFinal={isFinal}
+                                relatedMatchPlans={relatedMatchPlans}
+                            />
+                        )}
 
-                    {currentType === 'tournament' && (
-                        <TournamentTable
-                            key={`bracket-tournament-${eventId}-${isFinal}`}
-                            eventId={eventId}
-                            isFinal={isFinal}
-                            relatedMatchPlans={relatedMatchPlans}
-                        />
-                    )}
-
-                    {currentType === 'league' && teamData?.type === "league" && teamData.blocks && (
-                        <div className="space-y-8">
-                            {Object.keys(teamData.blocks).map((blockName) => (
-                                <div key={`league-${eventId}-${blockName}`} className="mb-6">
-                                    <h3 className="text-xl font-semibold mb-4">{blockName}ブロック</h3>
-                                    <LeagueTable
-                                        key={`league-table-${eventId}-${blockName}`}
-                                        i_key={`bracket-league-${eventId}-${blockName}`}
-                                        eventId={eventId}
-                                        blockName={blockName}
-                                        block={teamData.blocks[blockName]}
-                                    />
-                                </div>
-                            ))}
-                        </div>
-                    )}
+                        {currentType === 'league' && teamData?.type === "league" && teamData.blocks && (
+                            <LeagueSection 
+                                eventId={eventId}
+                                teamData={teamData}
+                            />
+                        )}
+                    </Suspense>
                 </div>
             ) : (
                 <div className="bg-white rounded-lg shadow-md p-8 text-center">
@@ -165,4 +239,5 @@ const Bracket = ({eventId, matchPlans}: { eventId: number, matchPlans: MatchPlan
     );
 }
 
-export default Bracket;
+export default memo(Bracket);
+

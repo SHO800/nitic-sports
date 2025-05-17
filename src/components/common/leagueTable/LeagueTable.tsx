@@ -1,100 +1,46 @@
 "use client"
 
 import {useData} from "@/hooks/data";
-import React, {useEffect, useRef, useMemo, useState} from "react";
+import React, {useEffect, useRef, useMemo, useState, memo, useCallback} from "react";
 import {MatchPlan} from "@prisma/client";
 import LeagueTableCell from "@/components/common/leagueTable/LeagueTableCell";
+import VirtualizedLeagueTable from "@/components/common/leagueTable/LeagueTableVirtualized";
+import LeagueTableEntity from "@/components/common/leagueTable/LeagueTableEntity";
+
+// チームの数に基づいて仮想化を使用するかを決定する閾値
+const VIRTUALIZATION_THRESHOLD = 8;
 
 const LeagueTable = ({i_key, eventId,  blockName, block}: {
     i_key: string,
     eventId: number,
     blockName: string,
-    block:
-        {
-            teamId: string
-            rank?: number
-        }[]
-
+    block: {
+        teamId: string
+        rank?: number
+    }[]
 }) => {
-    const {getBlockMatches} = useData()
-
-    const teamIds = useMemo(() => block.map((team) => team.teamId), [block]);
-    const [referredMatches, setReferredMatches] = useState<MatchPlan[]>([]);
-
-    const teamIdsLengthArray = useMemo(() => 
-        [-1, ...[...Array(teamIds.length).keys()]], 
-        [teamIds.length]
-    );
-
-    const tableRef = useRef<HTMLTableElement>(null);
-    const lineRef = useRef<HTMLDivElement>(null);
+    // チームの数が閾値を超える場合は仮想化テーブルを使用
+    if (block.length > VIRTUALIZATION_THRESHOLD) {
+        return (
+            <VirtualizedLeagueTable
+                i_key={i_key}
+                eventId={eventId}
+                blockName={blockName}
+                block={block}
+            />
+        );
+    }else {
+        return (
+            <LeagueTableEntity
+                i_key={i_key}
+                eventId={eventId}
+                blockName={blockName}
+                block={block}
+            />
+        );
+    }
     
-    useEffect(() => {
-        //     tableのサイズ変更を監視
-        const resizeObserver = new ResizeObserver(() => {
-            if (tableRef.current) {
-                const rect = tableRef.current.getBoundingClientRect();
-                const width = rect.width * teamIds.length / (teamIds.length + 1);
-                const height = rect.height * teamIds.length / (teamIds.length + 1);
+};
 
-                if (lineRef.current) {
-                    lineRef.current.style.width = `${Math.pow((Math.pow(width, 2) + Math.pow(height, 2)), 0.5)}px`;
-                    lineRef.current.style.rotate = `${Math.atan2(height - 1, width) * 180 / Math.PI}deg`;
-                }
-            }
-        });
 
-        if (tableRef.current) {
-            resizeObserver.observe(tableRef.current);
-        }
-
-        return () => {
-            if (tableRef.current) {
-                resizeObserver.unobserve(tableRef.current);
-            }
-        };
-    }, [teamIds.length]);
-    
-    useEffect(() => {
-        const matches = getBlockMatches(eventId, blockName, block);
-        setReferredMatches(matches);
-    }, [eventId, blockName, block, getBlockMatches]);
-
-    // セルのレンダリングロジックをメモ化
-    const renderTableCells = useMemo(() => (
-        teamIdsLengthArray.map((i) => (
-            <tr key={"leagueTableTr" + i_key + "-" + i} className={"border border-slate-300"}>
-                {
-                    teamIdsLengthArray.map((j) => (
-                        <td
-                            key={"leagueTableTd" + i_key + "-" + j}
-                            className={"border border-slate-300 h-8 w-16 text-center"}
-                        >
-                            <LeagueTableCell 
-                                i_key={i_key} 
-                                row={i} 
-                                col={j} 
-                                blockName={blockName} 
-                                block={block} 
-                                referredMatches={referredMatches} 
-                            />
-                        </td>
-                    ))
-                }
-            </tr>
-        ))
-    ), [teamIdsLengthArray, i_key, blockName, block, referredMatches]);
-
-    return (
-        <div className={"relative"}>
-            <div className={"h-[1px] bg-slate-300 absolute bottom-0 right-0 origin-bottom-right"} ref={lineRef}/>
-            <table className={"border-collapse border border-slate-500 w-full h-full"} ref={tableRef}>
-                <tbody>
-                    {renderTableCells}
-                </tbody>
-            </table>
-        </div>
-    )
-}
-
-export default React.memo(LeagueTable);
+export default memo(LeagueTable);

@@ -1,10 +1,11 @@
 import {MatchPlan} from "@prisma/client";
-import React, {ReactNode, useMemo} from "react";
-import {buildTournamentBracket, TournamentData} from "@/utils/tournamentUtils";
+import React, {memo, ReactNode, useMemo} from "react";
+import {buildTournamentBracket, TournamentData, TournamentNode} from "@/utils/tournamentUtils";
 import {useData} from "@/hooks/data";
 import TournamentTeamBox from "@/components/common/tournamentTable/TournamentTeamBox";
 import TournamentMatchBox from "@/components/common/tournamentTable/TournamentMatchBox";
-
+import batchMemoNodes from "@/utils/memoBatchRendering";
+import TournamentLine from "@/components/common/tournamentTable/TournamentLine";
 
 interface TournamentBracketProps {
     eventId: number;
@@ -47,6 +48,122 @@ const TournamentTable = ({eventId, isFinal, relatedMatchPlans}: Readonly<Tournam
         );
     }, [eventLoading, matchPlanLoading, matchResultLoading, teamLoading, events, relatedMatchPlans, matchPlans, teams, isFinal, eventId]);
 
+    // 最大行数を安全に計算（tournamentDataがnullの場合にもクラッシュしないように）
+    const maxRowNum = useMemo(() => {
+        return tournamentData?.teamIds.length ? tournamentData.teamIds.length * 2 : 0;
+    }, [tournamentData]);
+    
+    // ノードの配置と描画 - 常に実行される
+    const renderNodes = useMemo(() => {
+        if (!tournamentData) return null;
+        
+        return batchMemoNodes(
+            tournamentData.nodes,
+            (node) => (
+                <div
+                    style={{
+                        gridColumn: node.column,
+                        gridRow: node.row
+                    }}
+                >
+                    {node.type === "team" ? (
+                        <TournamentTeamBox
+                            node={node}
+                            rowWidth={rowWidth}
+                            rowHeight={rowHeight}
+                        />
+                    ) : (
+                        <TournamentMatchBox
+                            match={node}
+                            boxStyle={{}}
+                            matchResult={matchResults && matchResults[node.matchId.toString()]}
+                            rowWidth={rowWidth}
+                            rowHeight={rowHeight}
+                        />
+                    )}
+                </div>
+            ),
+            15, // チャンクサイズ
+            (node) => `node-${node.nodeId}-event-${eventId}-id-${node.type === "team" ? node.teamId : node.matchId}`
+        );
+    }, [tournamentData, rowWidth, rowHeight, matchResults, eventId]);
+
+    // 特殊ノードの描画とその線 - 常に実行される
+    const specialNodes = useMemo(() => {
+        if (!tournamentData) return null;
+        
+        return tournamentData.nodes
+            .filter(node => !node.nextNode)
+            .map(lastNode => {
+                if (lastNode.type === "team" || !lastNode.tournamentMatchNode) return null;
+
+                let text = "";
+                if (isFinal) {
+                    text = "優勝";
+                    if (lastNode.tournamentMatchNode.matchPlan.is3rdPlaceMatch) {
+                        text = "3位";
+                    }
+                } else {
+                    text = "本選";
+                }
+                
+                // 特殊ノードの位置を計算
+                const specialNodeColumn = lastNode.column + 2;
+                const specialNodeRow = lastNode.row;
+                
+                // 最終ノードから特殊ノードへの線を描画する
+                return (
+                    <React.Fragment key={eventId + "-specialNode-" + lastNode.nodeId}>
+                        {/* 特殊ノードへの線 */}
+                        <div 
+                            style={{
+                                gridColumn: lastNode.column, 
+                                gridRow: lastNode.row,
+                                position: 'relative',
+                                width: '100%',
+                                height: '100%'
+                            }}
+                        >
+                            <TournamentLine
+                                startX={rowWidth}
+                                startY={rowHeight / 2}
+                                endX={rowWidth * 2}
+                                endY={rowHeight / 2}
+                                type={"H"}
+                                color1={lastNode.tournamentMatchNode.matchPlan.status === "Completed" ? "rgb(255,0,0)" : "rgba(156, 163, 175, 0.8)"}
+                                color2={lastNode.tournamentMatchNode.matchPlan.status === "Completed" ? "rgb(255,0,0)" : "rgba(156, 163, 175, 0.8)"}
+                                thickness={4}
+                                animationTimingFunction={"linear"}
+                                duration={200}
+                                timeout={(lastNode.column+2) * 200 + 100}
+                            />
+                        </div>
+                        
+                        {/* 特殊ノード自体 */}
+                        <div
+                            className="text-center"
+                            style={{
+                                gridColumn: specialNodeColumn,
+                                gridRow: specialNodeRow
+                            }}
+                        >
+                            {text}
+                        </div>
+                    </React.Fragment>
+                );
+            });
+    }, [tournamentData, eventId, isFinal, rowWidth, rowHeight]);
+
+    // テンプレートカラムの設定 - 常に実行される
+    const gridTemplateColumns = useMemo(() => {
+        if (!tournamentData) return "";
+        return `${firstRowWidth}px repeat(${tournamentData.rounds + 2}, ${rowWidth}px)`;
+    }, [tournamentData, firstRowWidth, rowWidth]);
+
+    // テンプレート行の設定 - 常に実行される
+    const gridTemplateRows = useMemo(() => {
+        return `repeat(${maxRowNum}, ${rowHeight}px)`;
+    }, [maxRowNum, rowHeight]);
 
     // ロード中ならスピナーを表示
     if (eventLoading || matchPlanLoading || teamLoading) {
@@ -66,82 +183,20 @@ const TournamentTable = ({eventId, isFinal, relatedMatchPlans}: Readonly<Tournam
         );
     }
 
-    const maxRowNum = tournamentData.teamIds.length * 2;
-
-
     return (
         <div className="w-full overflow-x-auto">
             <div className="grid min-w-[250px] relative"
                  style={{
-                     gridTemplateColumns: `${firstRowWidth}px repeat(${tournamentData.rounds + 2}, ${rowWidth}px)`,
-                     gridTemplateRows: `repeat(${maxRowNum}, ${rowHeight}px)`
+                     gridTemplateColumns,
+                     gridTemplateRows
                  }}
             >
-                {tournamentData.nodes.map(match => {
-                    return <div
-                        key={"node-" + match.nodeId + "-event-" + eventId + "-id-" + (match.type === "team" ? match.teamId : match.matchId)}
-                        style={{
-                            gridColumn: match.column,
-                            gridRow: match.row
-                        }}
-                    >
-                        {match.row === 1 && match.column === 1}
-
-                        {
-                            match.type === "team" &&
-                            <TournamentTeamBox node={match} rowWidth={rowWidth} rowHeight={rowHeight}/>
-                        }
-                        {
-                            match.type === "match" &&
-                            <TournamentMatchBox match={match} boxStyle={{}}
-                                                matchResult={matchResults && matchResults[match.matchId.toString()]}
-                                                rowWidth={rowWidth}
-                                                rowHeight={rowHeight}/>
-                        }
-
-                    </div>
-                })}
-
-                {
-                    tournamentData.nodes.filter(node => !node.nextNode).map(lastNode => {
-                        if (lastNode.type === "team") return null;
-                        if (!lastNode.tournamentMatchNode) return null
-                        let text = "";
-                        if (isFinal) {
-                            text = "優勝"
-                            if (lastNode.tournamentMatchNode.matchPlan.is3rdPlaceMatch) { 
-                                text = "3位"
-                            }
-                        } else {
-                            text = "本選"
-                        }
-                        return (
-                            <SpecialNode key={eventId + "-specialNode-" + lastNode.nodeId} column={lastNode.column + 2}
-                                         row={lastNode.row}>
-                                {text}
-                            </SpecialNode>
-                        )
-
-                    })
-                }
-
+                {renderNodes}
+                {specialNodes}
             </div>
         </div>
     );
-}
+};
 
-export default TournamentTable
+export default memo(TournamentTable);
 
-const SpecialNode = ({children, column, row}: { children: ReactNode, column: number, row: number }) => {
-    return (
-        <div
-            className={" text-center"}
-            style={{
-                gridColumn: column,
-                gridRow: row
-            }}>
-            {children}
-        </div>
-    )
-
-}
