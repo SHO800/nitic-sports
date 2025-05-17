@@ -1,6 +1,4 @@
-// const fetcher = async <T>(key: string): Promise<T> => {
-//     return await fetch(key).then((res) => res.json() as Promise<T>);
-// }
+"use cache"
 /**
  * SWRで使用するfetcher関数
  * APIからのレスポンスを自動的にJSONに変換し、エラーハンドリングも実装

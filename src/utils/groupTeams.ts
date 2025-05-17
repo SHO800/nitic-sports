@@ -1,7 +1,8 @@
 import OrganizedTeams from "@/types/organizedTeams";
 import {Team} from "@prisma/client";
+import {cache} from "react";
 
-const groupTeams: (teams: Team[]) => { [p: string]: Team[] } = (teams: Team[]) => {
+const groupTeams: (teams: Team[]) => { [p: string]: Team[] } = cache((teams: Team[]) => {
     // nameの最初の1文字目でグルーピング
     if (!Array.isArray(teams)) return {}
     const organizedTeams = teams.reduce((acc: OrganizedTeams, team: Team) => {
@@ -26,6 +27,6 @@ const groupTeams: (teams: Team[]) => { [p: string]: Team[] } = (teams: Team[]) =
     return {
         ...organizedTeams
     }
-}
+})
 
 export default groupTeams

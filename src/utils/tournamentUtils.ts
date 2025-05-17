@@ -1,7 +1,7 @@
 import {Event, MatchPlan, MatchResult, Team} from '@prisma/client';
 import analyzeVariableTeamId from "@/utils/analyzeVariableTeamId";
 import {TeamIdVariableDataType} from "@/types/variableTeamId";
-import matchPlan from "@/components/dashboard/MatchPlan";
+import {cache} from "react";
 
 export type TournamentMatchNode = {
     matchId: number;
@@ -62,14 +62,13 @@ export interface TournamentData {
     teamIds: string[];
     teamMap: Record<number, { name: string; color?: string }>;
     matchPlanRange: MatchPlanRange
-
 }
 
 
 /**
  * イベントデータからトーナメントの構造を構築する
  */
-export const buildTournamentBracket = (
+export const buildTournamentBracket = cache((
     event: Event,
     relatedMatchPlans: MatchPlan[],
     allMatchPlans: MatchPlan[],
@@ -153,13 +152,13 @@ export const buildTournamentBracket = (
         teamMap,
         matchPlanRange: tournamentData.matchPlanIdRange!
     };
-}
+})
 
 
 /**
  * 与えられたnodesの中からsearchNodesとして与えられたノードあるいはチームを検索し, そのnodeを返す.
  */
-const searchTeamOrMatchNodes = (
+const searchTeamOrMatchNodes = cache((
     nodes: TournamentNode[],
     searchNode: TournamentNode | string[],
 ): TournamentNode[] => {
@@ -220,14 +219,14 @@ const searchTeamOrMatchNodes = (
     return foundNodes;
 
 }
-
+)
 /**
  * matchNodeが与えられたら, その前提試合も再帰的に全て取得したうえで, 関係のあるチームノード全てを取得する.
  */
-function getAllRelatedTeamNodes(
+const getAllRelatedTeamNodes = cache((
     nodes: TournamentNode[],
     matchNode: TournamentNode,
-): TournamentNode[] {
+): TournamentNode[] => {
 
     const relatedTeamNodes: TournamentNode[] = [];
 
@@ -247,20 +246,20 @@ function getAllRelatedTeamNodes(
 
 
     return relatedTeamNodes
-}
+})
 
 
 /**
  * 試合データからトーナメント構造を構築する。
  * 結果は考慮せず, 形状のみ。
  */
-function constructTournament(
+const constructTournament = cache((
     teamNodes: TournamentNode[],
     relatedMatchPlans: MatchPlan[],
     allMatchPlans: MatchPlan[],
     TeamInfos: TeamInfo[],
     canContain3rdMatch: boolean = true
-): TournamentNode[] {
+): TournamentNode[] => {
     const nodes: TournamentNode[] = [...teamNodes];
 
     // 試合IDをキーにした試合データのマッピングを作成。渡されたmatchPlansと中身は同じ。
@@ -365,19 +364,19 @@ function constructTournament(
 
 
     return nodes;
-}
+})
 
 
 /**
  * 試合のラウンドを計算
  */
-function calculateRound(match: MatchPlan, allMatches: MatchPlan[], detect3rdMatch: boolean = false, teamInfos: TeamInfo[] = []): number {
+const calculateRound = cache((match: MatchPlan, allMatches: MatchPlan[], detect3rdMatch: boolean = false, teamInfos: TeamInfo[] = []): number => {
     // 参照関係からラウンド数を推定
-    
+
     const dependencies = match.teamIds.map(teamId => analyzeVariableTeamId(teamId)).filter(node => node !== null)
     const minSeedCount = Math.min(...match.teamIds.map(teamId => getSeedCount(teamId, teamInfos)));
     if (!dependencies) return 1 + minSeedCount;
-    
+
     if (dependencies.length === 0 || (detect3rdMatch && dependencies.every(a => a.type === "T" && a.condition === "L"))) {
         return 1 + minSeedCount; // 初戦
     } else {
@@ -394,30 +393,30 @@ function calculateRound(match: MatchPlan, allMatches: MatchPlan[], detect3rdMatc
         });
         return maxRound + 1 + minSeedCount;
     }
-}
+})
 
 /**
  * 試合の位置（同じラウンド内での順序）を計算
  */
-function calculatePosition(match: MatchPlan, allMatches: MatchPlan[]): number {
+const calculatePosition = cache((match: MatchPlan, allMatches: MatchPlan[]): number => {
     const sameRoundMatches = allMatches.filter(m =>
         calculateRound(m, allMatches) === calculateRound(match, allMatches), true);
     return sameRoundMatches.indexOf(match);
-}
+})
 
-export function getSeedCount(teamId: string, teamInfo: TeamInfo[]) {
+export const getSeedCount = cache((teamId: string, teamInfo: TeamInfo[]) => {
     if (teamInfo.length === 0) return 0;
-    let foundSeed = teamInfo.find(t => t.teamId === teamId)?.seedCount
+    const foundSeed = teamInfo.find(t => t.teamId === teamId)?.seedCount
     if (foundSeed === undefined || foundSeed === Infinity || isNaN(foundSeed)) return 0;
     return foundSeed;
-}
-    
-export function findVariableIdFromNumberId(numberId: number, relatedMatchPlans: MatchPlan[], relatedMatchResults: MatchResult[]): string | null {
+})
+
+export const findVariableIdFromNumberId = cache((numberId: number, relatedMatchPlans: MatchPlan[], relatedMatchResults: MatchResult[]): string | null => {
     const matchResult = relatedMatchResults.find(matchResult => matchResult.teamIds.includes(numberId));
     if (!matchResult) return null;
     const index = matchResult.teamIds.indexOf(numberId);
-    
+
     const matchPlan = relatedMatchPlans.find(matchPlan => matchPlan.id === matchResult.matchId);
     if (!matchPlan) return null;
     return matchPlan.teamIds[index];
-}
+})

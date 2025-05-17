@@ -1,7 +1,9 @@
+import {cache} from "react";
+
 const firstDay = new Date('2025-05-22');
 const secondDay = new Date('2025-05-23')
 
-export const judgeDay12 = (date: Date) => {
+export const judgeDay12 = cache((date: Date) => {
     const firstDayTime = firstDay.getTime();
     const secondDayTime = secondDay.getTime();
     const cushionDate = new Date(date)
@@ -14,12 +16,11 @@ export const judgeDay12 = (date: Date) => {
     } else {
         return 0;
     }
-}
+})
 
-export const judgeDay12String = (date: Date): string | null => {
+export const judgeDay12String = cache((date: Date): string | null => {
     const result = judgeDay12(date)
     if (result === 1) return "Day1";
     if (result === 2) return "Day2";
     return null;
-    
-}
+})

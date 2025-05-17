@@ -1,6 +1,7 @@
 import {TeamIdVariableDataType} from "@/types/variableTeamId";
+import {cache} from "react";
 
-const analyzeVariableTeamId = (variableId: string): TeamIdVariableDataType | null => {
+const analyzeVariableTeamId = cache((variableId: string): TeamIdVariableDataType | null => {
     if (!variableId.startsWith("$")) return null;
     const variableIdSubstring = variableId.substring(1)
     const separatedStr = variableIdSubstring.split('-')
@@ -28,6 +29,6 @@ const analyzeVariableTeamId = (variableId: string): TeamIdVariableDataType | nul
         }
     }
     return null;
-}
+})
 
 export default analyzeVariableTeamId;

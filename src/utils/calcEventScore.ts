@@ -1,8 +1,9 @@
 import {Event, MatchPlan, MatchResult} from "@prisma/client";
 import {evaluateScore} from "../../public/EvaluateScore";
 import {findVariableIdFromNumberId, getSeedCount} from "@/utils/tournamentUtils";
+import {cache} from "react";
 
-const calcTotalTournamentRankings = (
+const calcTotalTournamentRankings = cache((
     relatedMatchPlans: MatchPlan[],
     relatedMatchResults: MatchResult[],
     isTimeBased: boolean,
@@ -205,10 +206,10 @@ const calcTotalTournamentRankings = (
             detail: `勝利数: ${team.wins}`
         }))
     }
-}
+})
 
 
-export const calcEventTotalRankings = (
+export const calcEventTotalRankings = cache((
     event: Event,
     allMatchPlans: MatchPlan[],
     allMatchResults: MatchResult[]
@@ -250,10 +251,10 @@ export const calcEventTotalRankings = (
             return calcTotalTournamentRankings(relatedMatchPlans, relatedMatchResults, event.isTimeBased, teamData.teams)
         }
     })
-}
+})
 
 
-export const calcEventScore = (event: Event, allMatchPlans: MatchPlan[], allMatchResults: MatchResult[]): RankWithEventScore[][] => {
+export const calcEventScore = cache((event: Event, allMatchPlans: MatchPlan[], allMatchResults: MatchResult[]): RankWithEventScore[][] => {
     const ranking = calcEventTotalRankings(event, allMatchPlans, allMatchResults)
     const results: RankWithEventScore[][] = []
     ranking.forEach((roundData, index) => {
@@ -267,6 +268,4 @@ export const calcEventScore = (event: Event, allMatchPlans: MatchPlan[], allMatc
         })
     })
     return results
-}
-
-
+})

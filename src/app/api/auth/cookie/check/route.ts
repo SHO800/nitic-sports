@@ -1,8 +1,11 @@
 import { Session } from "@/session";
 import { decrypt } from "@/session/encrypts";
 
-export const dynamicParams = true
-export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
+
+// ビルド時にプレレンダリングしない
+export const dynamic = "force-dynamic";
+
+export async function POST(request: Request) {
     try {
         const { id } = await request.json();
 

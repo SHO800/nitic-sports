@@ -1,5 +1,8 @@
+"use cache"
 import {prisma} from '@/../lib/prisma';
 import AnalyzeVariableTeamId from "@/utils/analyzeVariableTeamId";
+import {getEventById, getMatchThatDependsOn} from "../../lib/readQueries";
+import {cache} from "react";
 
 // リーグ順位計算用のチーム統計データ
 interface TeamRankingData {
@@ -29,9 +32,7 @@ export async function updateLeagueRankings(eventId: number, matchId: number): Pr
         }
 
         // イベント情報を取得
-        const event = await prisma.event.findUnique({
-            where: {id: eventId}
-        });
+        const event = await getEventById(eventId);
 
         if (!event || !event.teamData || !Array.isArray(event.teamData) || event.teamData.length === 0) {
             return false;
@@ -44,15 +45,8 @@ export async function updateLeagueRankings(eventId: number, matchId: number): Pr
         {
             
             // もしトーナメント形式でこの試合を前提とする試合がある場合
-            const matchPlans = await prisma.matchPlan.findMany({
-                where: {
-                    eventId,
-                    status: 'Waiting',
-                    teamIds: {
-                        hasSome: [`$T-${matchId}-W`, `$T-${matchId}-L`]
-                    }
-                }
-            });
+            const matchPlans = await getMatchThatDependsOn(eventId, matchId);
+            
             console.log(`トーナメント形式の試合の数: ${matchPlans.length}`);
             // その試合の他の依存チームの試合も完了しているかチェック
             const dependentMatchPlansWithAllTeams = matchPlans.filter(match =>
@@ -90,12 +84,15 @@ export async function updateLeagueRankings(eventId: number, matchId: number): Pr
 
 
             // 依存している試合のステータスを更新
-            await Promise.all(dependentMatchPlansWithAllTeams.map(match => {
-                return prisma.matchPlan.update({
-                    where: {id: match.id},
-                    data: {status: 'Preparing'}
-                });
-            }));
+            await prisma.matchPlan.updateMany({
+                where: {
+                    id: {
+                        in: dependentMatchPlansWithAllTeams.map(match => match.id)
+                    }
+                },
+                data: {status: 'Preparing'}
+            });
+            
         }
         
         // リーグ形式のデータを見つける
@@ -244,12 +241,14 @@ export async function updateLeagueRankings(eventId: number, matchId: number): Pr
             });
 
             // これらの試合のステータスを更新
-            await Promise.all(dependentMatchPlansWithAllTeams.map(match => {
-                return prisma.matchPlan.update({
-                    where: {id: match.id},
-                    data: {status: 'Preparing'}
-                });
-            }));
+            await prisma.matchPlan.updateMany({
+                where: {
+                    id: {
+                        in: dependentMatchPlansWithAllTeams.map(match => match.id)
+                    }
+                },
+                data: {status: 'Preparing'}
+            });
 
         }
         console.log(`イベント: ${eventId} ブロック "${blockName}" 状態: 完了=${blockStatus.completed}, 試合=${blockStatus.completedMatches}/${blockStatus.totalMatches}`);
@@ -265,10 +264,10 @@ export async function updateLeagueRankings(eventId: number, matchId: number): Pr
 /**
  * チームIDがあるブロックを見つける
  */
-function findBlockByMatch(
+const findBlockByMatch = cache((
     blocks: Record<string, LeagueTeamInfo[]>,
     teamIds: string[]
-): string | null {
+): string | null => {
     for (const [blockName, teams] of Object.entries(blocks)) {
         const blockTeamIds = teams.map(team => team.teamId);
         // 試合の両チームがこのブロックに属しているかチェック
@@ -280,7 +279,7 @@ function findBlockByMatch(
     }
 
     return null;
-}
+})
 
 /**
  * ブロック内の全試合が完了したかチェックする
