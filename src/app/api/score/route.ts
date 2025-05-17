@@ -1,7 +1,7 @@
-import {prisma} from "../../../../lib/prisma";
 import {Score} from "@prisma/client";
+import {getAllScores} from "../../../../lib/readQueries";
 
 export async function GET() {
-    const scores: Score[] = await prisma.score.findMany()
+    const scores: Score[] = await getAllScores()
     return Response.json(scores)
 }

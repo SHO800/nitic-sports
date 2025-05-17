@@ -1,13 +1,7 @@
-import {prisma} from '../../../../lib/prisma';
 import {MatchResult} from "@prisma/client";
+import {getAllMatchResults} from "../../../../lib/readQueries";
 
 export async function GET() {
-    const matchResults: MatchResult[] = await prisma.matchResult.findMany()
-
-    // <matchId>: {}の形にする
-    const matchResultsMap: Record<string, MatchResult> = {}
-    matchResults.forEach((matchResult) => {
-        matchResultsMap[matchResult.matchId.toString()] = matchResult
-    })
+    const matchResultsMap: Record<string, MatchResult> = await getAllMatchResults()
     return Response.json(matchResultsMap)
 }
