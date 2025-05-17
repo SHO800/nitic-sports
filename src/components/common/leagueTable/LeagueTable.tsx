@@ -1,7 +1,7 @@
 "use client"
 
 import {useData} from "@/hooks/data";
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useMemo, useState} from "react";
 import {MatchPlan} from "@prisma/client";
 import LeagueTableCell from "@/components/common/leagueTable/LeagueTableCell";
 
@@ -18,15 +18,17 @@ const LeagueTable = ({i_key, eventId,  blockName, block}: {
 }) => {
     const {getBlockMatches} = useData()
 
-    const teamIds = block.map((team) => team.teamId);
+    const teamIds = useMemo(() => block.map((team) => team.teamId), [block]);
     const [referredMatches, setReferredMatches] = useState<MatchPlan[]>([]);
 
-    const teamIdsLengthArray = [-1, ...[...Array(teamIds.length).keys()]]
+    const teamIdsLengthArray = useMemo(() => 
+        [-1, ...[...Array(teamIds.length).keys()]], 
+        [teamIds.length]
+    );
 
     const tableRef = useRef<HTMLTableElement>(null);
     const lineRef = useRef<HTMLDivElement>(null);
     
-
     useEffect(() => {
         //     tableのサイズ変更を監視
         const resizeObserver = new ResizeObserver(() => {
@@ -51,8 +53,6 @@ const LeagueTable = ({i_key, eventId,  blockName, block}: {
                 resizeObserver.unobserve(tableRef.current);
             }
         };
-
-
     }, [teamIds.length]);
     
     useEffect(() => {
@@ -60,37 +60,41 @@ const LeagueTable = ({i_key, eventId,  blockName, block}: {
         setReferredMatches(matches);
     }, [eventId, blockName, block, getBlockMatches]);
 
+    // セルのレンダリングロジックをメモ化
+    const renderTableCells = useMemo(() => (
+        teamIdsLengthArray.map((i) => (
+            <tr key={"leagueTableTr" + i_key + "-" + i} className={"border border-slate-300"}>
+                {
+                    teamIdsLengthArray.map((j) => (
+                        <td
+                            key={"leagueTableTd" + i_key + "-" + j}
+                            className={"border border-slate-300 h-8 w-16 text-center"}
+                        >
+                            <LeagueTableCell 
+                                i_key={i_key} 
+                                row={i} 
+                                col={j} 
+                                blockName={blockName} 
+                                block={block} 
+                                referredMatches={referredMatches} 
+                            />
+                        </td>
+                    ))
+                }
+            </tr>
+        ))
+    ), [teamIdsLengthArray, i_key, blockName, block, referredMatches]);
 
     return (
         <div className={"relative"}>
             <div className={"h-[1px] bg-slate-300 absolute bottom-0 right-0 origin-bottom-right"} ref={lineRef}/>
             <table className={"border-collapse border border-slate-500 w-full h-full"} ref={tableRef}>
                 <tbody>
-                {
-                    teamIdsLengthArray.map((i) => {
-                        return (
-                            <tr key={"leagueTableTr" + i_key + "-" + i} className={"border border-slate-300"}>
-                                {
-                                    teamIdsLengthArray.map((j) => {
-                                        return (
-                                            <td
-                                                key={"leagueTableTd" + i_key + "-" + j}
-                                                className={`border border-slate-300  h-8 w-16 text-center`}
-                                            >
-                                                <LeagueTableCell i_key={i_key} row={i} col={j} blockName={blockName} block={block} referredMatches={referredMatches} />
-                                            </td>
-                                        )
-                                    })
-                                }
-                            </tr>
-                        )
-                    })
-
-                }
+                    {renderTableCells}
                 </tbody>
             </table>
         </div>
     )
 }
 
-export default LeagueTable;
+export default React.memo(LeagueTable);

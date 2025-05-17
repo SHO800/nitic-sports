@@ -1,15 +1,17 @@
 "use client";
 
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useState, useMemo} from 'react';
 import LeagueTable from '@/components/common/leagueTable/LeagueTable';
-import {useData} from '@/hooks/data';
 import {MatchPlan} from "@prisma/client";
 import TournamentTable from "@/components/common/tournamentTable/TournamentTable";
+import {useData} from '@/hooks/data';
 
 const Bracket = ({eventId, matchPlans}: { eventId: number, matchPlans: MatchPlan[] }) => {
-
     const [isFinal, setIsFinal] = useState(false);
-    const {events, eventLoading} = useData();
+    const {
+        events,
+        eventLoading
+    } = useData();
 
     const [hasPreliminary, setHasPreliminary] = useState(false);
     const [hasFinal, setHasFinal] = useState(false);
@@ -17,65 +19,62 @@ const Bracket = ({eventId, matchPlans}: { eventId: number, matchPlans: MatchPlan
     const [preliminaryType, setPreliminaryType] = useState<'tournament' | 'league' | null>(null);
     const [finalType, setFinalType] = useState<'tournament' | 'league' | null>(null);
     const [relatedMatchPlans, setRelatedMatchPlans] = useState<MatchPlan[]>([]);
+    
     // 現在選択されている大会の形式を取得
     const getCurrentType = useCallback(() => {
         return isFinal ? finalType : preliminaryType;
     }, [isFinal, finalType, preliminaryType]);
 
-    // チームデータを取得
-    const getTeamData = useCallback((): TeamData | null => {
-        if (!events || eventLoading) return null;
+    // 現在のイベントをメモ化
+    const currentEvent = useMemo(() => {
+        if (!events) return null;
+        return events.find(e => e.id === eventId) || null;
+    }, [events, eventId]);
 
-        const event = events.find(e => e.id === eventId);
-        if (!event) return null;
+    // チームデータを取得 - メモ化利用
+    const teamData = useMemo(() => {
+        if (!currentEvent) return null;
 
-        const teamData = event.teamData as unknown as TeamData[];
+        const teamData = currentEvent.teamData as unknown as TeamData[];
         if (!Array.isArray(teamData) || teamData.length === 0) return null;
 
         return isFinal && teamData.length > 1 ? teamData[1] : teamData[0];
-    }, [events, eventLoading, eventId, isFinal]);
+    }, [currentEvent, isFinal]);
 
-
-    const teamData = getTeamData();
     const currentType = getCurrentType();
 
     useEffect(() => {
-        if (!eventLoading && events && eventId) {
-            const event = events.find(e => e.id === eventId);
+        if (!eventLoading && currentEvent) {
+            setEventName(currentEvent.name);
 
-            if (event) {
-                setEventName(event.name);
+            // 予選/本選の形式（トーナメントまたはリーグ）を確認
+            const teamData = currentEvent.teamData as unknown as TeamData[];
 
-                // 予選/本選の形式（トーナメントまたはリーグ）を確認
-                const teamData = event.teamData as unknown as TeamData[];
+            if (Array.isArray(teamData) && teamData.length > 0) {
+                setHasPreliminary(true);
+                setPreliminaryType(teamData[0]?.type as 'tournament' | 'league' | null);
+            } else {
+                setHasPreliminary(false);
+                setPreliminaryType(null);
+            }
 
-                if (Array.isArray(teamData) && teamData.length > 0) {
-                    setHasPreliminary(true);
-                    setPreliminaryType(teamData[0]?.type as 'tournament' | 'league' | null);
-                } else {
-                    setHasPreliminary(false);
-                    setPreliminaryType(null);
-                }
-
-                if (Array.isArray(teamData) && teamData.length > 1) {
-                    setHasFinal(true);
-                    setFinalType(teamData[1]?.type as 'tournament' | 'league' | null);
-                } else {
-                    setHasFinal(false);
-                    setFinalType(null);
-                }
-
+            if (Array.isArray(teamData) && teamData.length > 1) {
+                setHasFinal(true);
+                setFinalType(teamData[1]?.type as 'tournament' | 'league' | null);
+            } else {
+                setHasFinal(false);
+                setFinalType(null);
             }
         }
-    }, [events, eventLoading, eventId]);
+    }, [currentEvent, eventLoading]);
 
-
+    // matchPlansのフィルタリングをメモ化
     useEffect(() => {
         if (teamData && teamData.type === "tournament" && teamData.matchPlanIdRange) {
             const matchPlanIdRange = teamData.matchPlanIdRange;
             const startId = matchPlanIdRange.start;
             const endId = matchPlanIdRange.end;
-            const additionalIds = teamData.matchPlanIdRange.additional || [];
+            const additionalIds = matchPlanIdRange.additional || [];
 
             // 試合プランのID範囲を使用して関連する試合プランをフィルタリング
             const filteredMatchPlans = matchPlans.filter(matchPlan => {
@@ -84,7 +83,6 @@ const Bracket = ({eventId, matchPlans}: { eventId: number, matchPlans: MatchPlan
             setRelatedMatchPlans(filteredMatchPlans);
         }
     }, [teamData, matchPlans]);
-
 
     if (eventLoading || !eventId) {
         return (
@@ -134,7 +132,7 @@ const Bracket = ({eventId, matchPlans}: { eventId: number, matchPlans: MatchPlan
 
                     {currentType === 'tournament' && (
                         <TournamentTable
-                            key={`bracket-tournament-${eventId}`}
+                            key={`bracket-tournament-${eventId}-${isFinal}`}
                             eventId={eventId}
                             isFinal={isFinal}
                             relatedMatchPlans={relatedMatchPlans}

@@ -1,9 +1,9 @@
-import React, {CSSProperties, useCallback, useEffect, useMemo, useRef, useState} from "react";
+import React, {CSSProperties, useMemo} from "react";
 import {TournamentNodeMatch} from "@/utils/tournamentUtils";
 import {MatchResult, Status} from "@prisma/client";
 import TournamentLine from "@/components/common/tournamentTable/TournamentLine";
 import {useData} from "@/hooks/data";
-import {statusColors} from "@/components/dashboard/matchPlan/constants";
+import useTournamentLine from "@/hooks/useTournamentLine";
 
 const TournamentMatchBox = ({match, boxStyle, matchResult, rowWidth, rowHeight}: {
     match: TournamentNodeMatch,
@@ -12,85 +12,29 @@ const TournamentMatchBox = ({match, boxStyle, matchResult, rowWidth, rowHeight}:
     rowWidth: number
     rowHeight: number
 }) => {
+    const {matchResults} = useData();
+
+    const nextNodeRow = match.nextNode?.row;
+    const nextNodeColumn = match.nextNode?.column;
     
-    const {matchResults} = useData()
+    
 
-    const matchBoxRef = useRef<HTMLDivElement>(null);
-    const wrapperRef = useRef<HTMLDivElement>(null);
-
-    const [lineCoords, setLineCoords] = useState({
-        startX: 0,
-        startY: 0,
-        endX: 0,
-        endY: 0,
-        type: "H" as "H" | "V" | "LT" | "RT" | "LB" | "RB",
-    });
-
-    // リサイズ時や初回レンダリング時に座標を再計算
-    const calculateLineCoordinates = useCallback(() => {
-
-        if (!matchBoxRef.current || !wrapperRef.current) return;
-        const box = matchBoxRef.current.getBoundingClientRect();
-        let rowDiff;
-        let colDiff;
-        if (match.nextNode) {
-        rowDiff = match.nextNode.row - match.row
-         colDiff = match.nextNode.column - match.column
-        }else {
-            rowDiff = 0
-            colDiff = 1
-        }
-
-        const startX = box.width;
-        const endX = box.width + (colDiff) * rowWidth;
-        let startY = box.height / 2;
-        let endY = box.height / 2;
-        let type: "H" | "V" | "LT" | "RT" | "LB" | "RB";
-
-
-        if (rowDiff > 0) {
-            startY = box.height / 2;
-            endY = box.height / 2 + (rowDiff) * rowHeight;
-            type = "RT";
-        } else if (rowDiff < 0) {
-            startY = box.height / 2 + (rowDiff) * rowHeight;
-            endY = box.height / 2;
-            type = "RB";
-        } else {
-            type = "H"
-
-        }
-
-        setLineCoords({startX, startY, endX, endY, type});
-
-    }, [match.column, match.nextNode, match.row, rowHeight, rowWidth]);
-
-    // 次のノードとの接続線のための座標計算
-    useEffect(() => {
-            // 座標計算と監視設定
-            const observer = new ResizeObserver(() => {
-                calculateLineCoordinates();
-            });
-
-            if (matchBoxRef.current) {
-                calculateLineCoordinates();
-                observer.observe(matchBoxRef.current);
-            }
-
-            return () => {
-                if (matchBoxRef.current) {
-                    observer.unobserve(matchBoxRef.current);
-                }
-            };
-        }, [calculateLineCoordinates]
+    const { boxRef, lineCoords } = useTournamentLine(
+        rowWidth,
+        rowHeight,
+        match.row,
+        match.column,
+        nextNodeRow,
+        nextNodeColumn
     );
-    
+
+    // 勝者判定のロジックをメモ化
     const isWonInNextNode = useMemo(() => {
-        if (!matchResult || !matchResults || !match.nextNode || match.nextNode?.type === "team" || !matchResults[match.nextNode.matchId]) return false
-        return (matchResults[match.nextNode.matchId].winnerTeamId === matchResult.winnerTeamId)
-    }, [match.nextNode, matchResult, matchResults])
-        
-        
+        if (!matchResult || !matchResults || !match.nextNode || match.nextNode?.type === "team" || !matchResults[match.nextNode.matchId]) return false;
+        return (matchResults[match.nextNode.matchId].winnerTeamId === matchResult.winnerTeamId);
+    }, [match.nextNode, matchResult, matchResults]);
+
+    // 試合状態に応じた色の設定をメモ化
     const matchStatusColor = useMemo(() => {
         const statusColors = {
             Waiting: "text-blue-200",
@@ -99,28 +43,27 @@ const TournamentMatchBox = ({match, boxStyle, matchResult, rowWidth, rowHeight}:
             Finished: "text-yellow-500",
             Completed: "text-gray-300",
             Cancelled: "text-orange-300",
-        }
+        };
 
-        return statusColors[match.tournamentMatchNode.matchPlan.status]
-    }, [match.tournamentMatchNode.matchPlan.status])
-        
+        return statusColors[match.tournamentMatchNode.matchPlan.status];
+    }, [match.tournamentMatchNode.matchPlan.status]);
 
     return (
         <div
             className={"h-full relative w-full "}
             style={boxStyle}
-            ref={wrapperRef}
         >
             {!!match.matchId && (
                 <div
-                    className="text-md text-gray-500 pr-2 absolute  h-full w-full flex justify-end items-center bg-transparent">
+                    className="text-md text-gray-500 pr-2 absolute h-full w-full flex justify-end items-center bg-transparent">
                     <p className={matchStatusColor + " font-bold text-[1.2em]"}>{match.tournamentMatchNode.matchPlan.matchName}</p>
                 </div>
             )}
+            
 
-            <div className="relative h-full" ref={matchBoxRef}>
+            <div className="relative h-full" ref={boxRef}>
                 <TournamentLine
-                    key={"match-"+match.matchId+"-line-"+(match.tournamentMatchNode.matchPlan.status === Status.Completed).toString()}
+                    key={"match-" + match.matchId + "-line-" + (match.tournamentMatchNode.matchPlan.status === Status.Completed).toString()}
                     startX={lineCoords.startX}
                     startY={lineCoords.startY}
                     endX={lineCoords.endX}
@@ -134,12 +77,8 @@ const TournamentMatchBox = ({match, boxStyle, matchResult, rowWidth, rowHeight}:
                     timeout={(match.column) * 200 + 200}
                 />
             </div>
-
-            
-
-
         </div>
-    )
-}
+    );
+};
 
-export default TournamentMatchBox;
+export default React.memo(TournamentMatchBox);
