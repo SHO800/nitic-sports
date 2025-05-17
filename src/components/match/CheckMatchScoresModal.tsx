@@ -4,6 +4,7 @@ import {Event} from "@prisma/client";
 import {calcEventScore} from "@/utils/calcEventScore";
 import {createScores} from "@/app/actions/data";
 import LoadingButton from "@/components/common/LoadingButton";
+import {useDataContext} from "@/contexts/dataContext";
 
 const CheckMatchScoresModal = ({unSettledEvents}: { unSettledEvents: Event[] }) => {
     const [isOpen, setIsOpen] = useState<boolean>(false)
@@ -52,7 +53,7 @@ const ModalTab = ({isOpen, setIsOpen}: { isOpen: boolean, setIsOpen: (value: boo
 export default CheckMatchScoresModal;
 
 const ModalEventContainer = ({unsettledEvent, setIsOpen}: { unsettledEvent: Event, setIsOpen: (state: boolean) => void }) => {
-    const {matchPlans, matchResults, getMatchDisplayStr, scores, mutateScores} = useData()
+    const {matchPlans, matchResults, getMatchDisplayStr, scores, mutateScores} = useDataContext()
     const [calculatedScore, setCalculatedScore] = useState<RankWithEventScore[][]>([])
     const [mergedScore, setMergedScore] = useState<RankWithEventScore[]>([])
     const [isConfirming, setIsConfirming] = useState<boolean>(false) 

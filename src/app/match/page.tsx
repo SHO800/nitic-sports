@@ -6,10 +6,11 @@ import {useData} from "@/hooks/data";
 import Clock from "@/components/common/Clock";
 import LocationSelector from "@/components/match/LocationSelector";
 import CheckMatchScoresModal from "@/components/match/CheckMatchScoresModal";
-import {Event} from "@prisma/client" 
+import {Event} from "@prisma/client"
+import {useDataContext} from "@/contexts/dataContext"; 
 
 const MatchDashboard = () => {
-    const {events, locations, scores} = useData();
+    const {events, locations, scores} = useDataContext()
     const [selectedLocation, setSelectedLocation] = useState<string[]>([])
     const [isShowSelector, setIsShowSelector] = useState<boolean>(true)
     const [isSyncScroll, setIsSyncScroll] = useState<boolean>(true)

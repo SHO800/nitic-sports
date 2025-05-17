@@ -2,9 +2,10 @@
 import {useData} from "@/hooks/data";
 import Bracket from "@/components/common/Bracket";
 import {deleteEvent} from "@/app/actions/data";
+import {useDataContext} from "@/contexts/dataContext";
 
 const EventList = () => {
-    const {events, mutateEvents, matchPlans} = useData();
+    const {events, mutateEvents, matchPlans} = useDataContext()
 
     return (
         <>

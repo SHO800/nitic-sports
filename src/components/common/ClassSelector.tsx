@@ -1,5 +1,6 @@
 import {useState} from "react";
 import {useData} from "@/hooks/data";
+import {useDataContext} from "@/contexts/dataContext";
 
 interface ClassSelectorProps {
     groupedData: Record<string, { id: number, name: string }[]>
@@ -7,7 +8,7 @@ interface ClassSelectorProps {
 }
 
 const ClassSelector = ({groupedData, callback}: ClassSelectorProps) => {
-    const {getMatchDisplayStr} = useData()
+    const {getMatchDisplayStr} = useDataContext()
 
     const [variableType, setVariableType] = useState<"T" | "L" | null>(null);
 

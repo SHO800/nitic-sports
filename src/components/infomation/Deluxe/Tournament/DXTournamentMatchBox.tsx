@@ -3,6 +3,7 @@ import {TournamentNodeMatch} from "@/utils/tournamentUtils";
 import {useData} from "@/hooks/data";
 import {MatchResult} from "@prisma/client";
 import TournamentLine from "@/components/common/tournamentTable/TournamentLine";
+import {useDataContext} from "@/contexts/dataContext";
 
 const DXTournamentMatchBox = ({match, boxStyle, matchResult, rowWidth, rowHeight, teamIds}: {
     match: TournamentNodeMatch,
@@ -12,7 +13,7 @@ const DXTournamentMatchBox = ({match, boxStyle, matchResult, rowWidth, rowHeight
     rowHeight: number
     teamIds: string[]
 }) => {
-    const {getMatchDisplayStr, getActualTeamIdByVariableId} = useData();
+    const {getMatchDisplayStr, getActualTeamIdByVariableId} = useDataContext()
     // const {boxNodes, registerNode} = useTournamentBracket();
 
     const matchBoxRef = useRef<HTMLDivElement>(null);

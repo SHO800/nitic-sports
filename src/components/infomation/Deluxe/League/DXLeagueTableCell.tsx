@@ -1,5 +1,5 @@
-import {useData} from "@/hooks/data";
 import {MatchPlan} from "@prisma/client";
+import {useDataContext} from "@/contexts/dataContext";
 
 const DXLeagueTableCell = ({i_key, row, col, blockName, block, referredMatches, teamIds}: {
     i_key: string,
@@ -10,7 +10,7 @@ const DXLeagueTableCell = ({i_key, row, col, blockName, block, referredMatches, 
     referredMatches: MatchPlan[],
     teamIds: string[]
 }) => {
-    const {getMatchDisplayStr, matchResults} = useData()
+    const {getMatchDisplayStr, matchResults} = useDataContext()
 
     if (referredMatches.length === 0) return null;
     if (row === -1 && col === -1) return <p key={i_key} className={"font-bold"}>{blockName}</p>
@@ -27,35 +27,36 @@ const DXLeagueTableCell = ({i_key, row, col, blockName, block, referredMatches, 
     // const rightSideTeamName = getMatchDisplayStr(rightSideTeam);
     // const teamStr = `${leftSideTeamName} vs ${rightSideTeamName}`;
     const matchStr = match.matchName ? match.matchName : match.matchNote ? match.matchNote : "";
-    
+
     if (match.status === "Waiting") {
         return (
-            
-            <div key={i_key} className={`text-sm p-2 ${(match.teamIds === teamIds) ? "bg-amber-500": ""}`}>
-                <p className={`text-sm ${(match.teamIds === teamIds) ?"animate-pulse text-white text-[17px]" : ""}`}>({matchStr})</p>
+
+            <div key={i_key} className={`text-sm p-2 ${(match.teamIds === teamIds) ? "bg-amber-500" : ""}`}>
+                <p className={`text-sm ${(match.teamIds === teamIds) ? "animate-pulse text-white text-[17px]" : ""}`}>({matchStr})</p>
             </div>
         )
     }
     if (match.status === "Preparing") {
         return (
-            <div key={i_key} className={`text-sm p-2 ${(match.teamIds === teamIds) ? "bg-amber-500": ""}`}>
-                <p className={`text-sm ${(match.teamIds === teamIds) ?"animate-pulse text-white text-[17px]" : ""}`}>({matchStr})</p>
+            <div key={i_key} className={`text-sm p-2 ${(match.teamIds === teamIds) ? "bg-amber-500" : ""}`}>
+                <p className={`text-sm ${(match.teamIds === teamIds) ? "animate-pulse text-white text-[17px]" : ""}`}>({matchStr})</p>
             </div>
         )
     }
     if (match.status === "Playing") {
         return (
-            <div key={i_key} className={`text-sm p-2 arrow-flowing-bg ${(match.teamIds === teamIds) ? "bg-amber-500": "bg-[rgba(200,255,200,.3)]"}`}>
-                <p className={`text-sm ${(match.teamIds === teamIds) ?"animate-pulse text-white text-[17px]" : ""}`}>({matchStr})</p>
-                
+            <div key={i_key}
+                 className={`text-sm p-2 arrow-flowing-bg ${(match.teamIds === teamIds) ? "bg-amber-500" : "bg-[rgba(200,255,200,.3)]"}`}>
+                <p className={`text-sm ${(match.teamIds === teamIds) ? "animate-pulse text-white text-[17px]" : ""}`}>({matchStr})</p>
+
             </div>
         )
     }
     if (match.status === "Finished") {
         return (
-            <div key={i_key} className={`text-sm p-2 ${(match.teamIds === teamIds) ? "bg-amber-500": ""}`}>
-                <p className={`text-sm ${(match.teamIds === teamIds) ?"animate-pulse text-white text-[17px]" : ""}`}>({matchStr})</p>
-                
+            <div key={i_key} className={`text-sm p-2 ${(match.teamIds === teamIds) ? "bg-amber-500" : ""}`}>
+                <p className={`text-sm ${(match.teamIds === teamIds) ? "animate-pulse text-white text-[17px]" : ""}`}>({matchStr})</p>
+
             </div>
         )
     }
@@ -63,24 +64,24 @@ const DXLeagueTableCell = ({i_key, row, col, blockName, block, referredMatches, 
         // statusがCompletedの時はmatchResultsが存在する
         const matchResult = matchResults![match.id];
         if (!matchResult) return null;
-        
+
         const leftSideTeamIndex = match.teamIds.indexOf(leftSideTeam);
         const rightSideTeamIndex = match.teamIds.indexOf(rightSideTeam);
         if (leftSideTeamIndex === -1 || rightSideTeamIndex === -1) return null;
         const leftSideTeamScore = matchResult.matchScores[leftSideTeamIndex];
         const rightSideTeamScore = matchResult.matchScores[rightSideTeamIndex];
         const scoreStr = `${leftSideTeamScore} - ${rightSideTeamScore}`;
-        
+
         return (
-            <div key={i_key} className={`text-sm p-2 ${(match.teamIds === teamIds) ? "bg-amber-500": ""}`}>
-                <p className={`text-sm ${(match.teamIds === teamIds) ?"animate-pulse text-white text-[17px]" : ""}`}>{scoreStr}</p>
+            <div key={i_key} className={`text-sm p-2 ${(match.teamIds === teamIds) ? "bg-amber-500" : ""}`}>
+                <p className={`text-sm ${(match.teamIds === teamIds) ? "animate-pulse text-white text-[17px]" : ""}`}>{scoreStr}</p>
             </div>
         )
     }
 
     return (
         <div key={i_key} className={"text-sm p-2"}>
-                    <p className={""}>{matchStr}</p>
+            <p className={""}>{matchStr}</p>
         </div>
     )
 

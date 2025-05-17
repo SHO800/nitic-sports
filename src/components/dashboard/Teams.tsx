@@ -1,9 +1,8 @@
 "use client"
-import {useData} from "@/hooks/data";
-import {createTeam, deleteTeam} from "@/app/actions/data";
+import {useDataContext} from "@/contexts/dataContext";
 
 const Teams = () => {
-    const {teams, mutateTeams} = useData()
+    const {teams, mutateTeams} = useDataContext()
     return (
         <>
             {Array.isArray(teams) && teams?.map((team) => (
@@ -15,7 +14,7 @@ const Teams = () => {
                         <p className={`text-black `}>
                             {team.id} {team.name}
                         </p>
-                     </div>
+                    </div>
                     {/*<button*/}
                     {/*    onClick={async (e) => {*/}
                     {/*        e.preventDefault()*/}

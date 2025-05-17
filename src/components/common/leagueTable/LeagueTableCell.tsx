@@ -1,6 +1,6 @@
-import {useData} from "@/hooks/data";
 import {MatchPlan} from "@prisma/client";
-import React, {useMemo, memo} from "react";
+import React, {memo, useMemo} from "react";
+import {useDataContext} from "@/contexts/dataContext";
 
 const LeagueTableCell = ({i_key, row, col, blockName, block, referredMatches}: {
     i_key: string,
@@ -10,28 +10,28 @@ const LeagueTableCell = ({i_key, row, col, blockName, block, referredMatches}: {
     block: { teamId: string }[],
     referredMatches: MatchPlan[]
 }) => {
-    const {getMatchDisplayStr, matchResults} = useData();
+    const {getMatchDisplayStr, matchResults} = useDataContext()
 
     // 基本的なセル内容の条件判定をメモ化
     const cellContent = useMemo(() => {
         // 無駄な計算を回避
         if (referredMatches.length === 0) return null;
-        
+
         // ヘッダーセルの処理
         if (row === -1 && col === -1) {
-            return <HeaderCell text={blockName} isBold={true} />;
+            return <HeaderCell text={blockName} isBold={true}/>;
         }
-        
+
         if (row === -1 && col > -1) {
             const teamName = getMatchDisplayStr(block[col]?.teamId);
-            return <HeaderCell text={teamName} />;
+            return <HeaderCell text={teamName}/>;
         }
-        
+
         if (col === -1 && row > -1) {
             const teamName = getMatchDisplayStr(block[row]?.teamId);
-            return <HeaderCell text={teamName} isSmall={true} />;
+            return <HeaderCell text={teamName} isSmall={true}/>;
         }
-        
+
         // 同じチーム同士のセルは表示しない
         if (row === col) return null;
 
@@ -41,20 +41,20 @@ const LeagueTableCell = ({i_key, row, col, blockName, block, referredMatches}: {
         const match = referredMatches.find((match) => {
             return match.teamIds.includes(leftSideTeam) && match.teamIds.includes(rightSideTeam);
         });
-        
+
         if (!match) return null;
 
-        return <MatchCell match={match} leftSideTeam={leftSideTeam} rightSideTeam={rightSideTeam} />;
+        return <MatchCell match={match} leftSideTeam={leftSideTeam} rightSideTeam={rightSideTeam}/>;
     }, [blockName, block, col, getMatchDisplayStr, i_key, matchResults, referredMatches, row]);
 
     return cellContent;
 };
 
 // ヘッダーセルコンポーネント
-const HeaderCell = memo(({ text, isBold = false, isSmall = false }: { 
-    text: string, 
-    isBold?: boolean, 
-    isSmall?: boolean 
+const HeaderCell = memo(({text, isBold = false, isSmall = false}: {
+    text: string,
+    isBold?: boolean,
+    isSmall?: boolean
 }) => {
     return (
         <p className={`${isBold ? 'font-bold' : ''} ${isSmall ? 'text-sm' : ''}`}>
@@ -66,19 +66,19 @@ const HeaderCell = memo(({ text, isBold = false, isSmall = false }: {
 HeaderCell.displayName = 'HeaderCell';
 
 // 試合情報セルコンポーネント
-const MatchCell = memo(({ match, leftSideTeam, rightSideTeam }: { 
-    match: MatchPlan, 
-    leftSideTeam: string, 
-    rightSideTeam: string 
+const MatchCell = memo(({match, leftSideTeam, rightSideTeam}: {
+    match: MatchPlan,
+    leftSideTeam: string,
+    rightSideTeam: string
 }) => {
-    const { matchResults } = useData();
-    
+    const {matchResults} = useDataContext()
+
     const matchStr = match.matchName ? match.matchName : match.matchNote ? match.matchNote : "";
-    
+
     // 試合状態に応じた表示クラスを決定
     let cellClassName = "text-sm p-2";
     let content = matchStr;
-    
+
     switch (match.status) {
         case "Playing":
             cellClassName += " bg-[rgba(200,255,200,.3)] arrow-flowing-bg";
@@ -94,7 +94,7 @@ const MatchCell = memo(({ match, leftSideTeam, rightSideTeam }: {
             if (matchResult) {
                 const leftSideTeamIndex = match.teamIds.indexOf(leftSideTeam);
                 const rightSideTeamIndex = match.teamIds.indexOf(rightSideTeam);
-                
+
                 if (leftSideTeamIndex !== -1 && rightSideTeamIndex !== -1) {
                     const leftSideTeamScore = matchResult.matchScores[leftSideTeamIndex];
                     const rightSideTeamScore = matchResult.matchScores[rightSideTeamIndex];
@@ -105,7 +105,7 @@ const MatchCell = memo(({ match, leftSideTeam, rightSideTeam }: {
         default:
             content = `(${matchStr})`;
     }
-    
+
     return (
         <div className={cellClassName}>
             <p className="text-sm">{content}</p>

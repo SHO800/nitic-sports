@@ -5,6 +5,7 @@ import AddMatchPlanForm from "@/components/dashboard/AddMatchPlanForm";
 import {MatchPlan as MatchPlanType, Status} from "@prisma/client";
 import {deleteMatchPlan, updateMatchPlanStatus} from "@/app/actions/data";
 import MatchCard from "@/components/dashboard/matchPlan/MatchCard"
+import {useDataContext} from "@/contexts/dataContext";
 
 const MatchPlan = () => {
     const {
@@ -14,7 +15,7 @@ const MatchPlan = () => {
         events,
         mutateMatchPlans,
         getMatchDisplayStr
-    } = useData();
+    } = useDataContext()
 
     // 各試合のタイマー状態を管理
     const [matchTimers, setMatchTimers] = useState<Record<number, boolean>>({});

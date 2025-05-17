@@ -1,6 +1,7 @@
 "use client"
 import {useData} from "@/hooks/data";
 import {updateEvent} from "@/app/actions/data";
+import {useDataContext} from "@/contexts/dataContext";
 
 const EventEditForm = ({
                            teamDataJsonDraft,
@@ -9,7 +10,7 @@ const EventEditForm = ({
     teamDataJsonDraft: TeamData[],
     isTimeBased: boolean,
 }) => {
-    const {mutateEvents} = useData();
+    const {mutateEvents} = useDataContext()
 
     return (
         <form

@@ -1,5 +1,5 @@
-import {useData} from "@/hooks/data";
 import {useCallback, useEffect, useState} from "react";
+import {useDataContext} from "@/contexts/dataContext";
 
 interface TotalTeamScore {
     [teamId: number]: number
@@ -7,7 +7,7 @@ interface TotalTeamScore {
 
 
 const TotalScore = () => {
-    const {scores, getMatchDisplayStr} = useData()
+    const {scores, getMatchDisplayStr} = useDataContext()
     const [totalScoreByTeam, setTotalScoreByTeam] = useState<TotalTeamScore>()
     const [displayContents, setDisplayContents] = useState<ScoresByTeam>()
 
@@ -26,7 +26,7 @@ const TotalScore = () => {
         setTotalScoreByTeam(tmp)
 
     }, [scores])
-    
+
     useEffect(() => {
         consolidateScoresByTeam()
     }, [scores])
@@ -37,15 +37,15 @@ const TotalScore = () => {
             <div
                 className='flex flex-col items-start justify-between bg-gray-200 p-2 rounded mb-2'
             >
-                {totalScoreByTeam && 
+                {totalScoreByTeam &&
                     Object.entries(totalScoreByTeam).map(([key, value]) => {
                         return (
                             <div
-                                key={"total-score-"+ key}
+                                key={"total-score-" + key}
                             >
                                 {getMatchDisplayStr(key)}: {value}点</div>
                         )
-                        
+
                     })
                 }
 
@@ -54,7 +54,7 @@ const TotalScore = () => {
             <div
                 className='flex items-center justify-between bg-gray-200 p-2 rounded mb-2'
             >
-                    {JSON.stringify(scores)}
+                {JSON.stringify(scores)}
                 {/*{scores && scores.toSorted().map(score => {*/}
                 {/*    */}
                 {/*    <div key={"score-"+score.id} className={`text-black `}>*/}

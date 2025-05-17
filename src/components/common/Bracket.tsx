@@ -5,6 +5,7 @@ import LeagueTable from '@/components/common/leagueTable/LeagueTable';
 import {MatchPlan} from "@prisma/client";
 import TournamentTable from "@/components/common/tournamentTable/TournamentTable";
 import {useData} from '@/hooks/data';
+import {useDataContext} from "@/contexts/dataContext";
 
 // トーナメント部分を別コンポーネントに分離
 const TournamentSection = memo(({
@@ -112,7 +113,7 @@ const Bracket = ({eventId, matchPlans}: { eventId: number, matchPlans: MatchPlan
     const {
         events,
         eventLoading
-    } = useData();
+    } = useDataContext()
 
     const [hasPreliminary, setHasPreliminary] = useState(false);
     const [hasFinal, setHasFinal] = useState(false);

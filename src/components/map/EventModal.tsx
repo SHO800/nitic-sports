@@ -5,6 +5,7 @@ import { Status, MatchPlan as MatchPlanType } from "@prisma/client";
 // import MatchCountdownForMap from "./MatchCountdownForMap";
 // import MatchTimer from "../dashboard/MatchTimer";
 import Modal from "./Modal";
+import {useDataContext} from "@/contexts/dataContext";
 
 type Props = {
     placeId: number | null;
@@ -24,7 +25,7 @@ const EventModal = ({placeId, isOpen, closeModal}:Props) => {
         // locations,
         matchResults,
         // getMatchDisplayStr
-    } = useData();
+    } = useDataContext()
 
     {/*
     const getMatchStatus = (matchPlan: MatchPlanType): Status => {

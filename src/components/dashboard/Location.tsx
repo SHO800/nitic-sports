@@ -1,9 +1,10 @@
 "use client"
 import {useData} from "@/hooks/data";
 import {createLocation, deleteLocation} from "@/app/actions/data";
+import {useDataContext} from "@/contexts/dataContext";
 
 const Location = () => {
-    const {locations, mutateLocations} = useData()
+    const {locations, mutateLocations} = useDataContext()
     return (
         <>
             {locations?.map((location) => (

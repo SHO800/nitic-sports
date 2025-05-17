@@ -1,15 +1,15 @@
-import {useData} from "@/hooks/data";
 import {RefObject, UIEventHandler, useEffect, useMemo, useRef, useState} from "react";
 import {Event, Location, MatchPlan} from "@prisma/client";
 import MatchCard from "@/components/match/MatchCard";
+import {useDataContext} from "@/contexts/dataContext";
 
 const MatchesByLocation = ({location, onScroll, refs, isShowCompletedMatch = false}: {
     location: Location,
     onScroll: UIEventHandler<HTMLDivElement>,
     refs: RefObject<HTMLDivElement[]>,
-    isShowCompletedMatch: boolean 
+    isShowCompletedMatch: boolean
 }) => {
-    const {matchPlans, locations, events, matchResults} = useData()
+    const {matchPlans, locations, events, matchResults} = useDataContext()
     const [matchesInLocation, setMatchesInLocation] = useState<MatchPlan[]>([])
     const wrapperRef = useRef<HTMLDivElement | null>(null);
     const scrollerRef = useRef<HTMLDivElement | null>(null);
@@ -18,7 +18,7 @@ const MatchesByLocation = ({location, onScroll, refs, isShowCompletedMatch = fal
     useEffect(() => {
         if (!scrollerRef.current || refs.current.includes(scrollerRef.current)) return
         refs.current.push(scrollerRef.current)
-        
+
         return () => {
             refs.current = refs.current.filter(ref => ref !== scrollerRef.current)
         }
@@ -54,7 +54,7 @@ const MatchesByLocation = ({location, onScroll, refs, isShowCompletedMatch = fal
 
     useEffect(() => {
         if (!locations || !matchPlans) return;
-        const relatedMatchPlans: MatchPlan[] = matchPlans.filter(matchPlan => (matchPlan.locationId === location.id) && (isShowCompletedMatch || matchPlan.status !== "Completed") )
+        const relatedMatchPlans: MatchPlan[] = matchPlans.filter(matchPlan => (matchPlan.locationId === location.id) && (isShowCompletedMatch || matchPlan.status !== "Completed"))
         // 開始時刻で並べ替え
         relatedMatchPlans.sort((a, b) => new Date(a.scheduledStartTime).getTime() - new Date(b.scheduledStartTime).getTime())
         setMatchesInLocation(relatedMatchPlans)

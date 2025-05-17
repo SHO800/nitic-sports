@@ -8,6 +8,7 @@ import Header from "@/components/layout/Header/page";
 import Footer from "@/components/layout/Footer/page";
 import DataPreFetcher from "@/components/common/DataPreFetcher";
 import {CurrentTimeContextProvider} from "@/contexts/currentTimeContext";
+import {DataContextProvider} from "@/contexts/dataContext";
 
 const notoSansJp = Noto_Sans_JP({
     subsets: ['latin'],
@@ -24,8 +25,8 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({
-                                       children,
-                                   }: Readonly<{
+                                             children,
+                                         }: Readonly<{
     children: React.ReactNode;
 }>) {
     return (
@@ -36,7 +37,9 @@ export default async function RootLayout({
         <Header/>
         <CurrentTimeContextProvider>
             <DataPreFetcher>
-                {children}
+                <DataContextProvider>
+                    {children}
+                </DataContextProvider>
             </DataPreFetcher>
         </CurrentTimeContextProvider>
 

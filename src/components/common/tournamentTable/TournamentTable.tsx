@@ -1,11 +1,11 @@
 import {MatchPlan} from "@prisma/client";
-import React, {memo, ReactNode, useMemo} from "react";
-import {buildTournamentBracket, TournamentData, TournamentNode} from "@/utils/tournamentUtils";
-import {useData} from "@/hooks/data";
+import React, {memo, useMemo} from "react";
+import {buildTournamentBracket, TournamentData} from "@/utils/tournamentUtils";
 import TournamentTeamBox from "@/components/common/tournamentTable/TournamentTeamBox";
 import TournamentMatchBox from "@/components/common/tournamentTable/TournamentMatchBox";
 import batchMemoNodes from "@/utils/memoBatchRendering";
 import TournamentLine from "@/components/common/tournamentTable/TournamentLine";
+import {useDataContext} from "@/contexts/dataContext";
 
 interface TournamentBracketProps {
     eventId: number;
@@ -23,7 +23,7 @@ const TournamentTable = ({eventId, isFinal, relatedMatchPlans}: Readonly<Tournam
         matchResults,
         teams,
         teamLoading,
-    } = useData();
+    } = useDataContext()
 
     const firstRowWidth = 100;
     const rowWidth = 70;
@@ -52,11 +52,11 @@ const TournamentTable = ({eventId, isFinal, relatedMatchPlans}: Readonly<Tournam
     const maxRowNum = useMemo(() => {
         return tournamentData?.teamIds.length ? tournamentData.teamIds.length * 2 : 0;
     }, [tournamentData]);
-    
+
     // ノードの配置と描画 - 常に実行される
     const renderNodes = useMemo(() => {
         if (!tournamentData) return null;
-        
+
         return batchMemoNodes(
             tournamentData.nodes,
             (node) => (
@@ -91,7 +91,7 @@ const TournamentTable = ({eventId, isFinal, relatedMatchPlans}: Readonly<Tournam
     // 特殊ノードの描画とその線 - 常に実行される
     const specialNodes = useMemo(() => {
         if (!tournamentData) return null;
-        
+
         return tournamentData.nodes
             .filter(node => !node.nextNode)
             .map(lastNode => {
@@ -106,18 +106,18 @@ const TournamentTable = ({eventId, isFinal, relatedMatchPlans}: Readonly<Tournam
                 } else {
                     text = "本選";
                 }
-                
+
                 // 特殊ノードの位置を計算
                 const specialNodeColumn = lastNode.column + 2;
                 const specialNodeRow = lastNode.row;
-                
+
                 // 最終ノードから特殊ノードへの線を描画する
                 return (
                     <React.Fragment key={eventId + "-specialNode-" + lastNode.nodeId}>
                         {/* 特殊ノードへの線 */}
-                        <div 
+                        <div
                             style={{
-                                gridColumn: lastNode.column, 
+                                gridColumn: lastNode.column,
                                 gridRow: lastNode.row,
                                 position: 'relative',
                                 width: '100%',
@@ -135,10 +135,10 @@ const TournamentTable = ({eventId, isFinal, relatedMatchPlans}: Readonly<Tournam
                                 thickness={4}
                                 animationTimingFunction={"linear"}
                                 duration={200}
-                                timeout={(lastNode.column+2) * 200 + 100}
+                                timeout={(lastNode.column + 2) * 200 + 100}
                             />
                         </div>
-                        
+
                         {/* 特殊ノード自体 */}
                         <div
                             className="text-center"

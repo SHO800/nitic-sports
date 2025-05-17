@@ -4,9 +4,10 @@ import {useState} from "react";
 import TeamDataInput from "@/components/dashboard/events/TeamDataInput";
 import EventEditForm from "@/components/dashboard/events/EventEditForm";
 import {createEvent} from "@/app/actions/data";
+import {useDataContext} from "@/contexts/dataContext";
 
 const EventForm = () => {
-    const {mutateEvents, matchPlans} = useData();
+    const {mutateEvents, matchPlans} = useDataContext()
     const [isTwoStageCompetition, setIsTwoStageCompetition] = useState(false);
     const [isTimeBased, setIsTimeBased] = useState(false);
     const [eventType1, setEventType1] = useState<string | null>("tournament");

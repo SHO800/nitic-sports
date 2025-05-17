@@ -2,12 +2,13 @@ import ClassSelector from "@/components/common/ClassSelector";
 import {useState} from "react";
 import {useData} from "@/hooks/data";
 import {createMatchPlan, updateMatchPlan} from "@/app/actions/data";
+import {useDataContext} from "@/contexts/dataContext";
 
 
 const AddMatchPlanForm = () => {
 
     const [teamCount, setTeamCount] = useState(2);
-    const {events, groupedTeams, mutateMatchPlans} = useData()
+    const {events, groupedTeams, mutateMatchPlans} = useDataContext()
     const [isVisibleClassSelector, setIsVisibleClassSelector] = useState(false);
 
     // 試合名の頭文字を自動でインクリメントするか

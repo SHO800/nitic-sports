@@ -1,5 +1,6 @@
 "use client"
 import {useData} from "@/hooks/data";
+import {useDataContext} from "@/contexts/dataContext";
 
 type TeamDataInputProps = {
     index: number;
@@ -16,7 +17,7 @@ const TeamDataInput = ({
                            setTeamDataJsonDraft,
                            addTournamentTeamsFromPlans
                        }: TeamDataInputProps) => {
-    const {getMatchDisplayStr} = useData();
+    const {getMatchDisplayStr} = useDataContext()
 
 
     if (eventType === "tournament") {

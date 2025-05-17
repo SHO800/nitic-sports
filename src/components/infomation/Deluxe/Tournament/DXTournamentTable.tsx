@@ -4,6 +4,7 @@ import {buildTournamentBracket, TournamentData} from "@/utils/tournamentUtils";
 import {useData} from "@/hooks/data";
 import TournamentTeamBox from "@/components/common/tournamentTable/TournamentTeamBox";
 import DXTournamentMatchBox from "./DXTournamentMatchBox";
+import {useDataContext} from "@/contexts/dataContext";
 
 
 interface TournamentBracketProps {
@@ -24,7 +25,7 @@ const DXTournamentTable = ({teamIds, eventId, isFinal, relatedMatchPlans}: Reado
         teams,
         teamLoading,
         getMatchDisplayStr,
-    } = useData();
+    } = useDataContext()
 
     const firstRowWidth = 70;
     const rowWidth = 60;

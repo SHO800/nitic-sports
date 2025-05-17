@@ -1,11 +1,11 @@
 "use client"
 
-import {useData} from "@/hooks/data";
 import React, {useEffect, useRef, useState} from "react";
 import {MatchPlan} from "@prisma/client";
 import DXLeagueTableCell from "./DXLeagueTableCell";
+import {useDataContext} from "@/contexts/dataContext";
 
-const DXLeagueTable = ({i_key, receivedTeamIds, eventId,  blockName, block}: {
+const DXLeagueTable = ({i_key, receivedTeamIds, eventId, blockName, block}: {
     i_key: string,
     receivedTeamIds: string[];
     eventId: number,
@@ -17,7 +17,7 @@ const DXLeagueTable = ({i_key, receivedTeamIds, eventId,  blockName, block}: {
         }[]
 
 }) => {
-    const {getBlockMatches} = useData()
+    const {getBlockMatches} = useDataContext()
 
     const teamIds = block.map((team) => team.teamId);
     const [referredMatches, setReferredMatches] = useState<MatchPlan[]>([]);
@@ -26,7 +26,7 @@ const DXLeagueTable = ({i_key, receivedTeamIds, eventId,  blockName, block}: {
 
     const tableRef = useRef<HTMLTableElement>(null);
     const lineRef = useRef<HTMLDivElement>(null);
-    
+
 
     useEffect(() => {
         //     tableのサイズ変更を監視
@@ -55,7 +55,7 @@ const DXLeagueTable = ({i_key, receivedTeamIds, eventId,  blockName, block}: {
 
 
     }, [teamIds.length]);
-    
+
     useEffect(() => {
         const matches = getBlockMatches(eventId, blockName, block);
         setReferredMatches(matches);
@@ -78,7 +78,9 @@ const DXLeagueTable = ({i_key, receivedTeamIds, eventId,  blockName, block}: {
                                                 key={"leagueTableTd" + i_key + "-" + j}
                                                 className={`border border-slate-300  h-8 w-16 text-center`}
                                             >
-                                                <DXLeagueTableCell i_key={i_key} row={i} col={j} blockName={blockName} block={block} referredMatches={referredMatches} teamIds={receivedTeamIds} />
+                                                <DXLeagueTableCell i_key={i_key} row={i} col={j} blockName={blockName}
+                                                                   block={block} referredMatches={referredMatches}
+                                                                   teamIds={receivedTeamIds}/>
                                             </td>
                                         )
                                     })

@@ -3,6 +3,7 @@ import {useData} from "@/hooks/data";
 import {useEffect, useState} from "react";
 import analyzeVariableTeamId from "@/utils/analyzeVariableTeamId";
 import {createMatchResult} from "@/app/actions/data";
+import {useDataContext} from "@/contexts/dataContext";
 
 export const MatchResultForm = ({matchPlan, matchResult, isTimeBased = false}: { matchPlan: MatchPlan, matchResult?: MatchResult, isTimeBased: boolean}) => {
     const {
@@ -14,7 +15,7 @@ export const MatchResultForm = ({matchPlan, matchResult, isTimeBased = false}: {
         getLeagueDataByVariableId,
         isFixedMatchResultOrBlockRankByVariableId,
         getActualTeamIdByVariableId
-    } = useData()
+    } = useDataContext()
 
 
     const [actualTeamIds, setActualTeamIds] = useState<number[]>(matchResult ? matchResult.teamIds : []);

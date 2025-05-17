@@ -4,6 +4,7 @@ import { useData } from "@/hooks/data";
 // import MatchCountdownForReader from "../reader/MatchCountdownForReader";
 import MatchInfoOnModal from "../infomation/MatchInfoOnModal";
 import MatchInfoForReader from "../reader/MatchInfoForReader";
+import {useDataContext} from "@/contexts/dataContext";
 
 type Props =
     | {placeId: number | null;}
@@ -18,7 +19,7 @@ const MapInfo = ({placeId}:Props) => {
         locations,
         // matchResults,
         getMatchDisplayStr
-    } = useData();
+    } = useDataContext()
 
     const filteredItems = matchPlans?.filter((item) => item.locationId === placeId)
     const filteredByStatus = filteredItems?.filter((item) =>

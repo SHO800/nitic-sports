@@ -2,10 +2,11 @@ import { useState } from "react";
 import EventSwitch from "./EventSwitch";
 import Bracket from "../common/Bracket";
 import { useData } from "@/hooks/data";
+import {useDataContext} from "@/contexts/dataContext";
 
 const ResultInfo = () => {
     
-    const {matchPlans} = useData();
+    const {matchPlans} = useDataContext()
     const[selectedId,setSelectedId] = useState<number | "all">(1);
     
     const setId = (id: number | "all") => {

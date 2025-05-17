@@ -1,8 +1,8 @@
-import {useData} from "@/hooks/data";
+import {useDataContext} from "@/contexts/dataContext";
 
 const LeagueMatchResultButton = () => {
-    
-    const {} = useData()
+
+    const {} = useDataContext()
     return null
 }
 export default LeagueMatchResultButton;

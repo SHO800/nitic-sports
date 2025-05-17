@@ -2,8 +2,8 @@ import React, {CSSProperties, useMemo} from "react";
 import {TournamentNodeMatch} from "@/utils/tournamentUtils";
 import {MatchResult, Status} from "@prisma/client";
 import TournamentLine from "@/components/common/tournamentTable/TournamentLine";
-import {useData} from "@/hooks/data";
 import useTournamentLine from "@/hooks/useTournamentLine";
+import {useDataContext} from "@/contexts/dataContext";
 
 const TournamentMatchBox = ({match, boxStyle, matchResult, rowWidth, rowHeight}: {
     match: TournamentNodeMatch,
@@ -12,14 +12,13 @@ const TournamentMatchBox = ({match, boxStyle, matchResult, rowWidth, rowHeight}:
     rowWidth: number
     rowHeight: number
 }) => {
-    const {matchResults} = useData();
+    const {matchResults} = useDataContext()
 
     const nextNodeRow = match.nextNode?.row;
     const nextNodeColumn = match.nextNode?.column;
-    
-    
 
-    const { boxRef, lineCoords } = useTournamentLine(
+
+    const {boxRef, lineCoords} = useTournamentLine(
         rowWidth,
         rowHeight,
         match.row,
@@ -59,7 +58,7 @@ const TournamentMatchBox = ({match, boxStyle, matchResult, rowWidth, rowHeight}:
                     <p className={matchStatusColor + " font-bold text-[1.2em]"}>{match.tournamentMatchNode.matchPlan.matchName}</p>
                 </div>
             )}
-            
+
 
             <div className="relative h-full" ref={boxRef}>
                 <TournamentLine

@@ -1,10 +1,10 @@
 "use client"
 
 import {useState} from "react";
-import {useData} from "@/hooks/data";
 import MatchInfoForReader from "../reader/MatchInfoForReader";
 import {MatchPlan as MatchPlanType, Status} from "@prisma/client";
 import {useCurrentTime} from "@/hooks/currentTime";
+import {useDataContext} from "@/contexts/dataContext";
 
 type Props =
     | { eventId: number | string | null; eventIds?: undefined }
@@ -20,7 +20,7 @@ const NowHot: React.FC<Props> = (props) => {
         locations,
         matchResults,
         getMatchDisplayStr
-    } = useData();
+    } = useDataContext()
 
     const currentTime = useCurrentTime();
 

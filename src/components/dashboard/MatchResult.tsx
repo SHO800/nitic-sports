@@ -4,7 +4,7 @@
 // import {MatchResult as MatchResultSchema} from "@prisma/client";
 //
 // const MatchResult = () => {
-//     const {events, teams, locations, groupedTeams, matchResults, setMatchResults} = useData()
+//     const {events, teams, locations, groupedTeams, matchResults, setMatchResults} = useDataContext()
 //
 //     const [isVisibleClassSelector, setIsVisibleClassSelector] = useState(false);
 //     const [teamCount, setTeamCount] = useState(2);

@@ -3,13 +3,14 @@ import TournamentLine from "@/components/common/tournamentTable/TournamentLine";
 import {TournamentNodeTeam} from "@/utils/tournamentUtils";
 import {useData} from "@/hooks/data";
 import useTournamentLine from "@/hooks/useTournamentLine";
+import {useDataContext} from "@/contexts/dataContext";
 
 const TournamentTeamBox = ({node, rowWidth, rowHeight}: {
     node: TournamentNodeTeam
     rowWidth: number
     rowHeight: number
 }) => {
-    const {getMatchDisplayStr, getActualTeamIdByVariableId, matchResults} = useData();
+    const {getMatchDisplayStr, getActualTeamIdByVariableId, matchResults} = useDataContext()
     
     const nextNodeRow = node.nextNode?.row;
     const nextNodeColumn = node.nextNode?.column;

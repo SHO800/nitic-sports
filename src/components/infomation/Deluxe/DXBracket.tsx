@@ -5,11 +5,12 @@ import DXLeagueTable from './League/DXLeagueTable';
 import {useData} from '@/hooks/data';
 import {MatchPlan} from "@prisma/client";
 import DXTournamentTable from './Tournament/DXTournamentTable';
+import {useDataContext} from "@/contexts/dataContext";
 
 const DXBracket = ({eventId, matchPlans, teamIds}: { eventId: number, matchPlans: MatchPlan[] , teamIds:string[]}) => {
 
     const [isFinal, setIsFinal] = useState(false);
-    const {events, eventLoading} = useData();
+    const {events, eventLoading} = useDataContext()
 
     const [hasPreliminary, setHasPreliminary] = useState(false);
     const [hasFinal, setHasFinal] = useState(false);

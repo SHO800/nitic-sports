@@ -8,6 +8,7 @@ import {useData} from "@/hooks/data";
 import CardBorder from "@/components/match/CardBorder";
 import MatchTeams from "@/components/match/MatchTeams";
 import MatchController from "@/components/match/MatchController";
+import {useDataContext} from "@/contexts/dataContext";
 
 interface MatchCardProps {
     match: MatchPlan,
@@ -17,7 +18,7 @@ interface MatchCardProps {
 
 const MatchCard = ({match, eventsById, matchResults}: MatchCardProps) => {
 
-    const {getMatchDisplayStr} = useData()
+    const {getMatchDisplayStr} = useDataContext()
     const teamsDisplayNames = match.teamIds.map(teamId => getMatchDisplayStr(teamId))
     const event = eventsById[match.eventId]
     if (!event) {
