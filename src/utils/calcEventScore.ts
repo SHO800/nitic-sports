@@ -188,7 +188,7 @@ const calcTotalTournamentRankings = (
                 rank: Number.MAX_SAFE_INTEGER // 初期値は大きな数値
             };
         });
-        let teamIdsForVariableId: { [key: number]: string | null } = {};
+        const teamIdsForVariableId: { [key: number]: string | null } = {};
         Object.values(teamStats).forEach(team => {
             teamIdsForVariableId[team.teamId] = findVariableIdFromNumberId(team.teamId, relatedMatchPlans, relatedMatchResults)
         });
@@ -293,17 +293,16 @@ export const calcEventTotalRankings = (
     event: Event,
     allMatchPlans: MatchPlan[],
     allMatchResults: MatchResult[]
-): [Rank[][], boolean] => {
+): Rank[][] => {
 
     const eventMatches = allMatchPlans.filter(match => match.eventId === event.id)
     const eventMatchResults = allMatchResults.filter(result => eventMatches.some(match => match.id === result.matchId))
-    if (!eventMatches || !eventMatchResults) return [[[]], false];
+    if (!eventMatches || !eventMatchResults) return [[]];
 
     // 予選のデータを取得
     const teamDataArray = event.teamData as unknown as TeamData[];
-    if (!teamDataArray || teamDataArray.length === 0) return [[[]], false];
-
-    let hasConflict = false
+    if (!teamDataArray || teamDataArray.length === 0) return [[]];
+    
     const ranking: Rank[][] = teamDataArray.map(teamData => {
         if (teamData.type === "league") { // 方式がリーグなら
             const leagueBlocks = teamData.blocks // 予選のブロック情報を取得
@@ -333,12 +332,12 @@ export const calcEventTotalRankings = (
         }
     })
 
-    return [ranking, hasConflict]
+    return ranking
 }
 
 
 export const calcEventScore = (event: Event, allMatchPlans: MatchPlan[], allMatchResults: MatchResult[]): RankWithEventScore[][] => {
-    const [ranking, hasConflict] = calcEventTotalRankings(event, allMatchPlans, allMatchResults)
+    const ranking = calcEventTotalRankings(event, allMatchPlans, allMatchResults)
     const results: RankWithEventScore[][] = []
     ranking.forEach((roundData, index) => {
         const isQualify = (ranking.length === 2 && index === 0)
