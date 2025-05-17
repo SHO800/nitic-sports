@@ -2,87 +2,6 @@ import {Event, MatchPlan, MatchResult} from "@prisma/client";
 import {evaluateScore} from "../../public/EvaluateScore";
 import {findVariableIdFromNumberId, getSeedCount} from "@/utils/tournamentUtils";
 
-const isSameWinWeight = (a: completedLeagueTeamInfo, b: completedLeagueTeamInfo): boolean => {
-    return (
-        a.points === b.points &&
-        a.goalDifference === b.goalDifference &&
-        a.goalsFor === b.goalsFor &&
-        a.RockPaperScissors === b.RockPaperScissors
-    )
-}
-
-// /**
-//  * リーグ順位を計算する関数
-//  * 優先順位：勝ち点 > 得失点差 > 総得点数
-//  */
-// const calcTotalLeagueRankings = (teamStats: Record<string, LeagueTeamInfo[]>): {
-//     result: completedLeagueTeamInfo[],
-//     conflictedTeam?: completedLeagueTeamInfo[][]
-// } => {
-//     const teamsArray = Object.values(teamStats).flat()
-//     const teamsStrictArray: completedLeagueTeamInfo[] =
-//         teamsArray
-//             .filter(team => team.rank !== undefined && team.points !== undefined && team.goalDifference !== undefined && team.goalsFor !== undefined && team.wins !== undefined)
-//             .map(team => ({
-//                 ...team,
-//                 wins: team.wins ?? 0,
-//                 losses: team.losses ?? 0,
-//                 draws: team.draws ?? 0,
-//                 points: team.points ?? 0,
-//                 goalsFor: team.goalsFor ?? 0,
-//                 goalsAgainst: team.goalsAgainst ?? 0,
-//                 goalDifference: team.goalDifference ?? 0,
-//                 teamId: team.teamId,
-//                 rank: team.rank!,
-//                 provisionalRank: team.provisionalRank ?? 0,
-//             }));
-//
-//     const conflictedTeam: completedLeagueTeamInfo[][] = []
-//
-//     // チームをソート
-//     teamsStrictArray.sort((a, b) => {
-//         // ① 勝ち点の数で順位を決める
-//         // ② 各チームの勝ち点（勝利：3点、引き分け：1点、敗北：0点）の合計で順位を決める
-//         if (a.points !== b.points) {
-//             return b.points - a.points;
-//         }
-//
-//         // ③ 勝ち点が同じ場合は得失点差で順位を決める
-//         // ④ 勝ち点が同じ場合は、各チームの得失点差の合計で順位を決める。得失点差は、総得点から総失点を引いた数である
-//         if (a.goalDifference !== b.goalDifference) {
-//             return b.goalDifference - a.goalDifference;
-//         }
-//
-//         // ⑤ 得失点差も同じ場合は総得点数で順位を決める
-//         // ⑥ 勝ち点と得失点差が同じ場合は、各チームの総得点数で順位を決める
-//         if (a.goalsFor !== b.goalsFor) {
-//             return b.goalsFor - a.goalsFor;
-//         }
-//
-//         // ⑦ 総得点差も同じ場合は、じゃんけんをして順位を決める
-//         if (a.RockPaperScissors !== undefined && b.RockPaperScissors !== undefined) {
-//             return b.RockPaperScissors - a.RockPaperScissors;
-//         }
-//
-//         // じゃんけんも未実施の場合は重複したまま返してクライアントで重複を示す
-//         conflictedTeam.push([a, b])
-//         return 0;
-//     });
-//
-//     // 順位を付ける
-//     teamsStrictArray.forEach((team, index) => {
-//         if (index > 0 && isSameWinWeight(team, teamsStrictArray[index - 1])) {
-//             team.rank = teamsStrictArray[index - 1].rank;
-//         } else {
-//             team.rank = index + 1;
-//         }
-//     });
-//
-//
-//     return {result: teamsStrictArray, conflictedTeam: conflictedTeam.length === 0 ? undefined : conflictedTeam};
-// }
-
-
 const calcTotalTournamentRankings = (
     relatedMatchPlans: MatchPlan[],
     relatedMatchResults: MatchResult[],
@@ -168,10 +87,10 @@ const calcTotalTournamentRankings = (
                         return teamsByGradeWithRank
                     })
             })
-            
+
             sortedTeams = result.flat(1)
         }
-        
+
         // 結果を返す（タイムをdetailに含める）
         return sortedTeams.map(team => ({
             teamId: team.teamId,
@@ -302,8 +221,8 @@ export const calcEventTotalRankings = (
     // 予選のデータを取得
     const teamDataArray = event.teamData as unknown as TeamData[];
     if (!teamDataArray || teamDataArray.length === 0) return [[]];
-    
-    const ranking: Rank[][] = teamDataArray.map(teamData => {
+
+    return teamDataArray.map(teamData => {
         if (teamData.type === "league") { // 方式がリーグなら
             const leagueBlocks = teamData.blocks // 予選のブロック情報を取得
             let results: Rank[] = []
@@ -331,8 +250,6 @@ export const calcEventTotalRankings = (
             return calcTotalTournamentRankings(relatedMatchPlans, relatedMatchResults, event.isTimeBased, teamData.teams)
         }
     })
-
-    return ranking
 }
 
 
