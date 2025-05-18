@@ -12,7 +12,9 @@ export default function Header() {
 		<>
 			<nav className="fixed z-100 w-full bg-blue-900 text-white p-4 rounded">
 				<div className="flex items-center justify-between">
-					<div className="text-lg font-bold">2025年度体育大会</div>
+					<Link href="/" onClick={() => setIsOpen(!isOpen)} className="text-lg font-bold">
+						2025年度体育大会
+					</Link>
 
 					{/* ハンバーガーアイコン */}
 					<button

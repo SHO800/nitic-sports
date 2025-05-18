@@ -2,12 +2,12 @@ import { createMatchPlan, updateMatchPlan } from "@/app/actions/data";
 import ClassSelector from "@/components/common/ClassSelector";
 import { useDataContext } from "@/contexts/dataContext";
 import { useState } from "react";
+import LoadingButton from "@/components/common/LoadingButton";
 
 const AddMatchPlanForm = () => {
 	const [teamCount, setTeamCount] = useState(2);
 	const { events, groupedTeams, mutateMatchPlans } = useDataContext();
 	const [isVisibleClassSelector, setIsVisibleClassSelector] = useState(false);
-
 	// 試合名の頭文字を自動でインクリメントするか
 	const [isIncrementMatchNameCapital, setIsIncrementMatchNameCapital] =
 		useState(false);
@@ -24,6 +24,8 @@ const AddMatchPlanForm = () => {
 	const [isFinal, setIsFinal] = useState(false);
 	// 3位決定戦かどうか
 	const [is3rdPlaceMatch, setIs3rdPlaceMatch] = useState(false);
+	
+	const [isProcessing, setIsProcessing] = useState(false);
 
 	const increment = () => {
 		if (isIncrementMatchNameCapital || isIncrementMatchNameNumber) {
@@ -90,6 +92,8 @@ const AddMatchPlanForm = () => {
 				key={`addMatchPlanForm${teamCount}`}
 				onSubmit={async (e) => {
 					e.preventDefault();
+					if (isProcessing) return;
+					setIsProcessing(true);
 					await createMatchPlan(
 						Number(
 							(document.getElementById("eventId") as HTMLInputElement).value,
@@ -132,6 +136,7 @@ const AddMatchPlanForm = () => {
 					if (isIncrementMatchNameCapital || isIncrementMatchNameNumber) {
 						increment();
 					}
+					setIsProcessing(false)
 				}}
 				className="flex items-center mt-4"
 			>
@@ -302,6 +307,7 @@ const AddMatchPlanForm = () => {
 														span.innerText = name;
 														setIsVisibleClassSelector(false);
 													}}
+													isShowVariableId={true}
 												/>
 											</div>
 										</div>
@@ -394,12 +400,16 @@ const AddMatchPlanForm = () => {
 							required
 						/>
 					</div>
-					<button
+					<LoadingButton
 						type="submit"
 						className="bg-blue-500 hover:bg-blue-400 text-white mt-1 px-4 py-2 rounded"
+						disabled={isProcessing}
+						onClick={() => {
+							setIsProcessing(true);
+						}}
 					>
 						追加
-					</button>
+					</LoadingButton>
 				</div>
 			</form>
 			{/*    編集用*/}
@@ -407,6 +417,8 @@ const AddMatchPlanForm = () => {
 				key={`editMatchPlanForm${teamCount}`}
 				onSubmit={async (e) => {
 					e.preventDefault();
+					if (isProcessing) return;
+					setIsProcessing(true);
 
 					await updateMatchPlan(
 						Number(
@@ -450,6 +462,11 @@ const AddMatchPlanForm = () => {
 						is3rdPlaceMatch,
 					);
 					await mutateMatchPlans();
+					// インクリメントする場合はインクリメント
+					if (isIncrementMatchNameCapital || isIncrementMatchNameNumber) {
+						increment();
+					}
+					setIsProcessing(false);
 				}}
 				className="flex items-center mt-1"
 			>
@@ -461,12 +478,16 @@ const AddMatchPlanForm = () => {
 						className="border border-gray-400 px-4 py-2 mt-1 mr-2 rounded text-black"
 						placeholder="ID"
 					/>
-					<button
+					<LoadingButton
 						type="submit"
 						className="bg-green-500 hover:bg-green-400 text-white mt-1 mb-2 px-4 py-2 rounded"
+						disabled={isProcessing}
+						onClick={() => {
+							setIsProcessing(true);
+						}}
 					>
 						編集
-					</button>
+					</LoadingButton>
 				</div>
 			</form>
 		</div>

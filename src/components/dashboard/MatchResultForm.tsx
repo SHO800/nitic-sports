@@ -3,6 +3,7 @@ import { useDataContext } from "@/contexts/dataContext";
 import analyzeVariableTeamId from "@/utils/analyzeVariableTeamId";
 import type { MatchPlan, MatchResult } from "@prisma/client";
 import { useEffect, useState } from "react";
+import LoadingButton from "@/components/common/LoadingButton";
 
 export const MatchResultForm = ({
 	matchPlan,
@@ -129,6 +130,7 @@ export const MatchResultForm = ({
 			>
 				<form
 					onSubmit={async (e) => {
+						setCanInput(false);
 						e.preventDefault();
 						let scores = actualMatchScores;
 						if (isTimeBased) {
@@ -156,6 +158,7 @@ export const MatchResultForm = ({
 						);
 						await mutateMatchResults();
 						await mutateMatchPlans();
+						setCanInput(true);
 					}}
 				>
 					{/*チームごとに枠を用意*/}
@@ -334,13 +337,10 @@ export const MatchResultForm = ({
 							})}
 						</tbody>
 					</table>
-					<button
-						type="submit"
-						className="bg-green-500 hover:bg-green-400 text-white mt-1 px-4 py-2 rounded block mx-auto w-full"
-						disabled={!canInput}
-					>
+					
+					<LoadingButton className={"bg-green-500 hover:bg-green-400 text-white mt-1 px-4 py-2 rounded block mx-auto w-full"} type={"submit"} disabled={!canInput} onClick={()=>{}}>
 						更新
-					</button>
+					</LoadingButton>
 				</form>
 			</div>
 		</div>

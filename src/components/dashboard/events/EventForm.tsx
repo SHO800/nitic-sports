@@ -4,6 +4,7 @@ import EventEditForm from "@/components/dashboard/events/EventEditForm";
 import TeamDataInput from "@/components/dashboard/events/TeamDataInput";
 import { useDataContext } from "@/contexts/dataContext";
 import { useState } from "react";
+import LoadingButton from "@/components/common/LoadingButton";
 
 const EventForm = () => {
 	const { mutateEvents, matchPlans } = useDataContext();
@@ -247,11 +248,11 @@ const EventForm = () => {
 						</>
 					)}
 
-					<button
+					<LoadingButton
 						type="button"
+						disabled={false}
 						className="bg-blue-500 hover:bg-blue-600 text-black px-4 py-2 rounded"
-						onClick={async (e) => {
-							e.preventDefault();
+						onClick={async () => {
 							await createEvent(
 								(document.getElementById("eventName") as HTMLInputElement)
 									.value,
@@ -265,9 +266,10 @@ const EventForm = () => {
 							);
 							await mutateEvents();
 						}}
+						
 					>
 						追加
-					</button>
+					</LoadingButton>
 				</div>
 			</form>
 			<EventEditForm

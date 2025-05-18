@@ -174,10 +174,10 @@ const ModalEventContainer = ({
 			</div>
 			<div className={"ml-auto mt-8"}>
 				<LoadingButton
+					type={"button"}
 					onClick={confirmEventScores}
-					bgColor={"green"}
-					textColor={"white"}
-					isLoading={isConfirming}
+					className={"bg-green-500 hover:bg-green-400 rounded w-32 h-8 block z-50  "}
+					disabled={isConfirming}
 				>
 					確定
 				</LoadingButton>

@@ -4,9 +4,10 @@ import { useState } from "react";
 interface ClassSelectorProps {
 	groupedData: Record<string, { id: number; name: string }[]>;
 	callback?: (id: string, name: string) => void;
+	isShowVariableId: boolean
 }
 
-const ClassSelector = ({ groupedData, callback }: ClassSelectorProps) => {
+const ClassSelector = ({ groupedData, callback, isShowVariableId = false}: ClassSelectorProps) => {
 	const { getMatchDisplayStr } = useDataContext();
 
 	const [variableType, setVariableType] = useState<"T" | "L" | null>(null);
@@ -100,23 +101,25 @@ const ClassSelector = ({ groupedData, callback }: ClassSelectorProps) => {
 			) : (
 				<div className="text-center text-2xl font-bold">読み込み中...</div>
 			)}
-			{/*変数か*/}
-			<div className="text-center mt-4">
-				<input
-					type="checkbox"
-					id="variableType"
-					onChange={(e) => {
-						if (e.target.checked) {
-							setVariableType("T");
-						} else {
-							setVariableType(null);
-						}
-					}}
-				/>
-				<label htmlFor="variableType" className="text-white cursor-pointer">
-					変数を使用
-				</label>
-			</div>
+			{isShowVariableId &&
+                <div className="text-center mt-4">
+                    {/*変数を使用するか*/}
+                    <input
+                        type="checkbox"
+                        id="variableType"
+                        onChange={(e) => {
+                            if (e.target.checked) {
+                                setVariableType("T");
+                            } else {
+                                setVariableType(null);
+                            }
+                        }}
+                    />
+                    <label htmlFor="variableType" className="text-white cursor-pointer">
+                        変数を使用
+                    </label>
+                </div>
+            }
 			{variableType !== null && (
 				<div
 					className={
