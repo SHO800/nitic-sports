@@ -13,19 +13,20 @@ const TimeLine = ({
 	const [totalTime] = useState<number>(
 		new Date(endTime).getTime() - new Date(startTime).getTime(),
 	);
-
+	
 	// 経過時間をパーセンテージに変換
 	const time = currentTime.getTime() - start;
 	const percent = (time / totalTime) * 100;
-
+	if (percent < 0 || 100 < percent) {
+		return null;
+	}
+	
 	return (
 		<div className="relative w-full h-full">
 			<div
-				className="absolute left-0 h-[.1px] w-full bg-red-500 rounded"
+				className="absolute left-[-32px] h-[.1px] w-[calc(100%+64px)] bg-red-500 rounded z-10"
 				style={{ top: `${percent}%` }}
 			/>
-			{/*<div className="absolute left-0 h-[.1px] w-full bg-red-500 rounded" style={{ top: `0%` }}></div>*/}
-			{/* <p>{percent}</p> */}
 		</div>
 	);
 };
