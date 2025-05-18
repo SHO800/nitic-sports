@@ -5,7 +5,7 @@ import { judgeDay12String } from "@/utils/judgeDay12";
 import type { MatchPlan as MatchPlanType } from "@prisma/client";
 import clsx from "clsx";
 import { useState } from "react";
-import InfoModal from "../infomation/InfoModal";
+import InfoModal from "@/components/information/InfoModal";
 
 type MatchInfoProps = {
 	matchPlan: MatchPlanType;

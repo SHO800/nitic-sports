@@ -43,9 +43,8 @@ const MapInfo = ({ placeId }: Props) => {
 					// const status = getMatchStatus(item);
 
 					return (
-						<div className="flex justify-center bg-gray-100 px-10 rounded">
+						<div key={item.id} className="flex justify-center bg-gray-100 px-10 rounded">
 							<div
-								key={item.id}
 								className="flex flex-col bg-white w-[70vw] lg:w-[30vw] mb-1 border rounded"
 							>
 								<div className="flex justify-center bg-white px-1 rounded">

@@ -57,7 +57,7 @@ const InfoModal = ({
                         </div>
                     </div>
 
-                    <div className="bg-gray-100 max-w-full mt-1 rounded">
+                    <div className="bg-gray-100 max-w-full mt-1 lg:mx-40 rounded ">
                         {/* <div className="flex justify-center text-sm">leagueFigure or tournamentFigure ←イマココ!!</div> */}
                         {matchPlans && matchPlans.length > 0 && (
                             <Bracket

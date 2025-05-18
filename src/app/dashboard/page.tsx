@@ -12,19 +12,17 @@ const Dashboard = () => {
 	return (
 		<div>
 			<div className="min-h-screen">
-				<SignIn />
-				<SignOut />
 
-				<details className="container mx-auto p-4">
-					<summary className="text-3xl font-bold mb-4 px-3 py-2 rounded-2xl bg-blue-900  text-white">
-						クラス
-					</summary>
-					<Teams />
-				</details>
+				{/*<details className="container mx-auto p-4">*/}
+				{/*	<summary className="text-3xl font-bold mb-4 px-3 py-2 rounded-2xl bg-blue-900  text-white">*/}
+				{/*		クラス*/}
+				{/*	</summary>*/}
+				{/*	<Teams />*/}
+				{/*</details>*/}
 
 				<details className="container mx-auto p-4" open>
 					<summary className="text-3xl font-bold mb-4 px-3 py-2 rounded-2xl bg-blue-900  text-white">
-						種目
+						種目毎対戦表
 					</summary>
 					<Events />
 				</details>
@@ -41,12 +39,12 @@ const Dashboard = () => {
 					</summary>
 					<TotalScore />
 				</details>
-				<details className="container mx-auto p-4">
-					<summary className="text-3xl font-bold mb-4 px-3 py-2 rounded-2xl bg-blue-900  text-white">
-						会場
-					</summary>
-					<Location />
-				</details>
+				{/*<details className="container mx-auto p-4">*/}
+				{/*	<summary className="text-3xl font-bold mb-4 px-3 py-2 rounded-2xl bg-blue-900  text-white">*/}
+				{/*		会場*/}
+				{/*	</summary>*/}
+				{/*	<Location />*/}
+				{/*</details>*/}
 			</div>
 		</div>
 	);

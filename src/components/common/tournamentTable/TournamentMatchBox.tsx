@@ -70,17 +70,34 @@ const TournamentMatchBox = ({
 		return statusColors[match.tournamentMatchNode.matchPlan.status];
 	}, [match.tournamentMatchNode.matchPlan.status]);
 
+	// 強調スタイル
+	const highlightStyle = useMemo(() => {
+		if (!isCurrentTeamMatch) return "";
+
+		if (match.tournamentMatchNode.matchPlan.status === "Playing") {
+			return "bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-md shadow-lg transition-all duration-300 transform hover:scale-105";
+		}
+
+		return "bg-gradient-to-r from-blue-400 to-blue-600 text-white rounded-md shadow-md transition-all duration-300";
+	}, [isCurrentTeamMatch, match.tournamentMatchNode.matchPlan.status]);
+
 	return (
 		<div className={"h-full relative w-full "} style={boxStyle}>
 			{!!match.matchId && (
 				<div className="text-md text-gray-500 pr-2 absolute h-full w-full flex justify-end items-center bg-transparent">
 					<p
-						className={`${matchStatusColor} font-bold text-[1.2em]
-							${isCurrentTeamMatch ? "bg-amber-500 text-white rounded px-1" : ""}`}
+						className={`${matchStatusColor} font-bold text-[1.2em] ${highlightStyle} px-2 py-1`}
 					>
-						<span className={isCurrentTeamMatch ? "animate-pulse" : ""}>
-							{match.tournamentMatchNode.matchPlan.matchName}
-						</span>
+						{isCurrentTeamMatch ? (
+							<span className="relative">
+                <span className="relative z-10">
+                  {match.tournamentMatchNode.matchPlan.matchName}
+                </span>
+                <span className="absolute inset-0 bg-white opacity-20 rounded-full blur-sm animate-ping"></span>
+              </span>
+						) : (
+							match.tournamentMatchNode.matchPlan.matchName
+						)}
 					</p>
 				</div>
 			)}

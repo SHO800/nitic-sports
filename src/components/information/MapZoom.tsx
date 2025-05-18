@@ -42,7 +42,6 @@ const MapZoom = ({ locationId }: Props) => {
 						会場: {locationJudge(locationId)}
 					</p>
 					<div className="relative">
-						{locationId}
 						<MapContainer tag={0} />
 						<MapPin location={locationJudge(locationId)} />
 					</div>

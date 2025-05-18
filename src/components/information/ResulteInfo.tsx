@@ -15,7 +15,7 @@ const ResultInfo = () => {
 		<>
 			<EventSwitch selectedId={selectedId} setSelectedId={setId} />
 
-			<div className="flex justify-center bg-blue-200 mx-1 lg:mx-20 mb-2 p-1 rounded">
+			<div className="flex justify-center mx-1 lg:mx-20 mb-2 p-1 rounded">
 				<div className="flex flex-col min-w-[94vw] justify-center">
 					<div className="flex flex-col lg:mx-20 px-1 py-2 min-h-[30vh] bg-gray-100 rounded overflow-auto">
 						{matchPlans &&

@@ -107,6 +107,7 @@ const MatchesByLocation = ({
 						match={match}
 						eventsById={eventsById}
 						matchResults={matchResults}
+						canChangeState={true}
 					/>
 				))}
 			</div>

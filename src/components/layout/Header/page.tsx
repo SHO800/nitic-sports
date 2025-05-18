@@ -13,7 +13,7 @@ export default function Header() {
         <>
             <nav className="fixed z-100 w-full bg-blue-900 text-white p-4 rounded-b-xl">
                 <div className="flex items-center justify-between">
-                    <Link href="/" onClick={() => setIsOpen(!isOpen)} className="text-lg font-bold">
+                    <Link href="/" className="text-lg font-bold">
                         2025年度体育大会
                     </Link>
 

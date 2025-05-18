@@ -67,11 +67,11 @@ const MatchPlanCardOnMaodal = ({
 								<>
 									<div className="relative bg-black h-[0.5px] mx-3 mt-0.5" />
 
-									<p className="flex bg-white text-black px-1 rounded text-2xl justify-center">
+									<div className="flex bg-white text-black px-1 rounded text-2xl justify-center">
 										<MatchCountdownForReader
 											scheduledStartTime={matchPlan.scheduledStartTime}
 										/>
-									</p>
+									</div>
 								</>
 							)}
 						</div>

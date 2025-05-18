@@ -1,9 +1,10 @@
 "use client";
 import { deleteMatchPlan, updateMatchPlanStatus } from "@/app/actions/data";
-import MatchCard from "@/components/dashboard/matchPlan/MatchCard";
 import { useDataContext } from "@/contexts/dataContext";
-import { type MatchPlan as MatchPlanType, Status } from "@prisma/client";
+import { type MatchPlan as MatchPlanType, Status, Event } from "@prisma/client";
 import { Fragment, useState } from "react";
+import AddMatchPlanForm from "@/components/dashboard/AddMatchPlanForm";
+import MatchCard from "@/components/match/MatchCard";
 
 const MatchPlan = () => {
 	const {
@@ -92,27 +93,34 @@ const MatchPlan = () => {
 	};
 
 	return (
-		<>
+		<div className={"flex flex-row  flex-wrap justify-center space-x-8 space-y-8"}>
 			{events &&
 				matchPlans?.map((matchPlan) => {
 					const status = getMatchStatus(matchPlan);
+					const eventsById: Record<number, Event> = {};
+					events.forEach((event) => {
+						eventsById[event.id] = event;
+					});
 
 					return (
-						<Fragment key={matchPlan.id}>
+						<div className={"w-96"} key={matchPlan.id}>
+							
 							<MatchCard
-								matchPlan={matchPlan}
-								status={status}
-								events={events}
-								locations={locations}
+								match={matchPlan}
+								eventsById={eventsById}
+								canChangeState={false}
+								// status={status}
+								// events={events}
+								// locations={locations}
 								matchResults={matchResults}
-								getMatchDisplayStr={getMatchDisplayStr}
-								handleDeleteMatch={handleDeleteMatch}
+								// getMatchDisplayStr={getMatchDisplayStr}
+								// handleDeleteMatch={handleDeleteMatch}
 							/>
-						</Fragment>
+						</div>
 					);
 				})}
 			{/*<AddMatchPlanForm/>*/}
-		</>
+		</div>
 	);
 };
 

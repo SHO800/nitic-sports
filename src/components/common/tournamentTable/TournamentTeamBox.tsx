@@ -32,11 +32,8 @@ const TournamentTeamBox = ({
 
 	const displayStr = getMatchDisplayStr(node.teamId);
 
-	// チームが現在のチームIDと一致するかチェック
-	const isCurrentTeam = useMemo(() => {
-		if (!teamIds) return false;
-		return node.teamId === teamIds[0]; // 単一チームの場合は最初のIDと比較
-	}, [node.teamId, teamIds]);
+	// チームハイライト機能を削除
+	// isCurrentTeamの判定を削除
 
 	const isWonInNextNode = useMemo(() => {
 		const nextNode = node.nextNode;
@@ -50,11 +47,10 @@ const TournamentTeamBox = ({
 
 	return (
 		<div
-			className={`flex justify-end items-center p-2 relative h-10 w-full 
-				${isCurrentTeam ? "bg-amber-500 text-white rounded" : ""}`}
+			className="flex justify-end items-center p-2 relative h-10 w-full"
 			ref={boxRef}
 		>
-			<span className={isCurrentTeam ? "animate-pulse" : ""}>{displayStr}</span>
+			<span>{displayStr}</span>
 
 			{
 				<TournamentLine
