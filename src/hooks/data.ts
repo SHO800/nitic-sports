@@ -14,7 +14,7 @@ import useSWR, {SWRConfiguration} from "swr";
 
 // メモ化キャッシュの導入
 const MEMO_CACHE = new Map<string, { value: any; timestamp: number }>();
-const CACHE_TTL = 60000; // 1分間キャッシュを保持
+const CACHE_TTL = 30000; // 30秒間キャッシュを保持
 
 // メモ化関数
 function memoize<T>(key: string, compute: () => T): T {
@@ -47,7 +47,7 @@ export const useData = () => {
 	// 短期的なもの
 	const swrConfigShort: SWRConfiguration = {
 		...swrConfigBase,
-		refreshInterval: 30000, // 30秒ごとに再検証
+		refreshInterval: 15000, // 15秒ごとに再検証
 		revalidateOnFocus: true, // フォーカス時に再検証する
 	};
 	

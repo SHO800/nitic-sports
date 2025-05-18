@@ -36,7 +36,7 @@ export async function getAllLocations(): Promise<Location[]> {
 
 export async function getAllMatchPlans(): Promise<MatchPlan[]> {
 	cacheTag("matchPlans");
-	cacheLife("minutes");
+	cacheLife("seconds");
 	const rawPlans: MatchPlan[] = await prisma.matchPlan.findMany();
 	return rawPlans.sort((a, b) => a.id - b.id);
 }
@@ -63,7 +63,7 @@ export async function getAllMatchResults(): Promise<
 	Record<string, MatchResult>
 > {
 	cacheTag("matchResults");
-	cacheLife("minutes");
+	cacheLife("seconds");
 	const matchResults: MatchResult[] = await prisma.matchResult.findMany();
 	// <matchId>: {}の形にする
 	const matchResultsMap: Record<string, MatchResult> = {};
