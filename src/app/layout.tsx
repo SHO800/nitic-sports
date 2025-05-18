@@ -20,6 +20,7 @@ const notoSansJp = Noto_Sans_JP({
 });
 
 export const metadata: Metadata = {
+    
     title: "一関 - 体育大会2025",
     description: "一関高専校内体育大会の試合結果をリアルタイムでお届けします！",
 };
@@ -30,9 +31,9 @@ export default async function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en">
+        <html lang="ja" className={`${notoSansJp.variable}`}>
         <body
-            className={`${notoSansJp.variable} antialiased text-lg bg-gray-200`}
+            className={`antialiased text-lg bg-gray-200`}
         >
         <CurrentTimeContextProvider>
             <Header/>
