@@ -12,7 +12,7 @@ const EventEditForm = ({
 	isTimeBased: boolean;
 }) => {
 	const { mutateEvents } = useDataContext();
-	const [isProcessing, setIsProcessing] = useState(false);]
+	const [isProcessing, setIsProcessing] = useState(false);
 
 	return (
 		<form
