@@ -2,12 +2,11 @@
 
 import MatchesByLocation from "@/components/match/MatchesByLocation";
 import {useEffect, useRef, useState} from "react";
-import {useData} from "@/hooks/data";
 import Clock from "@/components/common/Clock";
 import LocationSelector from "@/components/match/LocationSelector";
 import CheckMatchScoresModal from "@/components/match/CheckMatchScoresModal";
 import {Event} from "@prisma/client"
-import {useDataContext} from "@/contexts/dataContext"; 
+import {useDataContext} from "@/contexts/dataContext";
 
 const MatchDashboard = () => {
     const {events, locations, scores} = useDataContext()
@@ -16,10 +15,10 @@ const MatchDashboard = () => {
     const [isSyncScroll, setIsSyncScroll] = useState<boolean>(true)
     const [isShowCompletedMatch, setIsShowCompletedMatch] = useState<boolean>(false);
     const refs = useRef<HTMLDivElement[]>([])
-    
+
     const [scoreUnsettledEvents, setScoreUnsettledEvents] = useState<Event[]>([])
-    
-    
+
+
     const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
         if (!isSyncScroll) {
             return
@@ -39,10 +38,10 @@ const MatchDashboard = () => {
         if (completedEvents.length === 0) return
         const unsettledEvents = completedEvents.filter(event => !scoreEventIds.has(event.id))
         setScoreUnsettledEvents(unsettledEvents as unknown as Event[])
-            
+
     }, [events, scores]);
-    
-    
+
+
     return (
         <div className={"relative w-screen h-[calc(100vh-130px)] overflow-hidden"}>
             <div className={"h-fit py-2 flex justify-center items-center relative"}>
@@ -83,8 +82,8 @@ const MatchDashboard = () => {
                 })}
 
             </div>
-            
-            {scoreUnsettledEvents.length!==0 && events && 
+
+            {scoreUnsettledEvents.length !== 0 && events &&
                 <CheckMatchScoresModal unSettledEvents={scoreUnsettledEvents}/>
             }
         </div>

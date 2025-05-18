@@ -9,7 +9,7 @@ interface TotalTeamScore {
 const TotalScore = () => {
     const {scores, getMatchDisplayStr} = useDataContext()
     const [totalScoreByTeam, setTotalScoreByTeam] = useState<TotalTeamScore>()
-    const [displayContents, setDisplayContents] = useState<ScoresByTeam>()
+    // const [displayContents, setDisplayContents] = useState<ScoresByTeam>()
 
 
     const consolidateScoresByTeam = useCallback(() => {

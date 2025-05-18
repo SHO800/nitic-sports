@@ -1,7 +1,6 @@
 import React, {useMemo} from "react";
 import TournamentLine from "@/components/common/tournamentTable/TournamentLine";
 import {TournamentNodeTeam} from "@/utils/tournamentUtils";
-import {useData} from "@/hooks/data";
 import useTournamentLine from "@/hooks/useTournamentLine";
 import {useDataContext} from "@/contexts/dataContext";
 
@@ -11,11 +10,11 @@ const TournamentTeamBox = ({node, rowWidth, rowHeight}: {
     rowHeight: number
 }) => {
     const {getMatchDisplayStr, getActualTeamIdByVariableId, matchResults} = useDataContext()
-    
+
     const nextNodeRow = node.nextNode?.row;
     const nextNodeColumn = node.nextNode?.column;
 
-    const { boxRef, lineCoords } = useTournamentLine(
+    const {boxRef, lineCoords} = useTournamentLine(
         rowWidth,
         rowHeight,
         node.row,
@@ -23,35 +22,35 @@ const TournamentTeamBox = ({node, rowWidth, rowHeight}: {
         nextNodeRow,
         nextNodeColumn
     );
-    
+
     const displayStr = getMatchDisplayStr(node.teamId);
-    
+
     const isWonInNextNode = useMemo(() => {
         const nextNode = node.nextNode;
         if (!matchResults || !nextNode || nextNode?.type === "team") return false;
         const actualId = getActualTeamIdByVariableId(node.teamId.toString());
         if (!actualId) return false;
-        const result = matchResults[nextNode.matchId];  
+        const result = matchResults[nextNode.matchId];
         if (!result) return false;
         return result.winnerTeamId === actualId;
     }, [getActualTeamIdByVariableId, matchResults, node.nextNode, node.teamId]);
-    
+
     return (
         <div
             className={`flex justify-end items-center p-2 relative h-10 w-full `}
             ref={boxRef}
         >
-            <span className="max-w-[180px]">{displayStr}</span>
-            
+            <span className="">{displayStr}</span>
+
             {
-                <TournamentLine 
+                <TournamentLine
                     startX={lineCoords.startX}
                     startY={lineCoords.startY}
                     endX={lineCoords.endX}
                     endY={lineCoords.endY}
                     type={lineCoords.type}
-                    color1={ isWonInNextNode ? "rgb(255,0,0)" : "rgba(156, 163, 175, 1)"}
-                    color2={ isWonInNextNode ? "rgb(255,0,0)" : "rgba(156, 163, 175, 1)"}
+                    color1={isWonInNextNode ? "rgb(255,0,0)" : "rgba(156, 163, 175, 1)"}
+                    color2={isWonInNextNode ? "rgb(255,0,0)" : "rgba(156, 163, 175, 1)"}
                     thickness={4}
                     animationTimingFunction={"linear"}
                     duration={200}

@@ -4,7 +4,7 @@ import {createContext, ReactNode, useContext} from "react";
 import {useData} from "@/hooks/data";
 
 
-export const DataContext = createContext<ReturnType<useData> | null>(null)
+export const DataContext = createContext<ReturnType<typeof useData> | null>(null)
 export const useDataContext = () => {
     const context = useContext(DataContext)
     if (!context) {

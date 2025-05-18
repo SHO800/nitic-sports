@@ -23,7 +23,7 @@ const DelayInfo = ({eventId}: Props) => {
         scheduledStartTime: new Date(item.scheduledStartTime),
     }));
 
-    const filteredItems = dateMatchPlans?.filter((item) => (item.status === "Waiting" || item.status === "Preparing") && item.scheduledStartTime.getTime() < currentTime)
+    const filteredItems = dateMatchPlans?.filter((item) => (item.status === "Waiting" || item.status === "Preparing") && item.scheduledStartTime.getTime() < currentTime.getTime())
 
     if (typeof eventId === "number") {
 

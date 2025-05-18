@@ -1,6 +1,5 @@
 import {MatchPlan, Status} from "@prisma/client";
 import {updateMatchPlanStatus} from "@/app/actions/data";
-import {useData} from "@/hooks/data";
 import {useDataContext} from "@/contexts/dataContext";
 
 const MatchController = ({match}: { match: MatchPlan }) => {

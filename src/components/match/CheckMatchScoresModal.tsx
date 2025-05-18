@@ -1,5 +1,4 @@
 import {useCallback, useEffect, useState} from "react";
-import {useData} from "@/hooks/data";
 import {Event} from "@prisma/client";
 import {calcEventScore} from "@/utils/calcEventScore";
 import {createScores} from "@/app/actions/data";
@@ -19,11 +18,12 @@ const CheckMatchScoresModal = ({unSettledEvents}: { unSettledEvents: Event[] }) 
                 onScroll={(e) => e.preventDefault()}
             >
                 <div
-                    className="flex flex-col items-center justify-center w-fit h-[calc(100%-12em)] m-24 mx-auto px-12 bg-white "
+                    className="flex flex-col items-start justify-center w-fit h-[calc(100%-12em)] pt-72 overflow-y-scroll m-24 mx-auto px-12 bg-white "
                     onClick={(e) => e.stopPropagation()}
                 >
                     {unSettledEvents.map(event => (
-                        <ModalEventContainer key={"scoreSetModal-" + event.id} unsettledEvent={event} setIsOpen={setIsOpen}/>
+                        <ModalEventContainer key={"scoreSetModal-" + event.id} unsettledEvent={event}
+                                             setIsOpen={setIsOpen}/>
                     ))}
 
                 </div>
@@ -52,11 +52,14 @@ const ModalTab = ({isOpen, setIsOpen}: { isOpen: boolean, setIsOpen: (value: boo
 
 export default CheckMatchScoresModal;
 
-const ModalEventContainer = ({unsettledEvent, setIsOpen}: { unsettledEvent: Event, setIsOpen: (state: boolean) => void }) => {
+const ModalEventContainer = ({unsettledEvent, setIsOpen}: {
+    unsettledEvent: Event,
+    setIsOpen: (state: boolean) => void
+}) => {
     const {matchPlans, matchResults, getMatchDisplayStr, scores, mutateScores} = useDataContext()
     const [calculatedScore, setCalculatedScore] = useState<RankWithEventScore[][]>([])
     const [mergedScore, setMergedScore] = useState<RankWithEventScore[]>([])
-    const [isConfirming, setIsConfirming] = useState<boolean>(false) 
+    const [isConfirming, setIsConfirming] = useState<boolean>(false)
 
     useEffect(() => {
         if (!matchPlans || !matchResults) return;
@@ -73,22 +76,22 @@ const ModalEventContainer = ({unsettledEvent, setIsOpen}: { unsettledEvent: Even
                 return [...acc, curr]
             }
         }, [])
-        
+
         const notZeroScores = mergedScore.filter(score => score.score !== 0)
         if (notZeroScores) setMergedScore(notZeroScores)
 
-    }, [matchPlans, matchResults, unsettledEvent, scores]);
-    
-    const confirmEventScores = useCallback(async ()=>{
+    }, [matchPlans, matchResults, unsettledEvent, scores]); // 無限再呼び出しに陥るので依存関係を更新してはならない
+
+    const confirmEventScores = useCallback(async () => {
         await createScores(unsettledEvent.id, mergedScore)
         await mutateScores()
         setIsOpen(false)
-    }, [mergedScore]) 
-    
+    }, [mutateScores, setIsOpen, unsettledEvent.id]) // 無限再呼び出しに陥るので依存関係を更新してはならない
+
     return (
-        <div className={"flex flex-col"}>
+        <div className={"flex flex-col w-full h-full bg-gray-200 rounded-lg p-4 mb-4"}>
             <p className={"text-2xl mb-4"}>{unsettledEvent.name}</p>
-            <div className={"w-full h-full flex flex-row items-start space-x-8 text-xl overflow-y-scroll"}>
+            <div className={"w-full h-fit flex flex-row items-start space-x-8 text-xl  overflow-y-scroll"}>
 
                 {calculatedScore.map((scores, index) => {
                         return (
@@ -136,10 +139,11 @@ const ModalEventContainer = ({unsettledEvent, setIsOpen}: { unsettledEvent: Even
                 </div>
             </div>
             <div className={"ml-auto mt-8"}>
-                
-            <LoadingButton onClick={confirmEventScores} bgColor={"green"} textColor={"white"} isLoading={isConfirming}>
-                確定
-            </LoadingButton>
+
+                <LoadingButton onClick={confirmEventScores} bgColor={"green"} textColor={"white"}
+                               isLoading={isConfirming}>
+                    確定
+                </LoadingButton>
             </div>
         </div>
     )
