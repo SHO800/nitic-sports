@@ -46,33 +46,52 @@ export const useData = () => {
 	};
 
 	// SWRフック呼び出しを最適化
+	
+	// それぞれteams, locations, events, matchPlans, matchResults, scoresのtagをつけたい
+	
 	const {
 		data: teams,
 		error: teamError,
 		isLoading: teamLoading,
 		mutate: mutateTeams,
-	} = useSWR<Team[]>(`${API_BASE}/team`, fetcher, swrConfig);
+	} = useSWR<Team[]>(
+		`${API_BASE}/team`,
+		(url) => fetcher(url, { next: { tags: ["teams"] } }),
+		swrConfig,
+	);
 
 	const {
 		data: locations,
 		error: locationError,
 		isLoading: locationLoading,
 		mutate: mutateLocations,
-	} = useSWR<Location[]>(`${API_BASE}/location`, fetcher, swrConfig);
+	} = useSWR<Location[]>(
+		`${API_BASE}/location`,
+		(url) => fetcher(url, { next: { tags: ["locations"] } }),
+		swrConfig,
+	);
 
 	const {
 		data: events,
 		error: eventError,
 		isLoading: eventLoading,
 		mutate: mutateEvents,
-	} = useSWR<Event[]>(`${API_BASE}/event`, fetcher, swrConfig);
+	} = useSWR<Event[]>(
+		`${API_BASE}/event`,
+		(url) => fetcher(url, { next: { tags: ["events"] } }),
+		swrConfig,
+	);
 
 	const {
 		data: matchPlans,
 		error: matchPlanError,
 		isLoading: matchPlanLoading,
 		mutate: mutateMatchPlans,
-	} = useSWR<MatchPlan[]>(`${API_BASE}/match-plan`, fetcher, swrConfig);
+	} = useSWR<MatchPlan[]>(
+		`${API_BASE}/match-plan`,
+		(url) => fetcher(url, { next: { tags: ["matchPlans"] } }),
+		swrConfig,
+	);
 
 	const {
 		data: matchResults,
@@ -81,7 +100,7 @@ export const useData = () => {
 		mutate: mutateMatchResults,
 	} = useSWR<{ [key: string]: MatchResult }>(
 		`${API_BASE}/match-result`,
-		fetcher,
+		(url) => fetcher(url, { next: { tags: ["matchResults"] } }),
 		swrConfig,
 	);
 
@@ -90,7 +109,11 @@ export const useData = () => {
 		error: scoreError,
 		isLoading: scoreLoading,
 		mutate: mutateScores,
-	} = useSWR<Score[]>(`${API_BASE}/score`, fetcher, swrConfig);
+	} = useSWR<Score[]>(
+		`${API_BASE}/score`,
+		(url) => fetcher(url, { next: { tags: ["scores"] } }),
+		swrConfig,
+	);
 
 	// グループ化されたチームをメモ化
 	const groupedTeams = useMemo(() => {
