@@ -14,13 +14,15 @@ interface TournamentBracketProps {
 	eventId: number;
 	isFinal: boolean;
 	relatedMatchPlans: MatchPlan[];
+	teamIds?: string[];
 }
 
 const TournamentTable = ({
-	eventId,
-	isFinal,
-	relatedMatchPlans,
-}: Readonly<TournamentBracketProps>) => {
+							 eventId,
+							 isFinal,
+							 relatedMatchPlans,
+							 teamIds,
+						 }: Readonly<TournamentBracketProps>) => {
 	const {
 		events,
 		eventLoading,
@@ -91,6 +93,7 @@ const TournamentTable = ({
 							node={node}
 							rowWidth={rowWidth}
 							rowHeight={rowHeight}
+							teamIds={teamIds}
 						/>
 					) : (
 						<TournamentMatchBox
@@ -99,6 +102,7 @@ const TournamentTable = ({
 							matchResult={matchResults?.[node.matchId.toString()]}
 							rowWidth={rowWidth}
 							rowHeight={rowHeight}
+							teamIds={teamIds}
 						/>
 					)}
 				</div>
@@ -107,7 +111,7 @@ const TournamentTable = ({
 			(node) =>
 				`node-${node.nodeId}-event-${eventId}-id-${node.type === "team" ? node.teamId : node.matchId}`,
 		);
-	}, [tournamentData, rowWidth, rowHeight, matchResults, eventId]);
+	}, [tournamentData, rowWidth, rowHeight, matchResults, eventId, teamIds]);
 
 	// 特殊ノードの描画とその線 - 常に実行される
 	const specialNodes = useMemo(() => {

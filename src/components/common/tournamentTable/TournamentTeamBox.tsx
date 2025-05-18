@@ -5,13 +5,15 @@ import type { TournamentNodeTeam } from "@/utils/tournamentUtils";
 import React, { useMemo } from "react";
 
 const TournamentTeamBox = ({
-	node,
-	rowWidth,
-	rowHeight,
-}: {
+							   node,
+							   rowWidth,
+							   rowHeight,
+							   teamIds,
+						   }: {
 	node: TournamentNodeTeam;
 	rowWidth: number;
 	rowHeight: number;
+	teamIds?: string[];
 }) => {
 	const { getMatchDisplayStr, getActualTeamIdByVariableId, matchResults } =
 		useDataContext();
@@ -30,6 +32,12 @@ const TournamentTeamBox = ({
 
 	const displayStr = getMatchDisplayStr(node.teamId);
 
+	// チームが現在のチームIDと一致するかチェック
+	const isCurrentTeam = useMemo(() => {
+		if (!teamIds) return false;
+		return node.teamId === teamIds[0]; // 単一チームの場合は最初のIDと比較
+	}, [node.teamId, teamIds]);
+
 	const isWonInNextNode = useMemo(() => {
 		const nextNode = node.nextNode;
 		if (!matchResults || !nextNode || nextNode?.type === "team") return false;
@@ -42,10 +50,11 @@ const TournamentTeamBox = ({
 
 	return (
 		<div
-			className={"flex justify-end items-center p-2 relative h-10 w-full "}
+			className={`flex justify-end items-center p-2 relative h-10 w-full 
+				${isCurrentTeam ? "bg-amber-500 text-white rounded" : ""}`}
 			ref={boxRef}
 		>
-			<span className="">{displayStr}</span>
+			<span className={isCurrentTeam ? "animate-pulse" : ""}>{displayStr}</span>
 
 			{
 				<TournamentLine

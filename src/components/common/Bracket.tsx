@@ -16,19 +16,22 @@ import {
 // トーナメント部分を別コンポーネントに分離
 const TournamentSection = memo(
 	({
-		eventId,
-		isFinal,
-		relatedMatchPlans,
-	}: {
+		 eventId,
+		 isFinal,
+		 relatedMatchPlans,
+		 teamIds,
+	 }: {
 		eventId: number;
 		isFinal: boolean;
 		relatedMatchPlans: MatchPlan[];
+		teamIds?: string[];
 	}) => (
 		<TournamentTable
 			key={`bracket-tournament-${eventId}-${isFinal}`}
 			eventId={eventId}
 			isFinal={isFinal}
 			relatedMatchPlans={relatedMatchPlans}
+			teamIds={teamIds}
 		/>
 	),
 );
@@ -38,11 +41,13 @@ TournamentSection.displayName = "TournamentSection";
 // リーグ部分を別コンポーネントに分離 - すべてのブロックを同時表示
 const LeagueSection = memo(
 	({
-		eventId,
-		teamData,
-	}: {
+		 eventId,
+		 teamData,
+		 teamIds,
+	 }: {
 		eventId: number;
 		teamData: LeagueTeamData;
+		teamIds?: string[];
 	}) => {
 		const blockNames = useMemo(
 			() => Object.keys(teamData.blocks),
@@ -60,6 +65,7 @@ const LeagueSection = memo(
 							eventId={eventId}
 							blockName={blockName}
 							block={teamData.blocks[blockName]}
+							receivedTeamIds={teamIds}
 						/>
 					</div>
 				))}
@@ -73,13 +79,13 @@ LeagueSection.displayName = "LeagueSection";
 // タブボタン部分を別コンポーネントに分離
 const TabButtons = memo(
 	({
-		hasPreliminary,
-		hasFinal,
-		isFinal,
-		preliminaryType,
-		finalType,
-		setIsFinal,
-	}: {
+		 hasPreliminary,
+		 hasFinal,
+		 isFinal,
+		 preliminaryType,
+		 finalType,
+		 setIsFinal,
+	 }: {
 		hasPreliminary: boolean;
 		hasFinal: boolean;
 		isFinal: boolean;
@@ -123,9 +129,14 @@ TabButtons.displayName = "TabButtons";
 
 // メインのBracketコンポーネント
 const Bracket = ({
-	eventId,
-	matchPlans,
-}: { eventId: number; matchPlans: MatchPlan[] }) => {
+					 eventId,
+					 matchPlans,
+					 teamIds,
+				 }: {
+	eventId: number;
+	matchPlans: MatchPlan[];
+	teamIds?: string[];
+}) => {
 	const [isFinal, setIsFinal] = useState(false);
 	const { events, eventLoading } = useDataContext();
 
@@ -253,13 +264,18 @@ const Bracket = ({
 								eventId={eventId}
 								isFinal={isFinal}
 								relatedMatchPlans={relatedMatchPlans}
+								teamIds={teamIds}
 							/>
 						)}
 
 						{currentType === "league" &&
 							teamData?.type === "league" &&
 							teamData.blocks && (
-								<LeagueSection eventId={eventId} teamData={teamData} />
+								<LeagueSection
+									eventId={eventId}
+									teamData={teamData}
+									teamIds={teamIds}
+								/>
 							)}
 					</Suspense>
 				</div>

@@ -6,17 +6,19 @@ import { type MatchResult, Status } from "@prisma/client";
 import React, { type CSSProperties, useMemo } from "react";
 
 const TournamentMatchBox = ({
-	match,
-	boxStyle,
-	matchResult,
-	rowWidth,
-	rowHeight,
-}: {
+								match,
+								boxStyle,
+								matchResult,
+								rowWidth,
+								rowHeight,
+								teamIds,
+							}: {
 	match: TournamentNodeMatch;
 	boxStyle: CSSProperties;
 	matchResult?: MatchResult;
 	rowWidth: number;
 	rowHeight: number;
+	teamIds?: string[];
 }) => {
 	const { matchResults } = useDataContext();
 
@@ -31,6 +33,12 @@ const TournamentMatchBox = ({
 		nextNodeRow,
 		nextNodeColumn,
 	);
+
+	// 現在の試合が選択されたチームのものかチェック
+	const isCurrentTeamMatch = useMemo(() => {
+		if (!teamIds || !match.tournamentMatchNode.matchPlan.teamIds) return false;
+		return match.tournamentMatchNode.matchPlan.teamIds === teamIds;
+	}, [match.tournamentMatchNode.matchPlan.teamIds, teamIds]);
 
 	// 勝者判定のロジックをメモ化
 	const isWonInNextNode = useMemo(() => {
@@ -66,8 +74,13 @@ const TournamentMatchBox = ({
 		<div className={"h-full relative w-full "} style={boxStyle}>
 			{!!match.matchId && (
 				<div className="text-md text-gray-500 pr-2 absolute h-full w-full flex justify-end items-center bg-transparent">
-					<p className={`${matchStatusColor} font-bold text-[1.2em]`}>
-						{match.tournamentMatchNode.matchPlan.matchName}
+					<p
+						className={`${matchStatusColor} font-bold text-[1.2em]
+							${isCurrentTeamMatch ? "bg-amber-500 text-white rounded px-1" : ""}`}
+					>
+						<span className={isCurrentTeamMatch ? "animate-pulse" : ""}>
+							{match.tournamentMatchNode.matchPlan.matchName}
+						</span>
 					</p>
 				</div>
 			)}
