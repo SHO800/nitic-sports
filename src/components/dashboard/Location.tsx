@@ -1,10 +1,8 @@
 "use client"
-import {useData} from "@/hooks/data";
-import {createLocation, deleteLocation} from "@/app/actions/data";
 import {useDataContext} from "@/contexts/dataContext";
 
 const Location = () => {
-    const {locations, mutateLocations} = useDataContext()
+    const {locations} = useDataContext()
     return (
         <>
             {locations?.map((location) => (
@@ -16,7 +14,7 @@ const Location = () => {
                         <p className={`text-black `}>
                             {location.id} {location.name}
                         </p>
-                     </div>
+                    </div>
                     {/*<button*/}
                     {/*    onClick={async (e) => {*/}
                     {/*        e.preventDefault()*/}

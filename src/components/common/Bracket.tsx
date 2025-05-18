@@ -1,18 +1,17 @@
 "use client";
 
-import {useCallback, useEffect, useState, useMemo, Suspense, memo} from 'react';
+import {memo, Suspense, useCallback, useEffect, useMemo, useState} from 'react';
 import LeagueTable from '@/components/common/leagueTable/LeagueTable';
 import {MatchPlan} from "@prisma/client";
 import TournamentTable from "@/components/common/tournamentTable/TournamentTable";
-import {useData} from '@/hooks/data';
 import {useDataContext} from "@/contexts/dataContext";
 
 // トーナメント部分を別コンポーネントに分離
 const TournamentSection = memo(({
-    eventId,
-    isFinal,
-    relatedMatchPlans
-}: {
+                                    eventId,
+                                    isFinal,
+                                    relatedMatchPlans
+                                }: {
     eventId: number,
     isFinal: boolean,
     relatedMatchPlans: MatchPlan[]
@@ -29,14 +28,14 @@ TournamentSection.displayName = 'TournamentSection';
 
 // リーグ部分を別コンポーネントに分離 - すべてのブロックを同時表示
 const LeagueSection = memo(({
-    eventId,
-    teamData
-}: {
+                                eventId,
+                                teamData
+                            }: {
     eventId: number,
     teamData: LeagueTeamData
 }) => {
     const blockNames = useMemo(() => Object.keys(teamData.blocks), [teamData.blocks]);
-    
+
     return (
         <div className="space-y-8">
             {blockNames.map((blockName) => (
@@ -61,13 +60,13 @@ LeagueSection.displayName = 'LeagueSection';
 
 // タブボタン部分を別コンポーネントに分離
 const TabButtons = memo(({
-    hasPreliminary,
-    hasFinal,
-    isFinal,
-    preliminaryType,
-    finalType,
-    setIsFinal
-}: {
+                             hasPreliminary,
+                             hasFinal,
+                             isFinal,
+                             preliminaryType,
+                             finalType,
+                             setIsFinal
+                         }: {
     hasPreliminary: boolean,
     hasFinal: boolean,
     isFinal: boolean,
@@ -121,7 +120,7 @@ const Bracket = ({eventId, matchPlans}: { eventId: number, matchPlans: MatchPlan
     const [preliminaryType, setPreliminaryType] = useState<'tournament' | 'league' | null>(null);
     const [finalType, setFinalType] = useState<'tournament' | 'league' | null>(null);
     const [relatedMatchPlans, setRelatedMatchPlans] = useState<MatchPlan[]>([]);
-    
+
     // 現在選択されている大会の形式を取得
     const getCurrentType = useCallback(() => {
         return isFinal ? finalType : preliminaryType;
@@ -201,7 +200,7 @@ const Bracket = ({eventId, matchPlans}: { eventId: number, matchPlans: MatchPlan
 
             {/* タブボタン */}
             {(hasPreliminary || hasFinal) && (
-                <TabButtons 
+                <TabButtons
                     hasPreliminary={hasPreliminary}
                     hasFinal={hasFinal}
                     isFinal={isFinal}
@@ -216,7 +215,7 @@ const Bracket = ({eventId, matchPlans}: { eventId: number, matchPlans: MatchPlan
                 <div className="bg-white rounded-lg shadow-md p-6 overflow-hidden">
                     <Suspense fallback={<div className="h-40 flex items-center justify-center">読み込み中...</div>}>
                         {currentType === 'tournament' && (
-                            <TournamentSection 
+                            <TournamentSection
                                 eventId={eventId}
                                 isFinal={isFinal}
                                 relatedMatchPlans={relatedMatchPlans}
@@ -224,7 +223,7 @@ const Bracket = ({eventId, matchPlans}: { eventId: number, matchPlans: MatchPlan
                         )}
 
                         {currentType === 'league' && teamData?.type === "league" && teamData.blocks && (
-                            <LeagueSection 
+                            <LeagueSection
                                 eventId={eventId}
                                 teamData={teamData}
                             />

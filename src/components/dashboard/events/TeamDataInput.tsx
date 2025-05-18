@@ -1,5 +1,4 @@
 "use client"
-import {useData} from "@/hooks/data";
 import {useDataContext} from "@/contexts/dataContext";
 
 type TeamDataInputProps = {
@@ -33,11 +32,12 @@ const TeamDataInput = ({
                         <button onClick={() => {
                             const newTeamData = [...teamDataJsonDraft]
                             const teamDataElem = newTeamData[index]
-                            if ("teams" in teamDataElem){
+                            if ("teams" in teamDataElem) {
                                 teamDataElem.teams.splice(idx, 1)
                                 setTeamDataJsonDraft(newTeamData)
                             }
-                        }}>×</button>
+                        }}>×
+                        </button>
                         <input
                             type="text"
                             name={`team-input-${idx}-${key.teamId}`}
@@ -168,8 +168,8 @@ const TeamDataInput = ({
                     onClick={() => {
                         const newTeamData = [...teamDataJsonDraft];
                         const teamDataElem = newTeamData[index];
-                        
-                        
+
+
                         if ("blocks" in teamDataElem) {
                             const blockName = String.fromCharCode(65 + Object.keys(teamDataElem.blocks).length);
                             teamDataElem.blocks[blockName] = [];

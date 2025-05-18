@@ -1,11 +1,9 @@
 "use client"
-import {useData} from "@/hooks/data";
 import Bracket from "@/components/common/Bracket";
-import {deleteEvent} from "@/app/actions/data";
 import {useDataContext} from "@/contexts/dataContext";
 
 const EventList = () => {
-    const {events, mutateEvents, matchPlans} = useDataContext()
+    const {events, matchPlans} = useDataContext()
 
     return (
         <>
@@ -41,10 +39,10 @@ const EventList = () => {
                         </div>
                     )}
                     <div className={"ml-2 bg-white rounded-xl"}>
-                        
-                    {matchPlans && matchPlans.length > 0 && (
-                        <Bracket eventId={event.id} matchPlans={matchPlans}/>
-                    )}
+
+                        {matchPlans && matchPlans.length > 0 && (
+                            <Bracket eventId={event.id} matchPlans={matchPlans}/>
+                        )}
                     </div>
                 </div>
             ))}

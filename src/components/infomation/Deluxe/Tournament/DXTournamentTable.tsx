@@ -1,7 +1,6 @@
 import {MatchPlan} from "@prisma/client";
 import React, {useMemo} from "react";
 import {buildTournamentBracket, TournamentData} from "@/utils/tournamentUtils";
-import {useData} from "@/hooks/data";
 import TournamentTeamBox from "@/components/common/tournamentTable/TournamentTeamBox";
 import DXTournamentMatchBox from "./DXTournamentMatchBox";
 import {useDataContext} from "@/contexts/dataContext";
@@ -24,7 +23,6 @@ const DXTournamentTable = ({teamIds, eventId, isFinal, relatedMatchPlans}: Reado
         matchResults,
         teams,
         teamLoading,
-        getMatchDisplayStr,
     } = useDataContext()
 
     const firstRowWidth = 70;
@@ -68,19 +66,17 @@ const DXTournamentTable = ({teamIds, eventId, isFinal, relatedMatchPlans}: Reado
             </div>
         );
     }
-
-    // 与えられたトーナメント表の最大列数
-    const maxRound = tournamentData.rounds;
+    
     const maxRowNum = tournamentData.teamIds.length * 2;
 
 
     return (
         <div className="w-full overflow-x-auto">
             <div className="grid min-w-[250px] relative"
-                style={{
-                    gridTemplateColumns: `${firstRowWidth}px repeat(${tournamentData.rounds}, ${rowWidth}px)`,
-                    gridTemplateRows: `repeat(${maxRowNum}, ${rowHeight}px)`
-                }}
+                 style={{
+                     gridTemplateColumns: `${firstRowWidth}px repeat(${tournamentData.rounds}, ${rowWidth}px)`,
+                     gridTemplateRows: `repeat(${maxRowNum}, ${rowHeight}px)`
+                 }}
             >
                 {
                     tournamentData.nodes.map(match => {
@@ -97,8 +93,9 @@ const DXTournamentTable = ({teamIds, eventId, isFinal, relatedMatchPlans}: Reado
                                 <TournamentTeamBox node={match} rowWidth={rowWidth} rowHeight={rowHeight}/>
                             }
                             {match.type === "match" && <DXTournamentMatchBox match={match} boxStyle={{}}
-                                                                           matchResult={matchResults && matchResults[match.matchId.toString()]}
-                                                                           rowWidth={rowWidth} rowHeight={rowHeight} teamIds={teamIds} />
+                                                                             matchResult={matchResults && matchResults[match.matchId.toString()]}
+                                                                             rowWidth={rowWidth} rowHeight={rowHeight}
+                                                                             teamIds={teamIds}/>
                             }
 
                         </div>

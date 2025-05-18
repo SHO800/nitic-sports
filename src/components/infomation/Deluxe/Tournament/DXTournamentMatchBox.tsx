@@ -1,6 +1,5 @@
 import React, {CSSProperties, useCallback, useEffect, useRef, useState} from "react";
 import {TournamentNodeMatch} from "@/utils/tournamentUtils";
-import {useData} from "@/hooks/data";
 import {MatchResult} from "@prisma/client";
 import TournamentLine from "@/components/common/tournamentTable/TournamentLine";
 import {useDataContext} from "@/contexts/dataContext";
@@ -13,7 +12,6 @@ const DXTournamentMatchBox = ({match, boxStyle, matchResult, rowWidth, rowHeight
     rowHeight: number
     teamIds: string[]
 }) => {
-    const {getMatchDisplayStr, getActualTeamIdByVariableId} = useDataContext()
     // const {boxNodes, registerNode} = useTournamentBracket();
 
     const matchBoxRef = useRef<HTMLDivElement>(null);
@@ -30,7 +28,7 @@ const DXTournamentMatchBox = ({match, boxStyle, matchResult, rowWidth, rowHeight
         rowDiff: 0,
         colDiff: 0
     })
-    
+
     // リサイズ時や初回レンダリング時に座標を再計算
     const calculateLineCoordinates = useCallback(() => {
 
@@ -44,7 +42,7 @@ const DXTournamentMatchBox = ({match, boxStyle, matchResult, rowWidth, rowHeight
         setDiffs({rowDiff, colDiff})
 
         let startX = box.width;
-        let endX = box.width + (colDiff ) * rowWidth;
+        let endX = box.width + (colDiff) * rowWidth;
         let startY = box.height / 2;
         let endY = box.height / 2;
         let type = "H" as "H" | "V" | "LT" | "RT" | "LB" | "RB";
@@ -52,13 +50,13 @@ const DXTournamentMatchBox = ({match, boxStyle, matchResult, rowWidth, rowHeight
 
         if (rowDiff > 0) {
             startX = box.width;
-            endX = box.width + (colDiff) * rowWidth; 
+            endX = box.width + (colDiff) * rowWidth;
             startY = box.height / 2;
             endY = box.height / 2 + (rowDiff) * rowHeight;
             type = "RT";
         } else if (rowDiff < 0) {
-            startX = box.width ;
-            endX = box.width + (colDiff ) * rowWidth;
+            startX = box.width;
+            endX = box.width + (colDiff) * rowWidth;
             startY = box.height / 2 + (rowDiff) * rowHeight;
             endY = box.height / 2;
             // endY += 4;
@@ -105,7 +103,7 @@ const DXTournamentMatchBox = ({match, boxStyle, matchResult, rowWidth, rowHeight
                     <p className={`${(match.tournamentMatchNode.matchPlan.teamIds === teamIds) ? "bg-amber-500 text-white rounded" : ""}`}>
                         <p className={`${(match.tournamentMatchNode.matchPlan.teamIds === teamIds) ? "animate-pulse text-3xl" : ""}`}>{match.tournamentMatchNode.matchPlan.matchName}</p>
                     </p>
-                    
+
                     {/*<p>{match.tournamentMatchNode.matchPlan.matchName} {`#${match.matchId}`} @{match.row}a*/}
                     {/*    {match.nextNode && match.nextNode.type === "match" && match.matchId}*/}
                     {/*    {match.tournamentMatchNode.matchPlan.matchNote && (*/}
@@ -130,7 +128,7 @@ const DXTournamentMatchBox = ({match, boxStyle, matchResult, rowWidth, rowHeight
                     // animationTimingFunction={"ease-out"}
                     animationTimingFunction={"linear"}
                     duration={200}
-                    timeout={(match.column) * 200 +200 }
+                    timeout={(match.column) * 200 + 200}
                 />
             </div>
 

@@ -1,10 +1,9 @@
 import StatusBadge from "@/components/dashboard/matchPlan/StatusBadge";
 import {judgeDay12String} from "@/utils/judgeDay12";
-import {Event, MatchPlan, MatchResult as MatchResultType, Prisma, Status} from "@prisma/client";
+import {Event, MatchPlan, MatchResult as MatchResultType, Status} from "@prisma/client";
 import MatchCountdown from "@/components/dashboard/matchPlan/MatchCountdown";
 import MatchTimer from "@/components/match/MatchTimer";
 import MatchResult from "@/components/dashboard/matchPlan/MatchResult";
-import {useData} from "@/hooks/data";
 import CardBorder from "@/components/match/CardBorder";
 import MatchTeams from "@/components/match/MatchTeams";
 import MatchController from "@/components/match/MatchController";

@@ -1,5 +1,4 @@
 "use client"
-import {useData} from "@/hooks/data";
 import {useState} from "react";
 import TeamDataInput from "@/components/dashboard/events/TeamDataInput";
 import EventEditForm from "@/components/dashboard/events/EventEditForm";
@@ -14,9 +13,9 @@ const EventForm = () => {
     const [eventType2, setEventType2] = useState<string | null>(null);
     const [teamDataJsonDraft, setTeamDataJsonDraft] = useState<TeamData[]>([
         {
-        type: "tournament",
-        teams: [],
-    }
+            type: "tournament",
+            teams: [],
+        }
     ]);
 
     const addTournamentTeamsFromPlans = (teamDataIndex: number) => {
@@ -169,7 +168,7 @@ const EventForm = () => {
                         >リーグ戦</label>
                         <div>
                             <p>チーム入力</p>
-                            
+
                             <TeamDataInput
                                 index={0}
                                 eventType={eventType1}
@@ -245,7 +244,7 @@ const EventForm = () => {
                             </div>
                         </>
                     }
-                    
+
                     <button
                         type='button'
                         className='bg-blue-500 hover:bg-blue-600 text-black px-4 py-2 rounded'

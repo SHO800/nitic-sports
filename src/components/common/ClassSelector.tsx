@@ -1,5 +1,4 @@
 import {useState} from "react";
-import {useData} from "@/hooks/data";
 import {useDataContext} from "@/contexts/dataContext";
 
 interface ClassSelectorProps {

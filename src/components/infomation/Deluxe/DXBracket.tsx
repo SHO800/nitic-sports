@@ -2,12 +2,11 @@
 
 import {useCallback, useEffect, useState} from 'react';
 import DXLeagueTable from './League/DXLeagueTable';
-import {useData} from '@/hooks/data';
 import {MatchPlan} from "@prisma/client";
 import DXTournamentTable from './Tournament/DXTournamentTable';
 import {useDataContext} from "@/contexts/dataContext";
 
-const DXBracket = ({eventId, matchPlans, teamIds}: { eventId: number, matchPlans: MatchPlan[] , teamIds:string[]}) => {
+const DXBracket = ({eventId, matchPlans, teamIds}: { eventId: number, matchPlans: MatchPlan[], teamIds: string[] }) => {
 
     const [isFinal, setIsFinal] = useState(false);
     const {events, eventLoading} = useDataContext()
@@ -99,7 +98,7 @@ const DXBracket = ({eventId, matchPlans, teamIds}: { eventId: number, matchPlans
         <div className="container mx-auto px-4 py-8">
             <h1 className="text-2xl font-bold mb-6 text-gray-800">{eventName} - 対戦表</h1>
 
-            
+
             {(hasPreliminary || hasFinal) && (
                 <div className="mb-8">
                     <div className="flex space-x-4">
@@ -130,7 +129,7 @@ const DXBracket = ({eventId, matchPlans, teamIds}: { eventId: number, matchPlans
                     </div>
                 </div>
             )}
-            
+
             {(hasPreliminary || hasFinal) ? (
                 <div className="bg-white max-w-[95vw] rounded-lg shadow-md p-6 overflow-auto">
 

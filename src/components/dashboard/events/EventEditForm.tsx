@@ -1,5 +1,4 @@
 "use client"
-import {useData} from "@/hooks/data";
 import {updateEvent} from "@/app/actions/data";
 import {useDataContext} from "@/contexts/dataContext";
 

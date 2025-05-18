@@ -1,11 +1,14 @@
 import {MatchPlan, MatchResult} from "@prisma/client";
-import {useData} from "@/hooks/data";
 import {useEffect, useState} from "react";
 import analyzeVariableTeamId from "@/utils/analyzeVariableTeamId";
 import {createMatchResult} from "@/app/actions/data";
 import {useDataContext} from "@/contexts/dataContext";
 
-export const MatchResultForm = ({matchPlan, matchResult, isTimeBased = false}: { matchPlan: MatchPlan, matchResult?: MatchResult, isTimeBased: boolean}) => {
+export const MatchResultForm = ({matchPlan, matchResult, isTimeBased = false}: {
+    matchPlan: MatchPlan,
+    matchResult?: MatchResult,
+    isTimeBased: boolean
+}) => {
     const {
         matchPlans,
         mutateMatchPlans,
@@ -110,7 +113,7 @@ export const MatchResultForm = ({matchPlan, matchResult, isTimeBased = false}: {
                                 return splitStr.join(":")
                             })
                         }
-                        
+
                         await createMatchResult(
                             matchPlan.id,
                             matchPlan.eventId,
@@ -130,11 +133,11 @@ export const MatchResultForm = ({matchPlan, matchResult, isTimeBased = false}: {
                     <table className={"mt-2 mb-4 border-separate border-spacing-y-1"}>
                         {/*チーム名, スコアorタイム, 勝者の3列*/}
                         <thead>
-                        
+
                         <tr className={"w-full"}>
-                            <th scope={"col"} className={"w-1/6"} >所属</th>
-                            <th scope={"col"} className={"w-2/3"} >{isTimeBased ? "タイム" : "スコア"}</th>
-                            <th scope={"col"} className={"w-1/6"} >勝者</th>
+                            <th scope={"col"} className={"w-1/6"}>所属</th>
+                            <th scope={"col"} className={"w-2/3"}>{isTimeBased ? "タイム" : "スコア"}</th>
+                            <th scope={"col"} className={"w-1/6"}>勝者</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -150,7 +153,7 @@ export const MatchResultForm = ({matchPlan, matchResult, isTimeBased = false}: {
                                         <td className={"whitespace-nowrap text-center"}>
                                             {isTimeBased ?
                                                 <>
-                                                    <input 
+                                                    <input
                                                         type="tel"
                                                         name={`matchResult-${matchPlan.eventId}-${index}-hh`}
                                                         id={`matchResult-${matchPlan.eventId}-${index}-hh`}
@@ -160,7 +163,7 @@ export const MatchResultForm = ({matchPlan, matchResult, isTimeBased = false}: {
                                                         onChange={(e) => {
                                                             const newMatchScores = [...actualMatchScores]
                                                             if (!newMatchScores[index]) newMatchScores[index] = "::."
-                                                            const splitStr =  newMatchScores[index].split(":")
+                                                            const splitStr = newMatchScores[index].split(":")
                                                             splitStr[0] = e.target.value
                                                             newMatchScores[index] = splitStr.join(":")// 結合
                                                             setActualMatchScores(newMatchScores)
@@ -179,7 +182,7 @@ export const MatchResultForm = ({matchPlan, matchResult, isTimeBased = false}: {
                                                         onChange={(e) => {
                                                             const newMatchScores = [...actualMatchScores]
                                                             if (!newMatchScores[index]) newMatchScores[index] = "::."
-                                                            const splitStr =  newMatchScores[index].split(":")
+                                                            const splitStr = newMatchScores[index].split(":")
                                                             splitStr[1] = e.target.value
                                                             newMatchScores[index] = splitStr.join(":")// 結合
                                                             setActualMatchScores(newMatchScores)
@@ -198,7 +201,7 @@ export const MatchResultForm = ({matchPlan, matchResult, isTimeBased = false}: {
                                                         onChange={(e) => {
                                                             const newMatchScores = [...actualMatchScores]
                                                             if (!newMatchScores[index]) newMatchScores[index] = "::."
-                                                            const splitStr =  newMatchScores[index].split(":")
+                                                            const splitStr = newMatchScores[index].split(":")
                                                             const splitStrSplitSec = splitStr[2].split(".")
                                                             splitStrSplitSec[0] = e.target.value
                                                             splitStr[2] = splitStrSplitSec.join(".")
@@ -219,7 +222,7 @@ export const MatchResultForm = ({matchPlan, matchResult, isTimeBased = false}: {
                                                         onChange={(e) => {
                                                             const newMatchScores = [...actualMatchScores]
                                                             if (!newMatchScores[index]) newMatchScores[index] = "::."
-                                                            const splitStr =  newMatchScores[index].split(":")
+                                                            const splitStr = newMatchScores[index].split(":")
                                                             const splitStrSplitSec = splitStr[2].split(".")
                                                             splitStrSplitSec[1] = e.target.value
                                                             splitStr[2] = splitStrSplitSec.join(".")
@@ -230,21 +233,21 @@ export const MatchResultForm = ({matchPlan, matchResult, isTimeBased = false}: {
                                                     />
                                                 </>
                                                 :
-                                            <input
-                                                type='number'
-                                                name={`matchResult-${matchPlan.eventId}-${index}`}
-                                                id={`matchResult-${matchPlan.eventId}-${index}`}
-                                                className='border border-gray-400 px-2 py-1 mx-2 h-8 rounded text-black w-[calc(100%-1em)]'
-                                                placeholder={'スコア'}
-                                                required
-                                                disabled={!canInput}
-                                                onChange={(e) => {
-                                                    const newMatchScores = [...actualMatchScores]
-                                                    newMatchScores[index] = e.target.value
-                                                    setActualMatchScores(newMatchScores)
-                                                }}
-                                                value={actualMatchScores[index] || ""}
-                                            />
+                                                <input
+                                                    type='number'
+                                                    name={`matchResult-${matchPlan.eventId}-${index}`}
+                                                    id={`matchResult-${matchPlan.eventId}-${index}`}
+                                                    className='border border-gray-400 px-2 py-1 mx-2 h-8 rounded text-black w-[calc(100%-1em)]'
+                                                    placeholder={'スコア'}
+                                                    required
+                                                    disabled={!canInput}
+                                                    onChange={(e) => {
+                                                        const newMatchScores = [...actualMatchScores]
+                                                        newMatchScores[index] = e.target.value
+                                                        setActualMatchScores(newMatchScores)
+                                                    }}
+                                                    value={actualMatchScores[index] || ""}
+                                                />
                                             }
                                         </td>
                                         <td>
