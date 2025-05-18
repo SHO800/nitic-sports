@@ -1,54 +1,42 @@
-import { useState } from "react";
-import { useData } from "@/hooks/data";
+import { useDataContext } from "@/contexts/dataContext";
 // import MatchInfoForMap from "./MatchInfoForReader";
-import { Status, MatchPlan as MatchPlanType } from "@prisma/client";
+import type { Status } from "@prisma/client";
+import { useState } from "react";
 // import MatchCountdownForMap from "./MatchCountdownForMap";
 // import MatchTimer from "../dashboard/MatchTimer";
 import Modal from "./Modal";
-import {useDataContext} from "@/contexts/dataContext";
 
 type Props = {
-    placeId: number | null;
-    isOpen: boolean;
-    closeModal: () => void;
-}
+	placeId: number | null;
+	isOpen: boolean;
+	closeModal: () => void;
+};
 
-const EventModal = ({placeId, isOpen, closeModal}:Props) => {
-    
-    if(!isOpen)return null;
+const EventModal = ({ placeId, isOpen, closeModal }: Props) => {
+	if (!isOpen) return null;
 
-    const [matchStatuses, setMatchStatuses] = useState<Record<number, Status>>({});
-        
-    const {
-        // matchPlans,
-        // events,
-        // locations,
-        matchResults,
-        // getMatchDisplayStr
-    } = useDataContext()
+	const [matchStatuses, setMatchStatuses] = useState<Record<number, Status>>(
+		{},
+	);
 
-    {/*
-    const getMatchStatus = (matchPlan: MatchPlanType): Status => {
-        // すでにローカル状態にステータスがある場合はそれを返す
-        if (matchStatuses[matchPlan.id] !== undefined) {
-            return matchStatuses[matchPlan.id];
-        }
-        
-        // すでに結果がある場合はCompletedステータス
-        if (matchResults && matchResults[matchPlan.id]) {
-            return Status.Completed;
-        }
-        
-        // デフォルトはDBから来るステータスを使用するか、なければPreparingとみなす
-        return matchPlan.status || Status.Preparing;
-    };
-    */}
+	const {
+		// matchPlans,
+		// events,
+		// locations,
+		matchResults,
+		// getMatchDisplayStr
+	} = useDataContext();
 
-    return(
-        <div className="flex flex-col fixed inset-0 z-80 w-full  h-screen bg-black/30 justify-center items-center">
-                <div className="flex flex-col lg:w-[60vw] px-1 pb-4 bg-gray-300 rounded">    
-                    <button onClick={closeModal} className="flex mr-1 ml-auto my-1 px-2 py-1 bg-red-400 hover:bg-red-300 rounded text-white float-right">×</button>
-                    {/*
+	return (
+		<div className="flex flex-col fixed inset-0 z-80 w-full  h-screen bg-black/30 justify-center items-center">
+			<div className="flex flex-col lg:w-[60vw] px-1 pb-4 bg-gray-300 rounded">
+				<button
+					onClick={closeModal}
+					className="flex mr-1 ml-auto my-1 px-2 py-1 bg-red-400 hover:bg-red-300 rounded text-white float-right"
+				>
+					×
+				</button>
+				{/*
                     <div className="flex bg-gray-300 justify-center pb-1 rounded-t">実施予定の試合</div>
                     {filteredItems?.map((item) => {
                         
@@ -76,12 +64,10 @@ const EventModal = ({placeId, isOpen, closeModal}:Props) => {
                     })}
                 */}
 
-                <Modal placeId={placeId} />
-
-                </div>
-        </div>
-    )
-    
-}
+				<Modal placeId={placeId} />
+			</div>
+		</div>
+	);
+};
 
 export default EventModal;

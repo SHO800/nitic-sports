@@ -1,15 +1,12 @@
-"use client"
+"use client";
 import EventList from "@/components/dashboard/events/EventList";
-import EventForm from "@/components/dashboard/events/EventForm";
-import EventEditForm from "@/components/dashboard/events/EventEditForm";
-import MinPlanIdInput from "@/components/dashboard/events/MinPlanIdInput";
 
 /**
  * Eventsコンポーネント
- * 
+ *
  * イベント一覧、イベント追加フォーム、イベント編集フォームを表示するコンポーネント
  * 各機能は分割されたコンポーネントに移動されています
- * 
+ *
  * 例 予選はリーグ, 本選はトーナメントの場合
  * [
  *   {
@@ -48,13 +45,13 @@ import MinPlanIdInput from "@/components/dashboard/events/MinPlanIdInput";
  * ]
  */
 const Events = () => {
-    return (
-        <>
-            <EventList />
-            {/*<EventForm />*/}
-            {/*<MinPlanIdInput />*/}
-        </>
-    );
+	return (
+		<>
+			<EventList />
+			{/*<EventForm />*/}
+			{/*<MinPlanIdInput />*/}
+		</>
+	);
 };
 
 export default Events;

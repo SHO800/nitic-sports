@@ -20,7 +20,7 @@
 //                             {/*XX月XX日 XX:XX ~ XX:XX*/}
 //                             {matchResult.id},
 //                             {matchResult.match}
-//                            
+//
 //                             {new Date(matchResult.scheduledStartTime).toLocaleString('ja-JP', {
 //                                 month: '2-digit',
 //                                 day: '2-digit',
@@ -163,7 +163,7 @@
 //                                                 }}
 //                                             />
 //                                             <div className={"fixed top-0 right-0 w-[400px] h-[400px] z-50"}>
-//                                                
+//
 //                                             </div>
 //                                         </div>
 //                                     }

@@ -1,20 +1,22 @@
-"use client"
+"use client";
 
-import {createContext, ReactNode, useContext} from "react";
-import {useData} from "@/hooks/data";
+import { useData } from "@/hooks/data";
+import { type ReactNode, createContext, useContext } from "react";
 
-
-export const DataContext = createContext<ReturnType<typeof useData> | null>(null)
+export const DataContext = createContext<ReturnType<typeof useData> | null>(
+	null,
+);
 export const useDataContext = () => {
-    const context = useContext(DataContext)
-    if (!context) {
-        throw new Error('DataContext must be used within a DataContextProvider')
-    }
+	const context = useContext(DataContext);
+	if (!context) {
+		throw new Error("DataContext must be used within a DataContextProvider");
+	}
 
-    return {...context}
-}
+	return { ...context };
+};
 
-
-export const DataContextProvider = ({children}: { children: ReactNode }) => {
-    return <DataContext.Provider value={useData()}>{children}</DataContext.Provider>
-}
+export const DataContextProvider = ({ children }: { children: ReactNode }) => {
+	return (
+		<DataContext.Provider value={useData()}>{children}</DataContext.Provider>
+	);
+};

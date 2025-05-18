@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import { signOut } from '@/session';
+import { signOut } from "@/session";
 
 const SignOut = () => {
-    return (
-        <button
-            onClick={() => {
-                signOut();
-            }}
-        >
-            サインアウト
-        </button>
-    );
+	return (
+		<button
+			onClick={() => {
+				signOut();
+			}}
+		>
+			サインアウト
+		</button>
+	);
 };
 
 export default SignOut;

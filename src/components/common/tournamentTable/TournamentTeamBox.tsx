@@ -1,64 +1,69 @@
-import React, {useMemo} from "react";
 import TournamentLine from "@/components/common/tournamentTable/TournamentLine";
-import {TournamentNodeTeam} from "@/utils/tournamentUtils";
+import { useDataContext } from "@/contexts/dataContext";
 import useTournamentLine from "@/hooks/useTournamentLine";
-import {useDataContext} from "@/contexts/dataContext";
+import type { TournamentNodeTeam } from "@/utils/tournamentUtils";
+import React, { useMemo } from "react";
 
-const TournamentTeamBox = ({node, rowWidth, rowHeight}: {
-    node: TournamentNodeTeam
-    rowWidth: number
-    rowHeight: number
+const TournamentTeamBox = ({
+	node,
+	rowWidth,
+	rowHeight,
+}: {
+	node: TournamentNodeTeam;
+	rowWidth: number;
+	rowHeight: number;
 }) => {
-    const {getMatchDisplayStr, getActualTeamIdByVariableId, matchResults} = useDataContext()
+	const { getMatchDisplayStr, getActualTeamIdByVariableId, matchResults } =
+		useDataContext();
 
-    const nextNodeRow = node.nextNode?.row;
-    const nextNodeColumn = node.nextNode?.column;
+	const nextNodeRow = node.nextNode?.row;
+	const nextNodeColumn = node.nextNode?.column;
 
-    const {boxRef, lineCoords} = useTournamentLine(
-        rowWidth,
-        rowHeight,
-        node.row,
-        node.column,
-        nextNodeRow,
-        nextNodeColumn
-    );
+	const { boxRef, lineCoords } = useTournamentLine(
+		rowWidth,
+		rowHeight,
+		node.row,
+		node.column,
+		nextNodeRow,
+		nextNodeColumn,
+	);
 
-    const displayStr = getMatchDisplayStr(node.teamId);
+	const displayStr = getMatchDisplayStr(node.teamId);
 
-    const isWonInNextNode = useMemo(() => {
-        const nextNode = node.nextNode;
-        if (!matchResults || !nextNode || nextNode?.type === "team") return false;
-        const actualId = getActualTeamIdByVariableId(node.teamId.toString());
-        if (!actualId) return false;
-        const result = matchResults[nextNode.matchId];
-        if (!result) return false;
-        return result.winnerTeamId === actualId;
-    }, [getActualTeamIdByVariableId, matchResults, node.nextNode, node.teamId]);
+	const isWonInNextNode = useMemo(() => {
+		const nextNode = node.nextNode;
+		if (!matchResults || !nextNode || nextNode?.type === "team") return false;
+		const actualId = getActualTeamIdByVariableId(node.teamId.toString());
+		if (!actualId) return false;
+		const result = matchResults[nextNode.matchId];
+		if (!result) return false;
+		return result.winnerTeamId === actualId;
+	}, [getActualTeamIdByVariableId, matchResults, node.nextNode, node.teamId]);
 
-    return (
-        <div
-            className={`flex justify-end items-center p-2 relative h-10 w-full `}
-            ref={boxRef}
-        >
-            <span className="">{displayStr}</span>
+	return (
+		<div
+			className={`flex justify-end items-center p-2 relative h-10 w-full `}
+			ref={boxRef}
+		>
+			<span className="">{displayStr}</span>
 
-            {
-                <TournamentLine
-                    startX={lineCoords.startX}
-                    startY={lineCoords.startY}
-                    endX={lineCoords.endX}
-                    endY={lineCoords.endY}
-                    type={lineCoords.type}
-                    color1={isWonInNextNode ? "rgb(255,0,0)" : "rgba(156, 163, 175, 1)"}
-                    color2={isWonInNextNode ? "rgb(255,0,0)" : "rgba(156, 163, 175, 1)"}
-                    thickness={4}
-                    animationTimingFunction={"linear"}
-                    duration={200}
-                    timeout={200}
-                />
-            }
-        </div>
-    );
+			{
+				<TournamentLine
+					startX={lineCoords.startX}
+					startY={lineCoords.startY}
+					endX={lineCoords.endX}
+					endY={lineCoords.endY}
+					type={lineCoords.type}
+					color1={isWonInNextNode ? "rgb(255,0,0)" : "rgba(156, 163, 175, 1)"}
+					color2={isWonInNextNode ? "rgb(255,0,0)" : "rgba(156, 163, 175, 1)"}
+					thickness={4}
+					animationTimingFunction={"linear"}
+					duration={200}
+					timeout={200}
+				/>
+			}
+		</div>
+	);
 };
 
 export default React.memo(TournamentTeamBox);

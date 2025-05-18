@@ -1,5 +1,5 @@
-import {Team} from "@prisma/client";
+import type { Team } from "@prisma/client";
 
-type OrganizedTeams = Record<string, Team[]>
+type OrganizedTeams = Record<string, Team[]>;
 
-export default OrganizedTeams
+export default OrganizedTeams;

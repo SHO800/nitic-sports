@@ -1,371 +1,469 @@
-import {useCallback, useMemo} from "react";
-import {Event, Location, MatchPlan, MatchResult, Score, Team} from "@prisma/client";
 import analyzeVariableTeamId from "@/utils/analyzeVariableTeamId";
-import useSWR from "swr";
 import fetcher from "@/utils/fetcher";
 import groupTeams from "@/utils/groupTeams";
+import type {
+	Event,
+	Location,
+	MatchPlan,
+	MatchResult,
+	Score,
+	Team,
+} from "@prisma/client";
+import { useCallback, useMemo } from "react";
+import useSWR from "swr";
 
 // メモ化キャッシュの導入
-const MEMO_CACHE = new Map<string, {value: any, timestamp: number}>();
+const MEMO_CACHE = new Map<string, { value: any; timestamp: number }>();
 const CACHE_TTL = 60000; // 1分間キャッシュを保持
 
 // メモ化関数
 function memoize<T>(key: string, compute: () => T): T {
-  const now = Date.now();
-  const cached = MEMO_CACHE.get(key);
-  
-  // 有効なキャッシュがあれば使用
-  if (cached && now - cached.timestamp < CACHE_TTL) {
-    return cached.value;
-  }
-  
-  // キャッシュがなければ計算して保存
-  const value = compute();
-  MEMO_CACHE.set(key, { value, timestamp: now });
-  return value;
+	const now = Date.now();
+	const cached = MEMO_CACHE.get(key);
+
+	// 有効なキャッシュがあれば使用
+	if (cached && now - cached.timestamp < CACHE_TTL) {
+		return cached.value;
+	}
+
+	// キャッシュがなければ計算して保存
+	const value = compute();
+	MEMO_CACHE.set(key, { value, timestamp: now });
+	return value;
 }
 
 export const useData = () => {
-    // APIのベースURLを一箇所に定義
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+	// APIのベースURLを一箇所に定義
+	const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
-    // SWRの設定を最適化
-    const swrConfig = {
-        revalidateOnFocus: false,      // フォーカス時に再検証しない
-        revalidateIfStale: true,       // 古いデータがある場合は再検証する
-        revalidateOnReconnect: true,   // 再接続時に再検証する
-        dedupingInterval: 5000,        // 5秒間の重複リクエスト防止
-        errorRetryCount: 3,            // エラー再試行回数の制限
-    };
+	// SWRの設定を最適化
+	const swrConfig = {
+		revalidateOnFocus: false, // フォーカス時に再検証しない
+		revalidateIfStale: true, // 古いデータがある場合は再検証する
+		revalidateOnReconnect: true, // 再接続時に再検証する
+		dedupingInterval: 5000, // 5秒間の重複リクエスト防止
+		errorRetryCount: 3, // エラー再試行回数の制限
+	};
 
-    // SWRフック呼び出しを最適化
-    const {
-        data: teams,
-        error: teamError,
-        isLoading: teamLoading,
-        mutate: mutateTeams
-    } = useSWR<Team[]>(`${API_BASE}/team`, fetcher, swrConfig);
+	// SWRフック呼び出しを最適化
+	const {
+		data: teams,
+		error: teamError,
+		isLoading: teamLoading,
+		mutate: mutateTeams,
+	} = useSWR<Team[]>(`${API_BASE}/team`, fetcher, swrConfig);
 
-    const {
-        data: locations,
-        error: locationError,
-        isLoading: locationLoading,
-        mutate: mutateLocations
-    } = useSWR<Location[]>(`${API_BASE}/location`, fetcher, swrConfig);
+	const {
+		data: locations,
+		error: locationError,
+		isLoading: locationLoading,
+		mutate: mutateLocations,
+	} = useSWR<Location[]>(`${API_BASE}/location`, fetcher, swrConfig);
 
-    const {
-        data: events,
-        error: eventError,
-        isLoading: eventLoading,
-        mutate: mutateEvents
-    } = useSWR<Event[]>(`${API_BASE}/event`, fetcher, swrConfig);
+	const {
+		data: events,
+		error: eventError,
+		isLoading: eventLoading,
+		mutate: mutateEvents,
+	} = useSWR<Event[]>(`${API_BASE}/event`, fetcher, swrConfig);
 
-    const {
-        data: matchPlans,
-        error: matchPlanError,
-        isLoading: matchPlanLoading,
-        mutate: mutateMatchPlans
-    } = useSWR<MatchPlan[]>(`${API_BASE}/match-plan`, fetcher, swrConfig);
+	const {
+		data: matchPlans,
+		error: matchPlanError,
+		isLoading: matchPlanLoading,
+		mutate: mutateMatchPlans,
+	} = useSWR<MatchPlan[]>(`${API_BASE}/match-plan`, fetcher, swrConfig);
 
-    const {
-        data: matchResults,
-        error: matchResultError,
-        isLoading: matchResultLoading,
-        mutate: mutateMatchResults
-    } = useSWR<{ [key: string]: MatchResult }>(`${API_BASE}/match-result`, fetcher, swrConfig);
+	const {
+		data: matchResults,
+		error: matchResultError,
+		isLoading: matchResultLoading,
+		mutate: mutateMatchResults,
+	} = useSWR<{ [key: string]: MatchResult }>(
+		`${API_BASE}/match-result`,
+		fetcher,
+		swrConfig,
+	);
 
-    const {
-        data: scores,
-        error: scoreError,
-        isLoading: scoreLoading,
-        mutate: mutateScores
-    } = useSWR<Score[]>(`${API_BASE}/score`, fetcher, swrConfig);
+	const {
+		data: scores,
+		error: scoreError,
+		isLoading: scoreLoading,
+		mutate: mutateScores,
+	} = useSWR<Score[]>(`${API_BASE}/score`, fetcher, swrConfig);
 
-    // グループ化されたチームをメモ化
-    const groupedTeams = useMemo(() => {
-        if (!teams) return {};
-        return groupTeams(teams);
-    }, [teams]);
+	// グループ化されたチームをメモ化
+	const groupedTeams = useMemo(() => {
+		if (!teams) return {};
+		return groupTeams(teams);
+	}, [teams]);
 
-    // 必須データが揃っているかのチェック関数
-    const hasRequiredData = useCallback(() => {
-        return !!(matchPlans && matchResults && teams && events && Array.isArray(teams));
-    }, [matchPlans, matchResults, teams, events]);
+	// 必須データが揃っているかのチェック関数
+	const hasRequiredData = useCallback(() => {
+		return !!(
+			matchPlans &&
+			matchResults &&
+			teams &&
+			events &&
+			Array.isArray(teams)
+		);
+	}, [matchPlans, matchResults, teams, events]);
 
-    // 試合名表示文字列取得関数をメモ化
-    const getMatchDisplayStr = useCallback((teamId: string | number): string => {
-        if (!hasRequiredData()) return '';
-        
-        // メモ化キャッシュを活用
-        return memoize(`displayStr-${teamId}`, () => {
-            // 変数IDの処理
-            if (typeof teamId === "string" && teamId.startsWith("$")) {
-                const variableTeamIdData = analyzeVariableTeamId(teamId);
-                if (!variableTeamIdData) return '';
+	// 試合名表示文字列取得関数をメモ化
+	const getMatchDisplayStr = useCallback(
+		(teamId: string | number): string => {
+			if (!hasRequiredData()) return "";
 
-                // トーナメント形式の処理
-                if (variableTeamIdData.type === "T") {
-                    const matchPlan = matchPlans!.find((mp) => mp.id === variableTeamIdData.matchId);
-                    if (!matchPlan) return '';
+			// メモ化キャッシュを活用
+			return memoize(`displayStr-${teamId}`, () => {
+				// 変数IDの処理
+				if (typeof teamId === "string" && teamId.startsWith("$")) {
+					const variableTeamIdData = analyzeVariableTeamId(teamId);
+					if (!variableTeamIdData) return "";
 
-                    const matchName = matchPlan.matchName;
-                    const expectedResult = variableTeamIdData.condition;
-                    const matchResult = matchResults![variableTeamIdData.matchId];
+					// トーナメント形式の処理
+					if (variableTeamIdData.type === "T") {
+						const matchPlan = matchPlans!.find(
+							(mp) => mp.id === variableTeamIdData.matchId,
+						);
+						if (!matchPlan) return "";
 
-                    // 試合結果が存在しない場合
-                    if (!matchResult) return `${matchName}${expectedResult === "W" ? "勝者" : "敗者"}`;
+						const matchName = matchPlan.matchName;
+						const expectedResult = variableTeamIdData.condition;
+						const matchResult = matchResults![variableTeamIdData.matchId];
 
-                    if (expectedResult === "W") {
-                        const team = teams!.find((t) => t.id === matchResult.winnerTeamId);
-                        return team ? `${team.name} ` : '';
-                    }
+						// 試合結果が存在しない場合
+						if (!matchResult)
+							return `${matchName}${expectedResult === "W" ? "勝者" : "敗者"}`;
 
-                    if (expectedResult === "L") {
-                        const team = teams!.find((t) => t.id === matchResult.loserTeamId);
-                        return team ? `${team.name} ` : `${matchName}敗者`;
-                    }
-                }
+						if (expectedResult === "W") {
+							const team = teams!.find(
+								(t) => t.id === matchResult.winnerTeamId,
+							);
+							return team ? `${team.name} ` : "";
+						}
 
-                // リーグ形式の処理
-                if (variableTeamIdData.type === "L") {
-                    let planStr = `${variableTeamIdData.blockName}ブロック${variableTeamIdData.expectedRank}位`;
-                    if (variableTeamIdData.eventId === 1) planStr = `${variableTeamIdData.blockName.charCodeAt(0) - 'A'.charCodeAt(0) +1}年の${variableTeamIdData.expectedRank}位`;
+						if (expectedResult === "L") {
+							const team = teams!.find((t) => t.id === matchResult.loserTeamId);
+							return team ? `${team.name} ` : `${matchName}敗者`;
+						}
+					}
 
-                    const event = events!.find((e) => e.id === variableTeamIdData.eventId);
-                    if (!event) return planStr;
+					// リーグ形式の処理
+					if (variableTeamIdData.type === "L") {
+						let planStr = `${variableTeamIdData.blockName}ブロック${variableTeamIdData.expectedRank}位`;
+						if (variableTeamIdData.eventId === 1)
+							planStr = `${variableTeamIdData.blockName.charCodeAt(0) - "A".charCodeAt(0) + 1}年の${variableTeamIdData.expectedRank}位`;
 
-                    const teamData = event.teamData as unknown as TeamData[];
-                    if (!teamData) return planStr;
+						const event = events!.find(
+							(e) => e.id === variableTeamIdData.eventId,
+						);
+						if (!event) return planStr;
 
-                    const teamDataIndex = variableTeamIdData.teamDataIndex;
-                    if (!teamData[teamDataIndex] || teamData[teamDataIndex].type !== "league" ) return planStr;
+						const teamData = event.teamData as unknown as TeamData[];
+						if (!teamData) return planStr;
 
-                    const block = teamData[teamDataIndex].blocks[variableTeamIdData.blockName];
-                    if (!block) return planStr;
+						const teamDataIndex = variableTeamIdData.teamDataIndex;
+						if (
+							!teamData[teamDataIndex] ||
+							teamData[teamDataIndex].type !== "league"
+						)
+							return planStr;
 
-                    const blockTeam = block.find((t) => t.rank === variableTeamIdData.expectedRank);
-                    if (!blockTeam) return planStr;
+						const block =
+							teamData[teamDataIndex].blocks[variableTeamIdData.blockName];
+						if (!block) return planStr;
 
-                    const team = teams!.find((t) => t.id.toString() === blockTeam.teamId);
-                    return team ? `${team.name} ` : '';
-                }
+						const blockTeam = block.find(
+							(t) => t.rank === variableTeamIdData.expectedRank,
+						);
+						if (!blockTeam) return planStr;
 
-                return '';
-            }
+						const team = teams!.find(
+							(t) => t.id.toString() === blockTeam.teamId,
+						);
+						return team ? `${team.name} ` : "";
+					}
 
-            // 通常のチームID処理
-            if (!teams || !events || !matchPlans || !matchResults || !Array.isArray(teams)) return '';
-            const team = teams.find((t) => t.id === Number(teamId));
-            return team ? `${team.name} ` : '';
-        });
-    }, [teams, events, matchPlans, matchResults, hasRequiredData]);
-    
-    // 以下の関数もメモ化によって最適化
-    const getActualTeamIdByVariableId = useCallback((variableId: string): number|null => {
-        if (!hasRequiredData()) return null;
-        
-        return memoize(`actualTeamId-${variableId}`, () => {
-            if (!variableId.startsWith("$")) return parseInt(variableId);
+					return "";
+				}
 
-            const variableTeamIdData = analyzeVariableTeamId(variableId);
-            if (!variableTeamIdData) return null;
+				// 通常のチームID処理
+				if (
+					!teams ||
+					!events ||
+					!matchPlans ||
+					!matchResults ||
+					!Array.isArray(teams)
+				)
+					return "";
+				const team = teams.find((t) => t.id === Number(teamId));
+				return team ? `${team.name} ` : "";
+			});
+		},
+		[teams, events, matchPlans, matchResults, hasRequiredData],
+	);
 
-            if (variableTeamIdData.type === "T") {
-                const matchPlan = matchPlans!.find((mp) => mp.id === variableTeamIdData.matchId);
-                if (!matchPlan) return null;
+	// 以下の関数もメモ化によって最適化
+	const getActualTeamIdByVariableId = useCallback(
+		(variableId: string): number | null => {
+			if (!hasRequiredData()) return null;
 
-                const matchResult = matchResults![variableTeamIdData.matchId];
-                if (!matchResult) return null;
+			return memoize(`actualTeamId-${variableId}`, () => {
+				if (!variableId.startsWith("$")) return Number.parseInt(variableId);
 
-                return variableTeamIdData.condition === "W" ? matchResult.winnerTeamId : matchResult.loserTeamId;
-            }
+				const variableTeamIdData = analyzeVariableTeamId(variableId);
+				if (!variableTeamIdData) return null;
 
-            if (variableTeamIdData.type === "L") {
-                const event = events!.find((e) => e.id === variableTeamIdData.eventId);
-                if (!event) return null;
+				if (variableTeamIdData.type === "T") {
+					const matchPlan = matchPlans!.find(
+						(mp) => mp.id === variableTeamIdData.matchId,
+					);
+					if (!matchPlan) return null;
 
-                const teamData = event.teamData as unknown as TeamData[];
-                if (!teamData) return null;
+					const matchResult = matchResults![variableTeamIdData.matchId];
+					if (!matchResult) return null;
 
-                const teamDataIndex = variableTeamIdData.teamDataIndex;
-                const blockName = variableTeamIdData.blockName;
-                const expectedRank = variableTeamIdData.expectedRank;
+					return variableTeamIdData.condition === "W"
+						? matchResult.winnerTeamId
+						: matchResult.loserTeamId;
+				}
 
-                if (teamData[teamDataIndex].type !== "league") return null;
+				if (variableTeamIdData.type === "L") {
+					const event = events!.find(
+						(e) => e.id === variableTeamIdData.eventId,
+					);
+					if (!event) return null;
 
-                const block = teamData[teamDataIndex].blocks[blockName];
-                if (!block) return null;
+					const teamData = event.teamData as unknown as TeamData[];
+					if (!teamData) return null;
 
-                const blockTeam = block.find((t) => t.rank === expectedRank);
-                if (!blockTeam) return null;
+					const teamDataIndex = variableTeamIdData.teamDataIndex;
+					const blockName = variableTeamIdData.blockName;
+					const expectedRank = variableTeamIdData.expectedRank;
 
-                return Number(blockTeam.teamId);
-            }
+					if (teamData[teamDataIndex].type !== "league") return null;
 
-            return null;
-        });
-    }, [matchPlans, matchResults, events, hasRequiredData]);
-    
-    // ブロック内の試合情報を取得する関数の最適化
-    const getBlockMatches = useCallback((eventId: number, blockName: string, block: { teamId: string }[]): MatchPlan[] => {
-        if (!hasRequiredData()) return [];
-        if (!blockName) return [];
-        
-        // チームID配列をソートして一意のキーを生成
-        const blockTeamIds = block.map((team) => team.teamId).sort().join(',');
-        const cacheKey = `blockMatches-${eventId}-${blockName}-${blockTeamIds}`;
-        
-        return memoize(cacheKey, () => {
-            // 指定された種目において, 指定されたteamIdsの配列に含まれるチーム同士の戦いを取得する
-            const sortedTeamIds = block.map((team) => team.teamId).sort();
-            const matchPlansForEvent = matchPlans!.filter((matchPlan) => matchPlan.eventId === eventId);
-            const matchPlansForBlock = matchPlansForEvent.filter((matchPlan) => {
-                const teamIds = matchPlan.teamIds as unknown as string[];
-                return teamIds.every((teamId) => sortedTeamIds.includes(teamId));
-            });
-            
-            return matchPlansForBlock;
-        });
-    }, [matchPlans, hasRequiredData]);
+					const block = teamData[teamDataIndex].blocks[blockName];
+					if (!block) return null;
 
-    // 試合結果が確定しているかどうかをチェックする関数を最適化
-    const isFixedMatchResultByMatchId = useCallback((matchId: string): boolean => {
-        if (!hasRequiredData()) return false;
-        
-        return memoize(`isFixedMatch-${matchId}`, () => {
-            const matchResult = matchResults![matchId];
-            return !!matchResult && matchResult.winnerTeamId !== null;
-        });
-    }, [matchResults, hasRequiredData]);
+					const blockTeam = block.find((t) => t.rank === expectedRank);
+					if (!blockTeam) return null;
 
-    // 変数IDによる試合結果またはブロックランク確定チェック関数を最適化
-    const isFixedMatchResultOrBlockRankByVariableId = useCallback((variableId: string): boolean => {
-        if (!hasRequiredData() || !variableId.startsWith("$")) return false;
-        
-        return memoize(`isFixedMatchOrRank-${variableId}`, () => {
-            const variableTeamIdData = analyzeVariableTeamId(variableId);
-            if (!variableTeamIdData) return false;
+					return Number(blockTeam.teamId);
+				}
 
-            if (variableTeamIdData.type === "T") {
-                const matchId = variableTeamIdData.matchId;
-                const matchPlan = matchPlans!.find((mp) => mp.id === matchId);
-                if (!matchPlan) return false;
+				return null;
+			});
+		},
+		[matchPlans, matchResults, events, hasRequiredData],
+	);
 
-                const matchResult = matchResults![matchId];
-                return !!matchResult && matchResult.winnerTeamId !== null;
-            }
+	// ブロック内の試合情報を取得する関数の最適化
+	const getBlockMatches = useCallback(
+		(
+			eventId: number,
+			blockName: string,
+			block: { teamId: string }[],
+		): MatchPlan[] => {
+			if (!hasRequiredData()) return [];
+			if (!blockName) return [];
 
-            if (variableTeamIdData.type === "L") {
-                const event = events!.find((e) => e.id === variableTeamIdData.eventId);
-                if (!event) return false;
+			// チームID配列をソートして一意のキーを生成
+			const blockTeamIds = block
+				.map((team) => team.teamId)
+				.sort()
+				.join(",");
+			const cacheKey = `blockMatches-${eventId}-${blockName}-${blockTeamIds}`;
 
-                const teamData = event.teamData as unknown as TeamData[];
-                if (!teamData) return false;
+			return memoize(cacheKey, () => {
+				// 指定された種目において, 指定されたteamIdsの配列に含まれるチーム同士の戦いを取得する
+				const sortedTeamIds = block.map((team) => team.teamId).sort();
+				const matchPlansForEvent = matchPlans!.filter(
+					(matchPlan) => matchPlan.eventId === eventId,
+				);
+				const matchPlansForBlock = matchPlansForEvent.filter((matchPlan) => {
+					const teamIds = matchPlan.teamIds as unknown as string[];
+					return teamIds.every((teamId) => sortedTeamIds.includes(teamId));
+				});
 
-                const teamDataIndex = variableTeamIdData.teamDataIndex;
-                const blockName = variableTeamIdData.blockName;
-                const expectedRank = variableTeamIdData.expectedRank;
+				return matchPlansForBlock;
+			});
+		},
+		[matchPlans, hasRequiredData],
+	);
 
-                if (teamData[teamDataIndex].type !== "league") return false;
+	// 試合結果が確定しているかどうかをチェックする関数を最適化
+	const isFixedMatchResultByMatchId = useCallback(
+		(matchId: string): boolean => {
+			if (!hasRequiredData()) return false;
 
-                const block = teamData[teamDataIndex].blocks[blockName];
-                if (!block) return false;
+			return memoize(`isFixedMatch-${matchId}`, () => {
+				const matchResult = matchResults![matchId];
+				return !!matchResult && matchResult.winnerTeamId !== null;
+			});
+		},
+		[matchResults, hasRequiredData],
+	);
 
-                return !!block.find((t) => t.rank === expectedRank);
-            }
+	// 変数IDによる試合結果またはブロックランク確定チェック関数を最適化
+	const isFixedMatchResultOrBlockRankByVariableId = useCallback(
+		(variableId: string): boolean => {
+			if (!hasRequiredData() || !variableId.startsWith("$")) return false;
 
-            return false;
-        });
-    }, [matchPlans, matchResults, events, hasRequiredData]);
+			return memoize(`isFixedMatchOrRank-${variableId}`, () => {
+				const variableTeamIdData = analyzeVariableTeamId(variableId);
+				if (!variableTeamIdData) return false;
 
-    // 変数IDからマッチプランを検索する関数を最適化
-    const searchMatchPlanByVariableId = useCallback((variableId: string): MatchPlan | null => {
-        if (!hasRequiredData()) return null;
-        
-        return memoize(`matchPlanByVarId-${variableId}`, () => {
-            const variableTeamIdData = analyzeVariableTeamId(variableId);
-            if (!variableTeamIdData || variableTeamIdData.type !== "T") return null;
+				if (variableTeamIdData.type === "T") {
+					const matchId = variableTeamIdData.matchId;
+					const matchPlan = matchPlans!.find((mp) => mp.id === matchId);
+					if (!matchPlan) return false;
 
-            const matchId = variableTeamIdData.matchId;
-            return matchPlans!.find((mp) => mp.id === matchId) || null;
-        });
-    }, [matchPlans, hasRequiredData]);
+					const matchResult = matchResults![matchId];
+					return !!matchResult && matchResult.winnerTeamId !== null;
+				}
 
-    // 変数IDからリーグデータを取得する関数を最適化
-    const getLeagueDataByVariableId = useCallback((variableId: string): TeamData | null => {
-        if (!hasRequiredData()) return null;
-        
-        return memoize(`leagueDataByVarId-${variableId}`, () => {
-            const variableTeamIdData = analyzeVariableTeamId(variableId);
-            if (!variableTeamIdData || variableTeamIdData.type !== "L") return null;
+				if (variableTeamIdData.type === "L") {
+					const event = events!.find(
+						(e) => e.id === variableTeamIdData.eventId,
+					);
+					if (!event) return false;
 
-            const event = events!.find((e) => e.id === variableTeamIdData.eventId);
-            if (!event) return null;
+					const teamData = event.teamData as unknown as TeamData[];
+					if (!teamData) return false;
 
-            const jsonData = event.teamData[variableTeamIdData.teamDataIndex];
-            return jsonData as unknown as TeamData || null;
-        });
-    }, [events, hasRequiredData]);
+					const teamDataIndex = variableTeamIdData.teamDataIndex;
+					const blockName = variableTeamIdData.blockName;
+					const expectedRank = variableTeamIdData.expectedRank;
 
-    // 試合IDから試合結果を取得する関数を最適化
-    const getMatchResultByMatchId = useCallback((matchId: string | number): MatchResult | null => {
-        if (!hasRequiredData() || (typeof matchId === "string" && matchId.startsWith("$"))) return null;
-        
-        return memoize(`matchResultById-${matchId}`, () => {
-            return matchResults![matchId] || null;
-        });
-    }, [matchResults, hasRequiredData]);
+					if (teamData[teamDataIndex].type !== "league") return false;
 
-    // すべてのロード状態を集約
-    const isLoading = teamLoading || locationLoading || eventLoading || matchPlanLoading ||
-        matchResultLoading || scoreLoading;
+					const block = teamData[teamDataIndex].blocks[blockName];
+					if (!block) return false;
 
-    // データロードエラーを集約
-    const errors = useMemo(() => {
-        return {
-            teamError,
-            locationError,
-            eventError,
-            matchPlanError,
-            matchResultError,
-            scoreError
-        };
-    }, [teamError, locationError, eventError, matchPlanError, matchResultError, scoreError]);
+					return !!block.find((t) => t.rank === expectedRank);
+				}
 
-    return {
-        // データ
-        teams,
-        teamLoading,
-        mutateTeams,
-        groupedTeams,
-        events,
-        eventLoading,
-        mutateEvents,
-        matchPlans,
-        matchPlanLoading,
-        mutateMatchPlans,
-        matchResults,
-        matchResultLoading,
-        mutateMatchResults,
-        locations,
-        locationLoading,
-        mutateLocations,
-        scores,
-        scoreLoading,
-        mutateScores,
-        // 集約した状態
-        isLoading,
-        hasErrors: Object.values(errors).some(Boolean),
-        errors,
+				return false;
+			});
+		},
+		[matchPlans, matchResults, events, hasRequiredData],
+	);
 
-        // 最適化したヘルパー関数
-        getBlockMatches,
-        getMatchDisplayStr,
-        getActualTeamIdByVariableId,
-        isFixedMatchResult: isFixedMatchResultByMatchId,
-        isFixedMatchResultOrBlockRankByVariableId,
-        searchMatchPlanByVariableId,
-        getMatchResultByMatchId,
-        getLeagueDataByVariableId,
-    };
+	// 変数IDからマッチプランを検索する関数を最適化
+	const searchMatchPlanByVariableId = useCallback(
+		(variableId: string): MatchPlan | null => {
+			if (!hasRequiredData()) return null;
+
+			return memoize(`matchPlanByVarId-${variableId}`, () => {
+				const variableTeamIdData = analyzeVariableTeamId(variableId);
+				if (!variableTeamIdData || variableTeamIdData.type !== "T") return null;
+
+				const matchId = variableTeamIdData.matchId;
+				return matchPlans!.find((mp) => mp.id === matchId) || null;
+			});
+		},
+		[matchPlans, hasRequiredData],
+	);
+
+	// 変数IDからリーグデータを取得する関数を最適化
+	const getLeagueDataByVariableId = useCallback(
+		(variableId: string): TeamData | null => {
+			if (!hasRequiredData()) return null;
+
+			return memoize(`leagueDataByVarId-${variableId}`, () => {
+				const variableTeamIdData = analyzeVariableTeamId(variableId);
+				if (!variableTeamIdData || variableTeamIdData.type !== "L") return null;
+
+				const event = events!.find((e) => e.id === variableTeamIdData.eventId);
+				if (!event) return null;
+
+				const jsonData = event.teamData[variableTeamIdData.teamDataIndex];
+				return (jsonData as unknown as TeamData) || null;
+			});
+		},
+		[events, hasRequiredData],
+	);
+
+	// 試合IDから試合結果を取得する関数を最適化
+	const getMatchResultByMatchId = useCallback(
+		(matchId: string | number): MatchResult | null => {
+			if (
+				!hasRequiredData() ||
+				(typeof matchId === "string" && matchId.startsWith("$"))
+			)
+				return null;
+
+			return memoize(`matchResultById-${matchId}`, () => {
+				return matchResults![matchId] || null;
+			});
+		},
+		[matchResults, hasRequiredData],
+	);
+
+	// すべてのロード状態を集約
+	const isLoading =
+		teamLoading ||
+		locationLoading ||
+		eventLoading ||
+		matchPlanLoading ||
+		matchResultLoading ||
+		scoreLoading;
+
+	// データロードエラーを集約
+	const errors = useMemo(() => {
+		return {
+			teamError,
+			locationError,
+			eventError,
+			matchPlanError,
+			matchResultError,
+			scoreError,
+		};
+	}, [
+		teamError,
+		locationError,
+		eventError,
+		matchPlanError,
+		matchResultError,
+		scoreError,
+	]);
+
+	return {
+		// データ
+		teams,
+		teamLoading,
+		mutateTeams,
+		groupedTeams,
+		events,
+		eventLoading,
+		mutateEvents,
+		matchPlans,
+		matchPlanLoading,
+		mutateMatchPlans,
+		matchResults,
+		matchResultLoading,
+		mutateMatchResults,
+		locations,
+		locationLoading,
+		mutateLocations,
+		scores,
+		scoreLoading,
+		mutateScores,
+		// 集約した状態
+		isLoading,
+		hasErrors: Object.values(errors).some(Boolean),
+		errors,
+
+		// 最適化したヘルパー関数
+		getBlockMatches,
+		getMatchDisplayStr,
+		getActualTeamIdByVariableId,
+		isFixedMatchResult: isFixedMatchResultByMatchId,
+		isFixedMatchResultOrBlockRankByVariableId,
+		searchMatchPlanByVariableId,
+		getMatchResultByMatchId,
+		getLeagueDataByVariableId,
+	};
 };

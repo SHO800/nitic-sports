@@ -1,201 +1,176 @@
-import {useState} from "react";
+import { useDataContext } from "@/contexts/dataContext";
+import { type MatchPlan as MatchPlanType, Status } from "@prisma/client";
+import { useState } from "react";
 import MatchInfoForReader from "../reader/MatchInfoForReader";
-import {MatchPlan as MatchPlanType, Status} from "@prisma/client";
-import {useDataContext} from "@/contexts/dataContext";
 
 type Props =
-    | { eventId: number | string | null; eventIds?: undefined }
-    | { eventIds: string; eventId?: undefined };
+	| { eventId: number | string | null; eventIds?: undefined }
+	| { eventIds: string; eventId?: undefined };
 
 const NextMatch: React.FC<Props> = (props) => {
+	const [matchStatuses] = useState<Record<number, Status>>({});
 
-    const [matchStatuses] = useState<Record<number, Status>>({});
+	const { matchPlans, events, locations, matchResults, getMatchDisplayStr } =
+		useDataContext();
 
-    const {
-        matchPlans,
-        events,
-        locations,
-        matchResults,
-        getMatchDisplayStr
-    } = useDataContext()
+	if (typeof props.eventId === "number") {
+		const MatchPlans = matchPlans?.map((item) => ({
+			...item,
+			scheduledStartTime: new Date(item.scheduledStartTime),
+			scheduledEndTime: new Date(item.scheduledEndTime),
+		}));
 
+		const filteredByEvent = MatchPlans?.filter(
+			(item) => item.eventId === props.eventId,
+		);
 
-    if (typeof props.eventId === "number") {
+		const AddedMatchTime = filteredByEvent?.map((item) => ({
+			...item,
+			matchTime:
+				item.scheduledEndTime.getTime() - item.scheduledStartTime.getTime(),
+		}));
 
-        const MatchPlans = matchPlans?.map((item) => ({
-            ...item,
-            scheduledStartTime: new Date(item.scheduledStartTime),
-            scheduledEndTime: new Date(item.scheduledEndTime),
-        }));
+		const SortedByStartTime = AddedMatchTime?.sort(
+			(a, b) => a.scheduledStartTime.getTime() - b.scheduledStartTime.getTime(),
+		);
 
+		const filteredByStatus = SortedByStartTime?.filter(
+			(item) => item.status === "Preparing" || item.status === "Waiting",
+			// && item.scheduledStartTime.getTime() < currentTime.currentTime
+		);
+		const NextThree = filteredByStatus?.slice(0, 3);
 
-        const filteredByEvent = MatchPlans?.filter((item) => item.eventId === props.eventId)
+		const getMatchStatus = (matchPlan: MatchPlanType): Status => {
+			// すでにローカル状態にステータスがある場合はそれを返す
+			if (matchStatuses[matchPlan.id] !== undefined) {
+				return matchStatuses[matchPlan.id];
+			}
 
+			// すでに結果がある場合はCompletedステータス
+			if (matchResults && matchResults[matchPlan.id]) {
+				return Status.Completed;
+			}
 
-        const AddedMatchTime = filteredByEvent?.map((item) => ({
-            ...item,
-            matchTime: (item.scheduledEndTime.getTime() - item.scheduledStartTime.getTime()),
-        }));
+			// デフォルトはDBから来るステータスを使用するか、なければPreparingとみなす
+			return matchPlan.status || Status.Preparing;
+		};
 
-        const SortedByStartTime = AddedMatchTime?.sort((a, b) => a.scheduledStartTime.getTime() - b.scheduledStartTime.getTime())
+		if (NextThree?.length === 0) {
+			return (
+				<div className="flex min-w-[94vw] justify-center">
+					<div className="flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[30vh] bg-gray-100 rounded overflow-auto">
+						{/* <div className="flex justify-center items-center h-full bg-gray-500 px-10 rounded"> */}
+						全試合終了しました
+						{/* </div> */}
+					</div>
+				</div>
+			);
+		}
 
-        const filteredByStatus = SortedByStartTime?.filter((item) =>
-                (item.status === "Preparing" || item.status === "Waiting")
-            // && item.scheduledStartTime.getTime() < currentTime.currentTime
-        )
-        const NextThree = filteredByStatus?.slice(0, 3);
-
-        const getMatchStatus = (matchPlan: MatchPlanType): Status => {
-            // すでにローカル状態にステータスがある場合はそれを返す
-            if (matchStatuses[matchPlan.id] !== undefined) {
-                return matchStatuses[matchPlan.id];
-            }
-
-            // すでに結果がある場合はCompletedステータス
-            if (matchResults && matchResults[matchPlan.id]) {
-                return Status.Completed;
-            }
-
-            // デフォルトはDBから来るステータスを使用するか、なければPreparingとみなす
-            return matchPlan.status || Status.Preparing;
-        };
-
-        if (NextThree?.length === 0) {
-            return (
-                <div className="flex min-w-[94vw] justify-center">
-                    <div
-                        className="flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[30vh] bg-gray-100 rounded overflow-auto">
-                        {/* <div className="flex justify-center items-center h-full bg-gray-500 px-10 rounded"> */}
-                        全試合終了しました
-                        {/* </div> */}
-                    </div>
-                </div>
-            )
-        }
-
-        return (
-            <div className="flex flex-col min-w-[94vw] justify-center">
-                <div className="flex flex-col lg:mx-20 px-1 py-2 min-h-[30vh] bg-gray-100 rounded overflow-auto">
-                    {NextThree?.map((item) => {
-
-                        return (
-                            <div className="flex justify-center bg-gray-100 px-10 rounded">
-                                <div key={item.id} className="flex flex-col bg-white mb-1 border rounded">
-                                    <div
-                                        className="flex justify-center w-[70vw] lg:w-[30vw] bg-white px-1 rounded text-2xl">
-
-                                        <MatchInfoForReader
-                                            matchPlan={item}
-                                            events={events}
-                                            locations={locations}
-                                            getMatchDisplayStr={getMatchDisplayStr}
-                                        />
-                                    </div>
-                                    {/*
+		return (
+			<div className="flex flex-col min-w-[94vw] justify-center">
+				<div className="flex flex-col lg:mx-20 px-1 py-2 min-h-[30vh] bg-gray-100 rounded overflow-auto">
+					{NextThree?.map((item) => {
+						return (
+							<div className="flex justify-center bg-gray-100 px-10 rounded">
+								<div
+									key={item.id}
+									className="flex flex-col bg-white mb-1 border rounded"
+								>
+									<div className="flex justify-center w-[70vw] lg:w-[30vw] bg-white px-1 rounded text-2xl">
+										<MatchInfoForReader
+											matchPlan={item}
+											events={events}
+											locations={locations}
+											getMatchDisplayStr={getMatchDisplayStr}
+										/>
+									</div>
+									{/*
                                 <p  className="flex justify-center bg-white text-black px-1 rounded text-2xl">
                                     {(status === Status.Waiting || status === Status.Preparing) && (
                                         <MatchCountdownForReader scheduledStartTime={item.scheduledStartTime}/>
                                     )}
                                 </p>
                                 */}
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-            </div>
-        )
-    }
+								</div>
+							</div>
+						);
+					})}
+				</div>
+			</div>
+		);
+	}
 
-    if (typeof props.eventId === "string") {
+	if (typeof props.eventId === "string") {
+		const MatchPlans = matchPlans?.map((item) => ({
+			...item,
+			scheduledStartTime: new Date(item.scheduledStartTime),
+			scheduledEndTime: new Date(item.scheduledEndTime),
+		}));
 
-        const MatchPlans = matchPlans?.map((item) => ({
-            ...item,
-            scheduledStartTime: new Date(item.scheduledStartTime),
-            scheduledEndTime: new Date(item.scheduledEndTime),
-        }));
+		const AddedMatchTime = MatchPlans?.map((item) => ({
+			...item,
+			matchTime:
+				item.scheduledEndTime.getTime() - item.scheduledStartTime.getTime(),
+		}));
 
-        const AddedMatchTime = MatchPlans?.map((item) => ({
-            ...item,
-            matchTime: (item.scheduledEndTime.getTime() - item.scheduledStartTime.getTime()),
-        }));
+		const SortedByStartTime = AddedMatchTime?.sort(
+			(a, b) => a.scheduledStartTime.getTime() - b.scheduledStartTime.getTime(),
+		);
 
+		const filteredByStatus = SortedByStartTime?.filter(
+			(item) => item.status === "Preparing" || item.status === "Waiting",
+			//  && item.scheduledStartTime.getTime() > currentTime.currentTime
+		);
+		const NextThree = filteredByStatus?.slice(0, 3);
 
-        const SortedByStartTime = AddedMatchTime?.sort((a, b) => a.scheduledStartTime.getTime() - b.scheduledStartTime.getTime())
+		if (NextThree?.length === 0) {
+			return (
+				<div className="flex min-w-[94vw] justify-center">
+					<div className="flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[30vh] bg-gray-100 rounded overflow-auto">
+						{/* <div className="flex justify-center items-center bg-gray-100 px-10 rounded"> */}
+						全試合終了しました
+						{/* </div> */}
+					</div>
+				</div>
+			);
+		}
 
-        const filteredByStatus = SortedByStartTime?.filter((item) =>
-                (item.status === "Preparing" || item.status === "Waiting")
-            //  && item.scheduledStartTime.getTime() > currentTime.currentTime
-        )
-        const NextThree = filteredByStatus?.slice(0, 3);
+		return (
+			<div className="flex flex-col min-w-[94vw] justify-center">
+				<div className="flex flex-col lg:mx-20 px-1 py-2 min-h-[30vh] bg-gray-100 rounded overflow-auto">
+					{NextThree?.map((item) => {
+						// const status = getMatchStatus(item);
 
-        {/*
-        const getMatchStatus = (matchPlan: MatchPlanType): Status => {
-            // すでにローカル状態にステータスがある場合はそれを返す
-            if (matchStatuses[matchPlan.id] !== undefined) {
-                return matchStatuses[matchPlan.id];
-            }
-            
-            // すでに結果がある場合はCompletedステータス
-            if (matchResults && matchResults[matchPlan.id]) {
-                return Status.Completed;
-            }
-            
-            // デフォルトはDBから来るステータスを使用するか、なければPreparingとみなす
-            return matchPlan.status || Status.Preparing;
-        };
-        */
-        }
-
-        if (NextThree?.length === 0) {
-            return (
-                <div className="flex min-w-[94vw] justify-center">
-                    <div
-                        className="flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[30vh] bg-gray-100 rounded overflow-auto">
-                        {/* <div className="flex justify-center items-center bg-gray-100 px-10 rounded"> */}
-                        全試合終了しました
-                        {/* </div> */}
-                    </div>
-                </div>
-            )
-        }
-
-        return (
-            <div className="flex flex-col min-w-[94vw] justify-center">
-                <div className="flex flex-col lg:mx-20 px-1 py-2 min-h-[30vh] bg-gray-100 rounded overflow-auto">
-                    {NextThree?.map((item) => {
-
-                        // const status = getMatchStatus(item);
-
-                        return (
-                            <div key={item.id} className="flex justify-center bg-gray-100 px-10 rounded">
-                                <div className="flex flex-col bg-white mb-1 border rounded">
-                                    <div className="flex justify-center w-[70vw] lg:w-[30vw] bg-white px-1 rounded">
-
-                                        <MatchInfoForReader
-                                            matchPlan={item}
-                                            events={events}
-                                            locations={locations}
-                                            getMatchDisplayStr={getMatchDisplayStr}
-                                        />
-
-                                    </div>
-                                    {/*
+						return (
+							<div
+								key={item.id}
+								className="flex justify-center bg-gray-100 px-10 rounded"
+							>
+								<div className="flex flex-col bg-white mb-1 border rounded">
+									<div className="flex justify-center w-[70vw] lg:w-[30vw] bg-white px-1 rounded">
+										<MatchInfoForReader
+											matchPlan={item}
+											events={events}
+											locations={locations}
+											getMatchDisplayStr={getMatchDisplayStr}
+										/>
+									</div>
+									{/*
                                     <p  className="flex justify-center bg-white text-black px-1 rounded text-2xl">
                                         {(status === Status.Waiting || status === Status.Preparing) && (
                                             <MatchCountdownForReader scheduledStartTime={item.scheduledStartTime} />
                                         )}
                                     </p>
                                     */}
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-            </div>
-        )
-    }
-
-}
+								</div>
+							</div>
+						);
+					})}
+				</div>
+			</div>
+		);
+	}
+};
 
 export default NextMatch;

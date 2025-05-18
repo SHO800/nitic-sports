@@ -1,208 +1,191 @@
-"use client"
+"use client";
 
-import {useState} from "react";
+import { useDataContext } from "@/contexts/dataContext";
+import { useCurrentTime } from "@/hooks/currentTime";
+import { type MatchPlan as MatchPlanType, Status } from "@prisma/client";
+import { useState } from "react";
 import MatchInfoForReader from "../reader/MatchInfoForReader";
-import {MatchPlan as MatchPlanType, Status} from "@prisma/client";
-import {useCurrentTime} from "@/hooks/currentTime";
-import {useDataContext} from "@/contexts/dataContext";
 
 type Props =
-    | { eventId: number | string | null; eventIds?: undefined }
-    | { eventIds: string; eventId?: undefined };
+	| { eventId: number | string | null; eventIds?: undefined }
+	| { eventIds: string; eventId?: undefined };
 
 const NowHot: React.FC<Props> = (props) => {
+	const [matchStatuses, setMatchStatuses] = useState<Record<number, Status>>(
+		{},
+	);
 
-    const [matchStatuses, setMatchStatuses] = useState<Record<number, Status>>({});
+	const { matchPlans, events, locations, matchResults, getMatchDisplayStr } =
+		useDataContext();
 
-    const {
-        matchPlans,
-        events,
-        locations,
-        matchResults,
-        getMatchDisplayStr
-    } = useDataContext()
+	const currentTime = useCurrentTime();
 
-    const currentTime = useCurrentTime();
+	if (typeof props.eventId === "number") {
+		const MatchPlans = matchPlans?.map((item) => ({
+			...item,
+			scheduledStartTime: new Date(item.scheduledStartTime),
+			scheduledEndTime: new Date(item.scheduledEndTime),
+		}));
 
-    if (typeof props.eventId === "number") {
+		const filteredByEvent = MatchPlans?.filter(
+			(item) => item.eventId === props.eventId,
+		);
 
-        const MatchPlans = matchPlans?.map((item) => ({
-            ...item,
-            scheduledStartTime: new Date(item.scheduledStartTime),
-            scheduledEndTime: new Date(item.scheduledEndTime),
-        }));
+		const AddedMatchTime = filteredByEvent?.map((item) => ({
+			...item,
+			matchTime:
+				item.scheduledEndTime.getTime() - item.scheduledStartTime.getTime(),
+		}));
 
-        const filteredByEvent = MatchPlans?.filter((item) => item.eventId === props.eventId)
+		const SortedByStartTime = AddedMatchTime?.sort(
+			(a, b) => a.scheduledStartTime.getTime() - b.scheduledStartTime.getTime(),
+		);
 
-        const AddedMatchTime = filteredByEvent?.map((item) => ({
-            ...item,
-            matchTime: (item.scheduledEndTime.getTime() - item.scheduledStartTime.getTime()),
-        }));
+		const filteredByStatus = SortedByStartTime?.filter(
+			(item) =>
+				item.status === "Playing" &&
+				item.scheduledStartTime.getTime() + (item.matchTime * 2) / 3 >
+					currentTime.currentTime,
+		);
+		const NowhotThree = filteredByStatus?.slice(0, 3);
 
+		const getMatchStatus = (matchPlan: MatchPlanType): Status => {
+			// すでにローカル状態にステータスがある場合はそれを返す
+			if (matchStatuses[matchPlan.id] !== undefined) {
+				return matchStatuses[matchPlan.id];
+			}
 
-        const SortedByStartTime = AddedMatchTime?.sort((a, b) => a.scheduledStartTime.getTime() - b.scheduledStartTime.getTime())
+			// すでに結果がある場合はCompletedステータス
+			if (matchResults && matchResults[matchPlan.id]) {
+				return Status.Completed;
+			}
 
-        const filteredByStatus = SortedByStartTime?.filter((item) =>
-            item.status === "Playing" && item.scheduledStartTime.getTime() + item.matchTime * 2 / 3 > currentTime.currentTime
-        )
-        const NowhotThree = filteredByStatus?.slice(0, 3);
+			// デフォルトはDBから来るステータスを使用するか、なければPreparingとみなす
+			return matchPlan.status || Status.Preparing;
+		};
 
-        const getMatchStatus = (matchPlan: MatchPlanType): Status => {
-            // すでにローカル状態にステータスがある場合はそれを返す
-            if (matchStatuses[matchPlan.id] !== undefined) {
-                return matchStatuses[matchPlan.id];
-            }
+		if (NowhotThree?.length === 0) {
+			return (
+				<div className="flex min-w-[94vw] justify-center">
+					<div className="flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[30vh] bg-gray-100 rounded overflow-auto">
+						{/* <div className="flex justify-center items-center h-full bg-gray-100 px-10 rounded"> */}
+						進行中の試合はありません
+						{/* </div> */}
+					</div>
+				</div>
+			);
+		}
 
-            // すでに結果がある場合はCompletedステータス
-            if (matchResults && matchResults[matchPlan.id]) {
-                return Status.Completed;
-            }
+		return (
+			<div className="flex flex-col min-w-[94vw] justify-center">
+				<div className="flex flex-col lg:mx-20 px-1 py-2 min-h-[30vh] bg-gray-100 rounded overflow-auto">
+					{NowhotThree?.map((item) => {
+						const status = getMatchStatus(item);
 
-            // デフォルトはDBから来るステータスを使用するか、なければPreparingとみなす
-            return matchPlan.status || Status.Preparing;
-        };
-
-        if (NowhotThree?.length === 0) {
-            return (
-                <div className="flex min-w-[94vw] justify-center">
-                    <div
-                        className="flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[30vh] bg-gray-100 rounded overflow-auto">
-                        {/* <div className="flex justify-center items-center h-full bg-gray-100 px-10 rounded"> */}
-                        進行中の試合はありません
-                        {/* </div> */}
-                    </div>
-                </div>
-            )
-        }
-
-        return (
-            <div className="flex flex-col min-w-[94vw] justify-center">
-                <div className="flex flex-col lg:mx-20 px-1 py-2 min-h-[30vh] bg-gray-100 rounded overflow-auto">
-                    {NowhotThree?.map((item) => {
-
-                        const status = getMatchStatus(item);
-
-                        return (
-                            <div className="flex justify-center bg-gray-100 px-10 rounded">
-                                <div key={item.id} className="flex flex-col bg-white mb-1 border rounded">
-                                    <div
-                                        className="flex justify-center w-[70vw] lg:w-[30vw] bg-white px-1 rounded text-2xl">
-
-                                        <MatchInfoForReader
-                                            matchPlan={item}
-                                            events={events}
-                                            locations={locations}
-                                            getMatchDisplayStr={getMatchDisplayStr}
-                                        />
-                                    </div>
-                                    {/*
+						return (
+							<div className="flex justify-center bg-gray-100 px-10 rounded">
+								<div
+									key={item.id}
+									className="flex flex-col bg-white mb-1 border rounded"
+								>
+									<div className="flex justify-center w-[70vw] lg:w-[30vw] bg-white px-1 rounded text-2xl">
+										<MatchInfoForReader
+											matchPlan={item}
+											events={events}
+											locations={locations}
+											getMatchDisplayStr={getMatchDisplayStr}
+										/>
+									</div>
+									{/*
                                 <p  className="flex justify-center bg-white text-black px-1 rounded text-2xl">
                                     {(status === Status.Waiting || status === Status.Preparing) && (
                                         <MatchCountdownForReader scheduledStartTime={item.scheduledStartTime}/>
                                     )}
                                 </p>
                                 */}
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-            </div>
-        )
-    }
+								</div>
+							</div>
+						);
+					})}
+				</div>
+			</div>
+		);
+	}
 
-    if (typeof props.eventId === "string") {
+	if (typeof props.eventId === "string") {
+		const MatchPlans = matchPlans?.map((item) => ({
+			...item,
+			scheduledStartTime: new Date(item.scheduledStartTime),
+			scheduledEndTime: new Date(item.scheduledEndTime),
+		}));
 
-        const MatchPlans = matchPlans?.map((item) => ({
-            ...item,
-            scheduledStartTime: new Date(item.scheduledStartTime),
-            scheduledEndTime: new Date(item.scheduledEndTime),
-        }));
+		const AddedMatchTime = MatchPlans?.map((item) => ({
+			...item,
+			matchTime:
+				item.scheduledEndTime.getTime() - item.scheduledStartTime.getTime(),
+		}));
 
-        const AddedMatchTime = MatchPlans?.map((item) => ({
-            ...item,
-            matchTime: (item.scheduledEndTime.getTime() - item.scheduledStartTime.getTime()),
-        }));
+		const SortedByStartTime = AddedMatchTime?.sort(
+			(a, b) => a.scheduledStartTime.getTime() - b.scheduledStartTime.getTime(),
+		);
 
+		const filteredByStatus = SortedByStartTime?.filter(
+			(item) =>
+				item.status === "Playing" &&
+				item.scheduledStartTime.getTime() + (item.matchTime * 2) / 3 >
+					currentTime.currentTime,
+		);
 
-        const SortedByStartTime = AddedMatchTime?.sort((a, b) => a.scheduledStartTime.getTime() - b.scheduledStartTime.getTime())
+		// 本番用
+		const NowhotThree = filteredByStatus?.slice(0, 3);
 
-        const filteredByStatus = SortedByStartTime?.filter((item) =>
-            item.status === "Playing" && item.scheduledStartTime.getTime() + item.matchTime * 2 / 3 > currentTime.currentTime
-        )
+		if (NowhotThree?.length === 0) {
+			return (
+				<div className="flex min-w-[94vw] justify-center">
+					<div className="flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[30vh] bg-gray-100 rounded overflow-auto">
+						{/* <div className="flex justify-center items-center bg-gray-100 px-10 rounded"> */}
+						進行中の試合はありません
+						{/* </div> */}
+					</div>
+				</div>
+			);
+		}
 
-        // 本番用
-        const NowhotThree = filteredByStatus?.slice(0, 3);
+		return (
+			<div className="flex flex-col min-w-[94vw] justify-center">
+				<div className="flex flex-col lg:mx-20 px-1 py-2 min-h-[30vh] bg-gray-100 rounded overflow-auto">
+					{NowhotThree?.map((item) => {
+						// const status = getMatchStatus(item);
 
-        //練習用
-        // const NowhotThree = AddedMatchTime?.slice(0,3);
-
-        {/*
-        const getMatchStatus = (matchPlan: MatchPlanType): Status => {
-            // すでにローカル状態にステータスがある場合はそれを返す
-            if (matchStatuses[matchPlan.id] !== undefined) {
-                return matchStatuses[matchPlan.id];
-            }
-            
-            // すでに結果がある場合はCompletedステータス
-            if (matchResults && matchResults[matchPlan.id]) {
-                return Status.Completed;
-            }
-            
-            // デフォルトはDBから来るステータスを使用するか、なければPreparingとみなす
-            return matchPlan.status || Status.Preparing;
-        };
-        */
-        }
-
-        if (NowhotThree?.length === 0) {
-            return (
-                <div className="flex min-w-[94vw] justify-center">
-                    <div
-                        className="flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[30vh] bg-gray-100 rounded overflow-auto">
-                        {/* <div className="flex justify-center items-center bg-gray-100 px-10 rounded"> */}
-                        進行中の試合はありません
-                        {/* </div> */}
-                    </div>
-                </div>
-            )
-        }
-
-        return (
-            <div className="flex flex-col min-w-[94vw] justify-center">
-                <div className="flex flex-col lg:mx-20 px-1 py-2 min-h-[30vh] bg-gray-100 rounded overflow-auto">
-                    {NowhotThree?.map((item) => {
-
-                        // const status = getMatchStatus(item);
-
-                        return (
-                            <div key={item.id} className="flex justify-center bg-gray-100 px-10 rounded">
-                                <div className="flex flex-col bg-white mb-1 border rounded">
-                                    <div className="flex justify-center w-[70vw] lg:w-[30vw] bg-white px-1 rounded">
-
-                                        <MatchInfoForReader
-                                            matchPlan={item}
-                                            events={events}
-                                            locations={locations}
-                                            getMatchDisplayStr={getMatchDisplayStr}
-                                        />
-                                    </div>
-                                    {/*
+						return (
+							<div
+								key={item.id}
+								className="flex justify-center bg-gray-100 px-10 rounded"
+							>
+								<div className="flex flex-col bg-white mb-1 border rounded">
+									<div className="flex justify-center w-[70vw] lg:w-[30vw] bg-white px-1 rounded">
+										<MatchInfoForReader
+											matchPlan={item}
+											events={events}
+											locations={locations}
+											getMatchDisplayStr={getMatchDisplayStr}
+										/>
+									</div>
+									{/*
                                     <p  className="flex justify-center bg-white text-black px-1 rounded text-2xl">
                                         {(status === Status.Waiting || status === Status.Preparing) && (
                                             <MatchCountdownForReader scheduledStartTime={item.scheduledStartTime} />
                                         )}
                                     </p>
                                     */}
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-            </div>
-        )
-    }
-
-}
+								</div>
+							</div>
+						);
+					})}
+				</div>
+			</div>
+		);
+	}
+};
 
 export default NowHot;
