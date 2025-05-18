@@ -45,7 +45,7 @@ const NowHot: React.FC<Props> = (props) => {
 			(item) =>
 				item.status === "Playing" &&
 				item.scheduledStartTime.getTime() + (item.matchTime * 2) / 3 >
-					currentTime.currentTime,
+					currentTime.currentTime.getTime(),
 		);
 		const NowhotThree = filteredByStatus?.slice(0, 3);
 
@@ -83,9 +83,8 @@ const NowHot: React.FC<Props> = (props) => {
 						const _status = getMatchStatus(item);
 
 						return (
-							<div className="flex justify-center bg-gray-100 px-10 rounded">
+							<div key={item.id} className="flex justify-center bg-gray-100 px-10 rounded">
 								<div
-									key={item.id}
 									className="flex flex-col bg-white mb-1 border rounded"
 								>
 									<div className="flex justify-center w-[70vw] lg:w-[30vw] bg-white px-1 rounded text-2xl">
@@ -133,7 +132,7 @@ const NowHot: React.FC<Props> = (props) => {
 			(item) =>
 				item.status === "Playing" &&
 				item.scheduledStartTime.getTime() + (item.matchTime * 2) / 3 >
-					currentTime.currentTime,
+					currentTime.currentTime.getTime(),
 		);
 
 		// 本番用

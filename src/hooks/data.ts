@@ -282,6 +282,7 @@ export const useData = () => {
 				const matchPlansForEvent = matchPlans?.filter(
 					(matchPlan) => matchPlan.eventId === eventId,
 				);
+				if (!matchPlansForEvent) return [];
 				const matchPlansForBlock = matchPlansForEvent.filter((matchPlan) => {
 					const teamIds = matchPlan.teamIds as unknown as string[];
 					return teamIds.every((teamId) => sortedTeamIds.includes(teamId));

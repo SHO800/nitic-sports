@@ -38,7 +38,7 @@ const MatchInfoOnModal = ({
 	const isPast =
 		matchPlan.status === "Waiting" ||
 		(matchPlan.status === "Preparing" &&
-			ReceivedMatchPlans.scheduledStartTimeNum < currentTime);
+			ReceivedMatchPlans.scheduledStartTimeNum < currentTime.getTime());
 
 	return (
 		<div className="w-full text-black">
