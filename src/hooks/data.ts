@@ -10,7 +10,7 @@ import type {
 	Team,
 } from "@prisma/client";
 import { useCallback, useMemo } from "react";
-import useSWR from "swr";
+import useSWR, {SWRConfiguration} from "swr";
 
 // メモ化キャッシュの導入
 const MEMO_CACHE = new Map<string, { value: any; timestamp: number }>();
@@ -37,13 +37,26 @@ export const useData = () => {
 	const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 	// SWRの設定を最適化
-	const swrConfig = {
-		revalidateOnFocus: false, // フォーカス時に再検証しない
+	const swrConfigBase: SWRConfiguration = {
 		revalidateIfStale: true, // 古いデータがある場合は再検証する
 		revalidateOnReconnect: true, // 再接続時に再検証する
 		dedupingInterval: 5000, // 5秒間の重複リクエスト防止
 		errorRetryCount: 3, // エラー再試行回数の制限
 	};
+	
+	// 短期的なもの
+	const swrConfigShort: SWRConfiguration = {
+		...swrConfigBase,
+		refreshInterval: 30000, // 30秒ごとに再検証
+		revalidateOnFocus: true, // フォーカス時に再検証する
+	};
+	
+	// 長期的なもの
+	const swrConfigLong: SWRConfiguration = {
+		...swrConfigBase,
+		revalidateOnFocus: false, // フォーカス時に再検証しない
+	};
+	
 
 	// SWRフック呼び出しを最適化
 	
@@ -57,7 +70,7 @@ export const useData = () => {
 	} = useSWR<Team[]>(
 		`${API_BASE}/team`,
 		(url) => fetcher(url, { next: { tags: ["teams"] } }),
-		swrConfig,
+		swrConfigLong,
 	);
 
 	const {
@@ -68,7 +81,7 @@ export const useData = () => {
 	} = useSWR<Location[]>(
 		`${API_BASE}/location`,
 		(url) => fetcher(url, { next: { tags: ["locations"] } }),
-		swrConfig,
+		swrConfigLong,
 	);
 
 	const {
@@ -79,7 +92,7 @@ export const useData = () => {
 	} = useSWR<Event[]>(
 		`${API_BASE}/event`,
 		(url) => fetcher(url, { next: { tags: ["events"] } }),
-		swrConfig,
+		swrConfigShort,
 	);
 
 	const {
@@ -90,7 +103,7 @@ export const useData = () => {
 	} = useSWR<MatchPlan[]>(
 		`${API_BASE}/match-plan`,
 		(url) => fetcher(url, { next: { tags: ["matchPlans"] } }),
-		swrConfig,
+		swrConfigShort,
 	);
 
 	const {
@@ -101,7 +114,7 @@ export const useData = () => {
 	} = useSWR<{ [key: string]: MatchResult }>(
 		`${API_BASE}/match-result`,
 		(url) => fetcher(url, { next: { tags: ["matchResults"] } }),
-		swrConfig,
+		swrConfigShort,
 	);
 
 	const {
@@ -112,7 +125,7 @@ export const useData = () => {
 	} = useSWR<Score[]>(
 		`${API_BASE}/score`,
 		(url) => fetcher(url, { next: { tags: ["scores"] } }),
-		swrConfig,
+		swrConfigShort,
 	);
 
 	// グループ化されたチームをメモ化
