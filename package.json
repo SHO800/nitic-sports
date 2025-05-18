@@ -6,8 +6,7 @@
 		"dev": "next dev --turbopack ",
 		"build": "prisma generate && prisma db push && next build",
 		"start": "next start",
-		"lint": "next lint",
-		"postinstall": "npm install --legacy-peer-deps"
+		"lint": "next lint"
 	},
 	"dependencies": {
 		"@headlessui/react": "^2.2.1",
