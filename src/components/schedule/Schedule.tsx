@@ -24,7 +24,7 @@ const Schedule = async () => {
 						quality={100}
 						className="object-cover aspect-[0.7072135785] !h-full !w-auto"
 					/>
-					<div className="absolute z-100 h-[1024px] w-full"></div>
+					<div className="absolute z-100 h-[1024px] w-full" />
 				</div>
 			</div>
 			<div

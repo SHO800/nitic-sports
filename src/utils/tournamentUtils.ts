@@ -449,25 +449,24 @@ const calculateRound = cache(
 				dependencies.every((a) => a.type === "T" && a.condition === "L"))
 		) {
 			return 1 + minSeedCount; // 初戦
-		} else {
-			// 参照している試合から最大ラウンドを計算
-			let maxRound = 0;
-			dependencies.forEach((dep: TeamIdVariableDataType) => {
-				if (dep.type == "T") {
-					const referencedMatch = allMatches.find((m) => m.id === dep.matchId);
-					if (referencedMatch) {
-						const round = calculateRound(
-							referencedMatch,
-							allMatches,
-							detect3rdMatch,
-							teamInfos,
-						);
-						maxRound = Math.max(maxRound, round);
-					}
-				}
-			});
-			return maxRound + 1 + minSeedCount;
 		}
+		// 参照している試合から最大ラウンドを計算
+		let maxRound = 0;
+		dependencies.forEach((dep: TeamIdVariableDataType) => {
+			if (dep.type === "T") {
+				const referencedMatch = allMatches.find((m) => m.id === dep.matchId);
+				if (referencedMatch) {
+					const round = calculateRound(
+						referencedMatch,
+						allMatches,
+						detect3rdMatch,
+						teamInfos,
+					);
+					maxRound = Math.max(maxRound, round);
+				}
+			}
+		});
+		return maxRound + 1 + minSeedCount;
 	},
 );
 
@@ -491,7 +490,7 @@ export const getSeedCount = cache((teamId: string, teamInfo: TeamInfo[]) => {
 	if (
 		foundSeed === undefined ||
 		foundSeed === Number.POSITIVE_INFINITY ||
-		isNaN(foundSeed)
+		Number.isNaN(foundSeed)
 	)
 		return 0;
 	return foundSeed;

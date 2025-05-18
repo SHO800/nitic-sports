@@ -14,7 +14,7 @@ const EventList = () => {
 				>
 					<div className="flex items-center justify-between  p-2 rounded mb-2">
 						<div className="flex items-center">
-							<p className={`text-black `}>
+							<p className={"text-black "}>
 								{event.id} {event.name} {event.description}
 							</p>
 						</div>
@@ -31,7 +31,7 @@ const EventList = () => {
 					</div>
 					{event.description && (
 						<div className="flex items-center">
-							<p className={`text-black `}>{event.description}</p>
+							<p className={"text-black "}>{event.description}</p>
 						</div>
 					)}
 					<div className={"ml-2 bg-white rounded-xl"}>

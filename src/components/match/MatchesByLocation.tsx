@@ -83,7 +83,7 @@ const MatchesByLocation = ({
 	return (
 		<div
 			className={"w-full h-full flex flex-col items-center max-w-[512px] "}
-			style={{ fontSize: fontSize + "px" }}
+			style={{ fontSize: `${fontSize}px` }}
 			ref={wrapperRef}
 		>
 			<div
@@ -103,7 +103,7 @@ const MatchesByLocation = ({
 			>
 				{matchesInLocation.map((match) => (
 					<MatchCard
-						key={"matches-" + match.id}
+						key={`matches-${match.id}`}
 						match={match}
 						eventsById={eventsById}
 						matchResults={matchResults}

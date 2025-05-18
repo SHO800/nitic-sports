@@ -40,7 +40,7 @@ const DXLeagueTable = ({
 				const height = (rect.height * teamIds.length) / (teamIds.length + 1);
 
 				if (lineRef.current) {
-					lineRef.current.style.width = `${Math.pow(Math.pow(width, 2) + Math.pow(height, 2), 0.5)}px`;
+					lineRef.current.style.width = `${(width ** 2 + height ** 2) ** 0.5}px`;
 					lineRef.current.style.rotate = `${(Math.atan2(height - 1, width) * 180) / Math.PI}deg`;
 				}
 			}
@@ -78,14 +78,16 @@ const DXLeagueTable = ({
 					{teamIdsLengthArray.map((i) => {
 						return (
 							<tr
-								key={"leagueTableTr" + i_key + "-" + i}
+								key={`leagueTableTr${i_key}-${i}`}
 								className={"border border-slate-300"}
 							>
 								{teamIdsLengthArray.map((j) => {
 									return (
 										<td
-											key={"leagueTableTd" + i_key + "-" + j}
-											className={`border border-slate-300  h-8 w-16 text-center`}
+											key={`leagueTableTd${i_key}-${j}`}
+											className={
+												"border border-slate-300  h-8 w-16 text-center"
+											}
 										>
 											<DXLeagueTableCell
 												i_key={i_key}

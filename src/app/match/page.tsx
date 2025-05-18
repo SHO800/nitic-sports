@@ -12,7 +12,7 @@ const MatchDashboard = () => {
 	const { events, locations, scores } = useDataContext();
 	const [selectedLocation, setSelectedLocation] = useState<string[]>([]);
 	const [isShowSelector, setIsShowSelector] = useState<boolean>(true);
-	const [isSyncScroll, setIsSyncScroll] = useState<boolean>(true);
+	const [isSyncScroll, _setIsSyncScroll] = useState<boolean>(true);
 	const [isShowCompletedMatch, setIsShowCompletedMatch] =
 		useState<boolean>(false);
 	const refs = useRef<HTMLDivElement[]>([]);
@@ -76,7 +76,7 @@ const MatchDashboard = () => {
 					selectedLocation.map((loc) => {
 						return (
 							<MatchesByLocation
-								key={"loc-list-id-" + loc + "-len-" + selectedLocation.length}
+								key={`loc-list-id-${loc}-len-${selectedLocation.length}`}
 								location={
 									locations.find((location) => location.id.toString() === loc)!
 								}

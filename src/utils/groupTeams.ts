@@ -23,7 +23,7 @@ const groupTeams: (teams: Team[]) => { [p: string]: Team[] } = cache(
 			}
 		}
 		if (otherGroups.length > 0) {
-			organizedTeams["他"] = otherGroups;
+			organizedTeams.他 = otherGroups;
 		}
 		return {
 			...organizedTeams,

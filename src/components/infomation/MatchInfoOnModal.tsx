@@ -56,7 +56,7 @@ const MatchInfoOnModal = ({
 				</p>
 			</div>
 
-			<div className="relative bg-black h-[0.5px] mx-2"></div>
+			<div className="relative bg-black h-[0.5px] mx-2" />
 
 			<div
 				className={`flex bg-white py-1 justify-center ${matchPlan.teamIds.length > 2 ? "text-2xl" : "text-4xl"}`}
@@ -74,7 +74,7 @@ const MatchInfoOnModal = ({
 				<br />
 			</div>
 
-			<div className="relative bg-black h-[0.5px] mx-2"></div>
+			<div className="relative bg-black h-[0.5px] mx-2" />
 
 			<div className="flex px-2 bg-white text-[18px] justify-between">
 				<div className={`flex ml-1 ${isPast ? "text-red-500" : "text-black"} `}>

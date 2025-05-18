@@ -42,7 +42,7 @@ const TournamentTeamBox = ({
 
 	return (
 		<div
-			className={`flex justify-end items-center p-2 relative h-10 w-full `}
+			className={"flex justify-end items-center p-2 relative h-10 w-full "}
 			ref={boxRef}
 		>
 			<span className="">{displayStr}</span>

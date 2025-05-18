@@ -42,7 +42,7 @@ const LeagueTable = ({
 			const width = (rect.width * teamIds.length) / (teamIds.length + 1);
 			const height = (rect.height * teamIds.length) / (teamIds.length + 1);
 
-			lineRef.current.style.width = `${Math.pow(Math.pow(width, 2) + Math.pow(height, 2), 0.5)}px`;
+			lineRef.current.style.width = `${(width ** 2 + height ** 2) ** 0.5}px`;
 			lineRef.current.style.rotate = `${(Math.atan2(height - 1, width) * 180) / Math.PI}deg`;
 		}
 	}, [teamIds.length]);
@@ -88,7 +88,7 @@ const LeagueTable = ({
 
 		return teamIdsLengthArray.map((i) => (
 			<LeagueTableRow
-				key={"leagueTableTr" + i_key + "-" + i}
+				key={`leagueTableTr${i_key}-${i}`}
 				i_key={i_key}
 				row={i}
 				teamIdsLengthArray={teamIdsLengthArray}

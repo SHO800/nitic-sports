@@ -66,7 +66,7 @@ const TournamentMatchBox = ({
 		<div className={"h-full relative w-full "} style={boxStyle}>
 			{!!match.matchId && (
 				<div className="text-md text-gray-500 pr-2 absolute h-full w-full flex justify-end items-center bg-transparent">
-					<p className={matchStatusColor + " font-bold text-[1.2em]"}>
+					<p className={`${matchStatusColor} font-bold text-[1.2em]`}>
 						{match.tournamentMatchNode.matchPlan.matchName}
 					</p>
 				</div>
@@ -74,14 +74,9 @@ const TournamentMatchBox = ({
 
 			<div className="relative h-full" ref={boxRef}>
 				<TournamentLine
-					key={
-						"match-" +
-						match.matchId +
-						"-line-" +
-						(
-							match.tournamentMatchNode.matchPlan.status === Status.Completed
-						).toString()
-					}
+					key={`match-${match.matchId}-line-${(
+						match.tournamentMatchNode.matchPlan.status === Status.Completed
+					).toString()}`}
 					startX={lineCoords.startX}
 					startY={lineCoords.startY}
 					endX={lineCoords.endX}

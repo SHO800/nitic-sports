@@ -96,9 +96,7 @@ const TournamentTable = ({
 						<TournamentMatchBox
 							match={node}
 							boxStyle={{}}
-							matchResult={
-								matchResults && matchResults[node.matchId.toString()]
-							}
+							matchResult={matchResults?.[node.matchId.toString()]}
 							rowWidth={rowWidth}
 							rowHeight={rowHeight}
 						/>
@@ -137,7 +135,7 @@ const TournamentTable = ({
 
 				// 最終ノードから特殊ノードへの線を描画する
 				return (
-					<React.Fragment key={eventId + "-specialNode-" + lastNode.nodeId}>
+					<React.Fragment key={`${eventId}-specialNode-${lastNode.nodeId}`}>
 						{/* 特殊ノードへの線 */}
 						<div
 							style={{
@@ -201,7 +199,7 @@ const TournamentTable = ({
 	if (eventLoading || matchPlanLoading || teamLoading) {
 		return (
 			<div className="flex justify-center items-center h-40">
-				<div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
+				<div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500" />
 			</div>
 		);
 	}

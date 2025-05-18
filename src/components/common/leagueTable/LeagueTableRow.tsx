@@ -21,7 +21,7 @@ const LeagueTableRow = ({
 		<tr className={"border border-slate-300"}>
 			{teamIdsLengthArray.map((col) => (
 				<td
-					key={"leagueTableTd" + i_key + "-" + col}
+					key={`leagueTableTd${i_key}-${col}`}
 					className={"border border-slate-300 h-8 w-16 text-center"}
 				>
 					<LeagueTableCell

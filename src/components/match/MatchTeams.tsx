@@ -12,7 +12,7 @@ const MatchTeams = memo(function MatchTeams({
 			{teamNames.map((teamName, index) => {
 				return (
 					<Fragment
-						key={"battleTeams-" + teamNames.join("-") + "-" + teamName + index}
+						key={`battleTeams-${teamNames.join("-")}-${teamName}${index}`}
 					>
 						{index !== 0 && (
 							<span className={"text-[.9em] mt-auto mb-1"}>vs</span>

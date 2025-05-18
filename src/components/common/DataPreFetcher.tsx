@@ -15,17 +15,16 @@ async function getTeams(): Promise<OrganizedTeams> {
 		) {
 			const teams = await prisma.team.findMany();
 			return groupTeams(teams);
-		} else {
-			// APIエンドポイント経由でデータを取得
-			const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/team`, {
-				cache: "force-cache",
-			});
-			if (!res.ok) {
-				throw new Error("Failed to fetch data");
-			}
-			const teams = await res.json();
-			return groupTeams(teams);
 		}
+		// APIエンドポイント経由でデータを取得
+		const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/team`, {
+			cache: "force-cache",
+		});
+		if (!res.ok) {
+			throw new Error("Failed to fetch data");
+		}
+		const teams = await res.json();
+		return groupTeams(teams);
 	} catch (error) {
 		console.error("Error fetching teams:", error);
 		return {}; // 空のオブジェクトを返す
@@ -39,15 +38,14 @@ async function getLocations() {
 			process.env.IS_PREVIEW === "true"
 		) {
 			return await prisma.location.findMany();
-		} else {
-			const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/location`, {
-				cache: "force-cache",
-			});
-			if (!res.ok) {
-				throw new Error("Failed to fetch data");
-			}
-			return await res.json();
 		}
+		const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/location`, {
+			cache: "force-cache",
+		});
+		if (!res.ok) {
+			throw new Error("Failed to fetch data");
+		}
+		return await res.json();
 	} catch (error) {
 		console.error("Error fetching locations:", error);
 		return [];
@@ -61,15 +59,14 @@ async function getMatchPlans() {
 			process.env.IS_PREVIEW === "true"
 		) {
 			return await prisma.matchPlan.findMany();
-		} else {
-			const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/match-plan`, {
-				cache: "default",
-			});
-			if (!res.ok) {
-				throw new Error("Failed to fetch data");
-			}
-			return await res.json();
 		}
+		const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/match-plan`, {
+			cache: "default",
+		});
+		if (!res.ok) {
+			throw new Error("Failed to fetch data");
+		}
+		return await res.json();
 	} catch (error) {
 		console.error("Error fetching match plans:", error);
 		return [];
@@ -91,18 +88,14 @@ async function getMatchResults() {
 				},
 				{},
 			);
-		} else {
-			const res = await fetch(
-				`${process.env.NEXT_PUBLIC_API_URL}/match-result`,
-				{
-					cache: "default",
-				},
-			);
-			if (!res.ok) {
-				throw new Error("Failed to fetch data");
-			}
-			return await res.json();
 		}
+		const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/match-result`, {
+			cache: "default",
+		});
+		if (!res.ok) {
+			throw new Error("Failed to fetch data");
+		}
+		return await res.json();
 	} catch (error) {
 		console.error("Error fetching match results:", error);
 		return {};

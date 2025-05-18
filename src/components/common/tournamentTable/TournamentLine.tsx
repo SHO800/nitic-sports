@@ -46,19 +46,20 @@ const TournamentLine: React.FC<TournamentLineProps> = ({
 				strokeDasharray: `${endX - startX}px`,
 				strokeDashoffset: `${endX - startX}px`,
 			};
-		} else if (type === "V") {
+		}
+		if (type === "V") {
 			return {
 				...baseStyle,
 				strokeDasharray: `${Math.abs(endY - startY)}px`,
 				strokeDashoffset: `${Math.abs(endY - startY)}px`,
 			};
-		} else if (["LT", "RT", "LB", "RB"].includes(type)) {
+		}
+		if (["LT", "RT", "LB", "RB"].includes(type)) {
 			// 角がある線は2本に分けるため、スタイルは別々に適用
 			return baseStyle;
-		} else if (type === "DIRECT") {
-			const length = Math.sqrt(
-				Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2),
-			);
+		}
+		if (type === "DIRECT") {
+			const length = Math.sqrt((endX - startX) ** 2 + (endY - startY) ** 2);
 			return {
 				...baseStyle,
 				strokeDasharray: `${length}px`,
@@ -89,7 +90,8 @@ const TournamentLine: React.FC<TournamentLineProps> = ({
 					top: `${min(startY, endY)}px`,
 				},
 			};
-		} else if (type === "H") {
+		}
+		if (type === "H") {
 			return {
 				width: `${endX - startX}px`,
 				height: `${endY - startY + thickness}px`,
@@ -98,7 +100,8 @@ const TournamentLine: React.FC<TournamentLineProps> = ({
 					top: `${startY}px`,
 				},
 			};
-		} else if (["LT", "RT", "LB", "RB", "DIRECT"].includes(type)) {
+		}
+		if (["LT", "RT", "LB", "RB", "DIRECT"].includes(type)) {
 			return {
 				width: `${endX - startX}px`,
 				height: `${Math.abs(endY - startY)}px`,
@@ -137,7 +140,8 @@ const TournamentLine: React.FC<TournamentLineProps> = ({
 				/>
 			</svg>
 		);
-	} else if (type === "H") {
+	}
+	if (type === "H") {
 		return (
 			<svg
 				className="absolute z-10"
@@ -159,7 +163,7 @@ const TournamentLine: React.FC<TournamentLineProps> = ({
 		);
 	}
 	// 以下、角のある線は共通コンポーネントに変更
-	else if (type === "LT") {
+	if (type === "LT") {
 		return (
 			<CornerLine
 				svgProps={svgProps}
@@ -178,7 +182,8 @@ const TournamentLine: React.FC<TournamentLineProps> = ({
 				}}
 			/>
 		);
-	} else if (type === "RT") {
+	}
+	if (type === "RT") {
 		return (
 			<CornerLine
 				svgProps={svgProps}
@@ -197,7 +202,8 @@ const TournamentLine: React.FC<TournamentLineProps> = ({
 				}}
 			/>
 		);
-	} else if (type === "LB") {
+	}
+	if (type === "LB") {
 		return (
 			<CornerLine
 				svgProps={svgProps}
@@ -211,7 +217,8 @@ const TournamentLine: React.FC<TournamentLineProps> = ({
 				line2={{ x1: 0, y1: 0, x2: endX - startX, y2: 0 }}
 			/>
 		);
-	} else if (type === "RB") {
+	}
+	if (type === "RB") {
 		return (
 			<CornerLine
 				svgProps={svgProps}
@@ -235,7 +242,8 @@ const TournamentLine: React.FC<TournamentLineProps> = ({
 				}}
 			/>
 		);
-	} else if (type === "DIRECT") {
+	}
+	if (type === "DIRECT") {
 		return (
 			<svg
 				className="absolute z-10"
@@ -286,12 +294,12 @@ const CornerLine: React.FC<CornerLineProps> = ({
 }) => {
 	// 1本目の線の長さを計算
 	const line1Length = Math.sqrt(
-		Math.pow(line1.x2 - line1.x1, 2) + Math.pow(line1.y2 - line1.y1, 2),
+		(line1.x2 - line1.x1) ** 2 + (line1.y2 - line1.y1) ** 2,
 	);
 
 	// 2本目の線の長さを計算
 	const line2Length = Math.sqrt(
-		Math.pow(line2.x2 - line2.x1, 2) + Math.pow(line2.y2 - line2.y1, 2),
+		(line2.x2 - line2.x1) ** 2 + (line2.y2 - line2.y1) ** 2,
 	);
 
 	return (

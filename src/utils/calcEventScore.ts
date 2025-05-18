@@ -111,139 +111,136 @@ const calcTotalTournamentRankings = cache(
 				rank: team.rank,
 				detail: `タイム: ${team.bestTime}`,
 			}));
-		} else {
-			// チームの初期化
-			Array.from(teamIds).forEach((teamId) => {
-				teamStats[teamId] = {
-					teamId,
-					wins: 0,
-					rank: Number.MAX_SAFE_INTEGER, // 初期値は大きな数値
-				};
-			});
-			const teamIdsForVariableId: { [key: number]: string | null } = {};
-			Object.values(teamStats).forEach((team) => {
-				teamIdsForVariableId[team.teamId] = findVariableIdFromNumberId(
-					team.teamId,
-					relatedMatchPlans,
-					relatedMatchResults,
-				);
-			});
-			// キーとバリューを逆転
-			const variableIdsForTeamId: {
-				[key: string]: number;
-			} = Object.fromEntries(
-				Object.entries(teamIdsForVariableId).map((a) => a.reverse()),
-			);
-
-			// 勝利数をカウント
-			relatedMatchResults.forEach((result) => {
-				const winnerTeamId = result.winnerTeamId?.toString();
-				if (winnerTeamId && teamStats[winnerTeamId]) {
-					teamStats[winnerTeamId].wins += 1;
-				}
-			});
-
-			// seedCountをwinsに加算
-			teamInfos.forEach((teamInfo) => {
-				const teamIdStr = teamInfo.teamId;
-				const teamIdNum: number | undefined = variableIdsForTeamId[teamIdStr];
-				if (teamIdNum && teamStats[teamIdNum])
-					teamStats[teamIdNum].wins += getSeedCount(teamIdStr, teamInfos);
-			});
-
-			// 決勝戦と3位決定戦を特定
-			const finalMatch = relatedMatchPlans.find(
-				(match) => match.isFinal === true,
-			);
-			const thirdPlaceMatch = relatedMatchPlans.find(
-				(match) => match.is3rdPlaceMatch === true,
-			);
-			// 決勝戦の結果から1位と2位を決定
-			if (finalMatch) {
-				const finalResult = relatedMatchResults.find(
-					(result) => result.matchId === finalMatch.id,
-				);
-				if (finalResult && finalResult.winnerTeamId) {
-					// 優勝チーム（1位）
-					const winnerTeamId = finalResult.winnerTeamId;
-					if (teamStats[winnerTeamId]) {
-						teamStats[winnerTeamId].rank = 1;
-					}
-
-					// 準優勝チーム（2位）
-					finalResult.teamIds.forEach((teamId) => {
-						if (teamId !== winnerTeamId && teamStats[teamId]) {
-							teamStats[teamId].rank = 2;
-						}
-					});
-				}
-			}
-
-			// 3位決定戦の結果から3位と4位を決定
-			if (thirdPlaceMatch) {
-				const thirdPlaceResult = relatedMatchResults.find(
-					(result) => result.matchId === thirdPlaceMatch.id,
-				);
-				if (thirdPlaceResult && thirdPlaceResult.winnerTeamId) {
-					// 3位のチーム
-					const thirdPlaceTeamId = thirdPlaceResult.winnerTeamId;
-					if (teamStats[thirdPlaceTeamId]) {
-						teamStats[thirdPlaceTeamId].rank = 3;
-					}
-
-					// 4位のチーム
-					thirdPlaceResult.teamIds.forEach((teamId) => {
-						if (teamId !== thirdPlaceTeamId && teamStats[teamId]) {
-							teamStats[teamId].rank = 4;
-						}
-					});
-				}
-			}
-
-			// 上位4チーム以外のチームを勝利数で順位付け
-			const remainingTeams = Object.values(teamStats).filter(
-				(team) => team.rank === Number.MAX_SAFE_INTEGER,
-			);
-			remainingTeams.sort((a, b) => {
-				const aInVariableId = teamIdsForVariableId[a.teamId];
-				const aTotalWinPoint =
-					a.wins + (aInVariableId ? getSeedCount(aInVariableId, teamInfos) : 0);
-				const bInVariableId = teamIdsForVariableId[b.teamId];
-				const bTotalWinPoint =
-					b.wins + (bInVariableId ? getSeedCount(bInVariableId, teamInfos) : 0);
-				return bTotalWinPoint - aTotalWinPoint;
-			});
-
-			// 5位以降を割り当て
-			let currentRank = 5;
-			let prevWins = -1;
-
-			remainingTeams.forEach((team, index) => {
-				const teamInVariableId = teamIdsForVariableId[team.teamId];
-				if (
-					index === 0 ||
-					team.wins +
-						(teamInVariableId
-							? getSeedCount(teamInVariableId, teamInfos)
-							: 0) !==
-						prevWins
-				) {
-					// 勝利数が異なる場合、新しい順位
-					currentRank = 5 + index;
-				}
-
-				team.rank = currentRank;
-				prevWins =
-					team.wins +
-					(teamInVariableId ? getSeedCount(teamInVariableId, teamInfos) : 0);
-			});
-
-			return Object.values(teamStats).map((team) => ({
-				teamId: team.teamId,
-				rank: team.rank,
-				detail: `勝利数: ${team.wins}`,
-			}));
 		}
+		// チームの初期化
+		Array.from(teamIds).forEach((teamId) => {
+			teamStats[teamId] = {
+				teamId,
+				wins: 0,
+				rank: Number.MAX_SAFE_INTEGER, // 初期値は大きな数値
+			};
+		});
+		const teamIdsForVariableId: { [key: number]: string | null } = {};
+		Object.values(teamStats).forEach((team) => {
+			teamIdsForVariableId[team.teamId] = findVariableIdFromNumberId(
+				team.teamId,
+				relatedMatchPlans,
+				relatedMatchResults,
+			);
+		});
+		// キーとバリューを逆転
+		const variableIdsForTeamId: {
+			[key: string]: number;
+		} = Object.fromEntries(
+			Object.entries(teamIdsForVariableId).map((a) => a.reverse()),
+		);
+
+		// 勝利数をカウント
+		relatedMatchResults.forEach((result) => {
+			const winnerTeamId = result.winnerTeamId?.toString();
+			if (winnerTeamId && teamStats[winnerTeamId]) {
+				teamStats[winnerTeamId].wins += 1;
+			}
+		});
+
+		// seedCountをwinsに加算
+		teamInfos.forEach((teamInfo) => {
+			const teamIdStr = teamInfo.teamId;
+			const teamIdNum: number | undefined = variableIdsForTeamId[teamIdStr];
+			if (teamIdNum && teamStats[teamIdNum])
+				teamStats[teamIdNum].wins += getSeedCount(teamIdStr, teamInfos);
+		});
+
+		// 決勝戦と3位決定戦を特定
+		const finalMatch = relatedMatchPlans.find(
+			(match) => match.isFinal === true,
+		);
+		const thirdPlaceMatch = relatedMatchPlans.find(
+			(match) => match.is3rdPlaceMatch === true,
+		);
+		// 決勝戦の結果から1位と2位を決定
+		if (finalMatch) {
+			const finalResult = relatedMatchResults.find(
+				(result) => result.matchId === finalMatch.id,
+			);
+			if (finalResult?.winnerTeamId) {
+				// 優勝チーム（1位）
+				const winnerTeamId = finalResult.winnerTeamId;
+				if (teamStats[winnerTeamId]) {
+					teamStats[winnerTeamId].rank = 1;
+				}
+
+				// 準優勝チーム（2位）
+				finalResult.teamIds.forEach((teamId) => {
+					if (teamId !== winnerTeamId && teamStats[teamId]) {
+						teamStats[teamId].rank = 2;
+					}
+				});
+			}
+		}
+
+		// 3位決定戦の結果から3位と4位を決定
+		if (thirdPlaceMatch) {
+			const thirdPlaceResult = relatedMatchResults.find(
+				(result) => result.matchId === thirdPlaceMatch.id,
+			);
+			if (thirdPlaceResult?.winnerTeamId) {
+				// 3位のチーム
+				const thirdPlaceTeamId = thirdPlaceResult.winnerTeamId;
+				if (teamStats[thirdPlaceTeamId]) {
+					teamStats[thirdPlaceTeamId].rank = 3;
+				}
+
+				// 4位のチーム
+				thirdPlaceResult.teamIds.forEach((teamId) => {
+					if (teamId !== thirdPlaceTeamId && teamStats[teamId]) {
+						teamStats[teamId].rank = 4;
+					}
+				});
+			}
+		}
+
+		// 上位4チーム以外のチームを勝利数で順位付け
+		const remainingTeams = Object.values(teamStats).filter(
+			(team) => team.rank === Number.MAX_SAFE_INTEGER,
+		);
+		remainingTeams.sort((a, b) => {
+			const aInVariableId = teamIdsForVariableId[a.teamId];
+			const aTotalWinPoint =
+				a.wins + (aInVariableId ? getSeedCount(aInVariableId, teamInfos) : 0);
+			const bInVariableId = teamIdsForVariableId[b.teamId];
+			const bTotalWinPoint =
+				b.wins + (bInVariableId ? getSeedCount(bInVariableId, teamInfos) : 0);
+			return bTotalWinPoint - aTotalWinPoint;
+		});
+
+		// 5位以降を割り当て
+		let currentRank = 5;
+		let prevWins = -1;
+
+		remainingTeams.forEach((team, index) => {
+			const teamInVariableId = teamIdsForVariableId[team.teamId];
+			if (
+				index === 0 ||
+				team.wins +
+					(teamInVariableId ? getSeedCount(teamInVariableId, teamInfos) : 0) !==
+					prevWins
+			) {
+				// 勝利数が異なる場合、新しい順位
+				currentRank = 5 + index;
+			}
+
+			team.rank = currentRank;
+			prevWins =
+				team.wins +
+				(teamInVariableId ? getSeedCount(teamInVariableId, teamInfos) : 0);
+		});
+
+		return Object.values(teamStats).map((team) => ({
+			teamId: team.teamId,
+			rank: team.rank,
+			detail: `勝利数: ${team.wins}`,
+		}));
 	},
 );
 
@@ -283,30 +280,28 @@ export const calcEventTotalRankings = cache(
 					];
 				});
 				return results;
-			} else {
-				// 方式がトーナメントなら
-				const matchPlanIdRange = teamData.matchPlanIdRange;
-				if (!matchPlanIdRange) return {} as Rank[];
-				const relatedMatchPlans = eventMatches.filter((plan) => {
-					return (
-						(matchPlanIdRange.start <= plan.id &&
-							plan.id <= matchPlanIdRange.end) ||
-						(matchPlanIdRange.additional &&
-							matchPlanIdRange.additional.includes(plan.id))
-					);
-				});
-				const relatedMatchPlanIds = relatedMatchPlans.map((plan) => plan.id);
-				const relatedMatchResults = eventMatchResults.filter((result) =>
-					relatedMatchPlanIds.includes(result.matchId),
-				);
-
-				return calcTotalTournamentRankings(
-					relatedMatchPlans,
-					relatedMatchResults,
-					event.isTimeBased,
-					teamData.teams,
-				);
 			}
+			// 方式がトーナメントなら
+			const matchPlanIdRange = teamData.matchPlanIdRange;
+			if (!matchPlanIdRange) return {} as Rank[];
+			const relatedMatchPlans = eventMatches.filter((plan) => {
+				return (
+					(matchPlanIdRange.start <= plan.id &&
+						plan.id <= matchPlanIdRange.end) ||
+					matchPlanIdRange.additional?.includes(plan.id)
+				);
+			});
+			const relatedMatchPlanIds = relatedMatchPlans.map((plan) => plan.id);
+			const relatedMatchResults = eventMatchResults.filter((result) =>
+				relatedMatchPlanIds.includes(result.matchId),
+			);
+
+			return calcTotalTournamentRankings(
+				relatedMatchPlans,
+				relatedMatchResults,
+				event.isTimeBased,
+				teamData.teams,
+			);
 		});
 	},
 );

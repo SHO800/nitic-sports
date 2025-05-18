@@ -17,7 +17,8 @@ const analyzeVariableTeamId = cache(
 				matchId,
 				condition,
 			};
-		} else if (matchType === "L") {
+		}
+		if (matchType === "L") {
 			// 対象試合がリーグ
 			const eventId = Number(separatedStr[1]);
 			const teamDataIndex = Number(separatedStr[2]);

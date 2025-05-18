@@ -11,11 +11,11 @@ export const judgeDay12 = cache((date: Date) => {
 
 	if (dateTime >= firstDayTime && dateTime < secondDayTime) {
 		return 1;
-	} else if (dateTime >= secondDayTime) {
-		return 2;
-	} else {
-		return 0;
 	}
+	if (dateTime >= secondDayTime) {
+		return 2;
+	}
+	return 0;
 });
 
 export const judgeDay12String = cache((date: Date): string | null => {

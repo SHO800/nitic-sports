@@ -66,7 +66,7 @@ const MatchInfoForReader = ({
 				</p>
 			</div>
 
-			<div className="relative bg-black h-[0.5px] mx-2"></div>
+			<div className="relative bg-black h-[0.5px] mx-2" />
 
 			<div
 				onClick={() => OpenModal()}
@@ -85,7 +85,7 @@ const MatchInfoForReader = ({
 				<br />
 			</div>
 
-			<div className="relative bg-black h-[0.5px] mx-2"></div>
+			<div className="relative bg-black h-[0.5px] mx-2" />
 
 			<div
 				onClick={() => OpenModal()}

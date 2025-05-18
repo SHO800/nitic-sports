@@ -53,7 +53,7 @@ const MatchResult = ({
 								{matchResult.teamIds.map((teamId: number, index: number) => {
 									return (
 										<tr
-											key={"matchResultTeam" + index}
+											key={`matchResultTeam${index}`}
 											className={"h-8 text-[1.1em] border-y-2 border-gray-400"}
 										>
 											<td>

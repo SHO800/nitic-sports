@@ -1,4 +1,4 @@
-import { createCipheriv, createDecipheriv } from "crypto";
+import { createCipheriv, createDecipheriv } from "node:crypto";
 
 const key = Buffer.from(process.env.SESSION_KEY!, "hex");
 const iv = Buffer.from(process.env.SESSION_IV!, "hex");

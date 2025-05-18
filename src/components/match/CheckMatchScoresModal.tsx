@@ -24,7 +24,7 @@ const CheckMatchScoresModal = ({
 				>
 					{unSettledEvents.map((event) => (
 						<ModalEventContainer
-							key={"scoreSetModal-" + event.id}
+							key={`scoreSetModal-${event.id}`}
 							unsettledEvent={event}
 							setIsOpen={setIsOpen}
 						/>
@@ -72,7 +72,7 @@ const ModalEventContainer = ({
 		RankWithEventScore[][]
 	>([]);
 	const [mergedScore, setMergedScore] = useState<RankWithEventScore[]>([]);
-	const [isConfirming, setIsConfirming] = useState<boolean>(false);
+	const [isConfirming, _setIsConfirming] = useState<boolean>(false);
 
 	useEffect(() => {
 		if (!matchPlans || !matchResults) return;
@@ -90,12 +90,11 @@ const ModalEventContainer = ({
 				if (existing) {
 					existing.score += curr.score;
 					existing.detail = existing.detail
-						? existing.detail + "," + curr.detail
+						? `${existing.detail},${curr.detail}`
 						: curr.detail;
 					return acc;
-				} else {
-					return [...acc, curr];
 				}
+				return [...acc, curr];
 			}, []);
 
 		const notZeroScores = mergedScore.filter((score) => score.score !== 0);
@@ -121,7 +120,7 @@ const ModalEventContainer = ({
 				{calculatedScore.map((scores, index) => {
 					return (
 						<div
-							key={"scoreSetModal-" + unsettledEvent.id + "-" + index}
+							key={`scoreSetModal-${unsettledEvent.id}-${index}`}
 							className={"flex flex-col space-y-2"}
 						>
 							<p className={"font-bold "}>
@@ -134,14 +133,7 @@ const ModalEventContainer = ({
 
 									return (
 										<div
-											key={
-												"scoreSetModal-" +
-												unsettledEvent.id +
-												"-" +
-												index +
-												"-" +
-												score.teamId
-											}
+											key={`scoreSetModal-${unsettledEvent.id}-${index}-${score.teamId}`}
 											className={"ml-4"}
 										>
 											<span className={""}>{score.rank}位</span>:{" "}
@@ -168,14 +160,7 @@ const ModalEventContainer = ({
 
 							return (
 								<div
-									key={
-										"scoreSetModal-merged-" +
-										unsettledEvent.id +
-										"-" +
-										index +
-										"-" +
-										score.teamId
-									}
+									key={`scoreSetModal-merged-${unsettledEvent.id}-${index}-${score.teamId}`}
 									className={"ml-4"}
 								>
 									<span className={"w-18 inline-block"}>

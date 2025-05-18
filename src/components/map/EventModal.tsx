@@ -15,7 +15,7 @@ type Props = {
 const EventModal = ({ placeId, isOpen, closeModal }: Props) => {
 	if (!isOpen) return null;
 
-	const [matchStatuses, setMatchStatuses] = useState<Record<number, Status>>(
+	const [_matchStatuses, _setMatchStatuses] = useState<Record<number, Status>>(
 		{},
 	);
 

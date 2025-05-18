@@ -65,23 +65,19 @@ export async function updateLeagueRankings(
 					if (at.type === "T") {
 						if (at.matchId === matchId) {
 							return true; // 今処理中の試合のことだったならそのままok
-						} else {
-							// それ以外の試合のチームIDの場合は、確認してくる
-							const matchPlan = await prisma.matchPlan.findUnique({
-								where: { id: Number.parseInt(String(at.matchId)) },
-							});
-							return matchPlan && matchPlan.status === "Completed";
 						}
-					} else if (at.type === "L") {
+						// それ以外の試合のチームIDの場合は、確認してくる
+						const matchPlan = await prisma.matchPlan.findUnique({
+							where: { id: Number.parseInt(String(at.matchId)) },
+						});
+						return matchPlan && matchPlan.status === "Completed";
+					}
+					if (at.type === "L") {
 						const blockName = at.blockName;
 						const leagueData = teamDataArray[leagueDataIndex] as LeagueTeamData;
 						const blockStatus = leagueData.blockStatus || {};
 						if (at.eventId === eventId) {
-							return (
-								blockStatus &&
-								blockStatus[blockName] &&
-								blockStatus[blockName].completed
-							);
+							return blockStatus?.[blockName]?.completed;
 						}
 					}
 					return false; // それ以外の条件はfalse
@@ -193,7 +189,7 @@ export async function updateLeagueRankings(
 					updatedTeamInfo.rank = rankPosition;
 				} else if (updatedTeamInfo.rank !== undefined) {
 					// rankが設定されていたら削除（まだ全試合が終わっていない）
-					delete updatedTeamInfo.rank;
+					updatedTeamInfo.rank = undefined;
 				}
 
 				return updatedTeamInfo;
@@ -247,18 +243,17 @@ export async function updateLeagueRankings(
 							if (at.eventId === eventId && at.blockName === blockName) {
 								// 今処理中のブロックのことだったならそのままok
 								return true;
-							} else {
-								// それ以外のブロックのチームIDの場合は、確認してくる
-								if (at.eventId === eventId) {
-									const blockStatus = updatedBlockStatus[at.blockName];
-									return blockStatus && blockStatus.completed;
-								} else {
-									// 他の種目のブロックの場合は、全て完了しているか確認する
-									// TODO: 他の種目に依存することは現状ないと考えられるのでpass
-									return true;
-								}
 							}
-						} else if (at.type === "T") {
+							// それ以外のブロックのチームIDの場合は、確認してくる
+							if (at.eventId === eventId) {
+								const blockStatus = updatedBlockStatus[at.blockName];
+								return blockStatus?.completed;
+							}
+							// 他の種目のブロックの場合は、全て完了しているか確認する
+							// TODO: 他の種目に依存することは現状ないと考えられるのでpass
+							return true;
+						}
+						if (at.type === "T") {
 							// チームIDの場合はその試合が完了しているか確認
 							const matchPlan = await prisma.matchPlan.findUnique({
 								where: { id: Number.parseInt(at.matchId.toString()) },
@@ -344,7 +339,7 @@ async function isBlockCompleted(
 	const blockMatches = blockMatchPlans.filter((match) => {
 		const matchTeamIds = match.teamIds.map((id) => {
 			const numId = Number.parseInt(id);
-			return isNaN(numId) ? -1 : numId;
+			return Number.isNaN(numId) ? -1 : numId;
 		});
 
 		// この試合の両方のチームがブロックに所属しているか確認
@@ -424,7 +419,7 @@ async function calculateBlockRankings(
 		// スコア解析（文字列から数値へ）
 		const scores = matchScores.map((score) => {
 			const numScore = Number.parseInt(score);
-			return isNaN(numScore) ? 0 : numScore;
+			return Number.isNaN(numScore) ? 0 : numScore;
 		});
 
 		// 引き分けかどうかの判定（ここは競技によって異なる可能性あり）

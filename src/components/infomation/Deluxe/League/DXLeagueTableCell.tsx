@@ -116,7 +116,7 @@ const DXLeagueTableCell = ({
 	}
 	if (match.status === "Completed") {
 		// statusがCompletedの時はmatchResultsが存在する
-		const matchResult = matchResults![match.id];
+		const matchResult = matchResults?.[match.id];
 		if (!matchResult) return null;
 
 		const leftSideTeamIndex = match.teamIds.indexOf(leftSideTeam);

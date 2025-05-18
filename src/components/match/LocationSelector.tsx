@@ -35,7 +35,7 @@ const LocationSelector = ({
 		>
 			{locations?.map((location) => {
 				return (
-					<option value={location.id} key={"loc-selector-id-" + location.id}>
+					<option value={location.id} key={`loc-selector-id-${location.id}`}>
 						{location.name}
 					</option>
 				);

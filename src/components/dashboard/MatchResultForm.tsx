@@ -36,10 +36,10 @@ export const MatchResultForm = ({
 	const [actualLoserTeamId, setActualLoserTeamId] = useState<number | null>(
 		matchResult ? matchResult.loserTeamId : null,
 	); // 複数対戦の場合はそもそも表示しない
-	const [actualResultNote, setActualResultNote] = useState<string>(
+	const [actualResultNote, _setActualResultNote] = useState<string>(
 		matchResult?.resultNote ? matchResult.resultNote : "",
 	);
-	const [actualResultSecretNote, setActualResultSecretNote] = useState<string>(
+	const [actualResultSecretNote, _setActualResultSecretNote] = useState<string>(
 		matchResult?.resultSecretNote ? matchResult.resultSecretNote : "",
 	);
 
@@ -67,39 +67,39 @@ export const MatchResultForm = ({
 		const defaultTeamIds = matchPlan.teamIds.map((teamId): number => {
 			if (!teamId.startsWith("$")) {
 				return Number(teamId);
-			} else {
-				// もし他の試合結果依存だった場合
-				// その結果が確定していたならその結果を代入
-				if (isFixedMatchResultOrBlockRankByVariableId(teamId)) {
-					// 依存している試合の結果を取得
-					const analyzedTeamId = analyzeVariableTeamId(teamId);
-					if (analyzedTeamId === null) return -1;
-					if (analyzedTeamId.type === "T") {
-						if (!matchResults) return -1;
-						if (analyzedTeamId.condition === "W")
-							return matchResults[analyzedTeamId.matchId]?.winnerTeamId ?? -1;
-						else return matchResults[analyzedTeamId.matchId]?.loserTeamId ?? -1;
-					} else if (analyzedTeamId.type === "L") {
-						// もしリーグ戦の結果だった場合
-						// 該当するリーグ戦の結果を取得
-						const leagueData = getLeagueDataByVariableId(teamId);
-						if (leagueData && leagueData.type === "league") {
-							const blockName = analyzedTeamId.blockName;
-							// 該当する順位のチームを取得
-							const team = leagueData.blocks[blockName].find(
-								(team) => team.rank === analyzedTeamId.expectedRank,
-							);
-							if (team) {
-								return Number(team.teamId);
-							} else {
-								// 該当する順位のチームが見つからなかった場合
-								return -1;
-							}
-						}
-					}
-					return -1;
-				} else return -1; // 別の箇所でそもそも入力不可にする処理が走るので空でok
 			}
+			// もし他の試合結果依存だった場合
+			// その結果が確定していたならその結果を代入
+			if (isFixedMatchResultOrBlockRankByVariableId(teamId)) {
+				// 依存している試合の結果を取得
+				const analyzedTeamId = analyzeVariableTeamId(teamId);
+				if (analyzedTeamId === null) return -1;
+				if (analyzedTeamId.type === "T") {
+					if (!matchResults) return -1;
+					if (analyzedTeamId.condition === "W")
+						return matchResults[analyzedTeamId.matchId]?.winnerTeamId ?? -1;
+					return matchResults[analyzedTeamId.matchId]?.loserTeamId ?? -1;
+				}
+				if (analyzedTeamId.type === "L") {
+					// もしリーグ戦の結果だった場合
+					// 該当するリーグ戦の結果を取得
+					const leagueData = getLeagueDataByVariableId(teamId);
+					if (leagueData && leagueData.type === "league") {
+						const blockName = analyzedTeamId.blockName;
+						// 該当する順位のチームを取得
+						const team = leagueData.blocks[blockName].find(
+							(team) => team.rank === analyzedTeamId.expectedRank,
+						);
+						if (team) {
+							return Number(team.teamId);
+						}
+						// 該当する順位のチームが見つからなかった場合
+						return -1;
+					}
+				}
+				return -1;
+			}
+			return -1; // 別の箇所でそもそも入力不可にする処理が走るので空でok
 		});
 		setActualTeamIds(defaultTeamIds);
 	}, [
@@ -179,7 +179,7 @@ export const MatchResultForm = ({
 								const actualTeamId = getActualTeamIdByVariableId(teamId);
 								const ac = actualTeamId ? actualTeamId.toString() : teamId;
 								return (
-									<tr key={"matchResultTeam" + index} className={"h-12"}>
+									<tr key={`matchResultTeam${index}`} className={"h-12"}>
 										<td className={"text-center"}>
 											<p className={"text-[1.1em]"}>
 												{getMatchDisplayStr(teamId)}
@@ -312,7 +312,7 @@ export const MatchResultForm = ({
 										<td>
 											<input
 												type="radio"
-												name={"matchResultWinner-" + matchPlan.id}
+												name={`matchResultWinner-${matchPlan.id}`}
 												id={`matchResult-${matchPlan.id}-${index}`}
 												required
 												value={ac}

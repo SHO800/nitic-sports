@@ -64,7 +64,7 @@ export default function Header() {
 						<Link href="/" onClick={() => setIsOpen(!isOpen)} className="pl-2">
 							Home
 						</Link>
-						<div className="h-0.5 bg-gray-400"></div>
+						<div className="h-0.5 bg-gray-400" />
 						<Link
 							href="/dashboard"
 							onClick={() => setIsOpen(!isOpen)}
@@ -72,7 +72,7 @@ export default function Header() {
 						>
 							Dashboard
 						</Link>
-						<div className="h-0.5 bg-gray-400"></div>
+						<div className="h-0.5 bg-gray-400" />
 						<Link
 							href="/schedule"
 							onClick={() => setIsOpen(!isOpen)}
@@ -80,7 +80,7 @@ export default function Header() {
 						>
 							Schedule
 						</Link>
-						<div className="h-0.5 bg-gray-400"></div>
+						<div className="h-0.5 bg-gray-400" />
 						<Link
 							href="/infomation"
 							onClick={() => setIsOpen(!isOpen)}
@@ -88,7 +88,7 @@ export default function Header() {
 						>
 							Infomation
 						</Link>
-						<div className="h-0.5 bg-gray-400"></div>
+						<div className="h-0.5 bg-gray-400" />
 						<Link
 							href="/map"
 							onClick={() => setIsOpen(!isOpen)}

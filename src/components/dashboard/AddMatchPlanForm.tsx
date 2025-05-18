@@ -87,7 +87,7 @@ const AddMatchPlanForm = () => {
 	return (
 		<div>
 			<form
-				key={"addMatchPlanForm" + teamCount}
+				key={`addMatchPlanForm${teamCount}`}
 				onSubmit={async (e) => {
 					e.preventDefault();
 					await createMatchPlan(
@@ -251,7 +251,7 @@ const AddMatchPlanForm = () => {
 
 						{[...Array(teamCount)].map((_, index) => (
 							<div
-								key={"matchTeamEditorDiv" + index}
+								key={`matchTeamEditorDiv${index}`}
 								className="flex items-center"
 							>
 								<label
@@ -269,10 +269,7 @@ const AddMatchPlanForm = () => {
 										setIsVisibleClassSelector(true);
 									}}
 								/>
-								<span
-									id={`team${index + 1}Name`}
-									className="text-black mr-2"
-								></span>
+								<span id={`team${index + 1}Name`} className="text-black mr-2" />
 
 								{/*もしinputがアクティブなら*/}
 								{isVisibleClassSelector &&
@@ -407,7 +404,7 @@ const AddMatchPlanForm = () => {
 			</form>
 			{/*    編集用*/}
 			<form
-				key={"editMatchPlanForm" + teamCount}
+				key={`editMatchPlanForm${teamCount}`}
 				onSubmit={async (e) => {
 					e.preventDefault();
 

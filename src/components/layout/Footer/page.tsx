@@ -47,7 +47,7 @@ const Footer = () => {
 			<p className={"mt-2 text-sm"}>R7年度4J有志2名</p>
 			<p className={"mt-3 text-xs"}>協力</p>
 			<p className={"mt-2 text-sm"}>R7体育大会実行委員会</p>
-			<div className={"relative mt-3 " + notoSansJPFont.className}>
+			<div className={`relative mt-3 ${notoSansJPFont.className}`}>
 				<div className={"flex flex-row space-x-36 w-full justify-center "}>
 					<div className={"flex flex-row justify-start w-[40px] py-1 relative"}>
 						<Image

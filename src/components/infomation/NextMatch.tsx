@@ -40,14 +40,14 @@ const NextMatch: React.FC<Props> = (props) => {
 		);
 		const NextThree = filteredByStatus?.slice(0, 3);
 
-		const getMatchStatus = (matchPlan: MatchPlanType): Status => {
+		const _getMatchStatus = (matchPlan: MatchPlanType): Status => {
 			// すでにローカル状態にステータスがある場合はそれを返す
 			if (matchStatuses[matchPlan.id] !== undefined) {
 				return matchStatuses[matchPlan.id];
 			}
 
 			// すでに結果がある場合はCompletedステータス
-			if (matchResults && matchResults[matchPlan.id]) {
+			if (matchResults?.[matchPlan.id]) {
 				return Status.Completed;
 			}
 

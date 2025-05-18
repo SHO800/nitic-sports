@@ -23,7 +23,7 @@ const TimeLine = ({
 			<div
 				className="absolute left-0 h-[.1px] w-full bg-red-500 rounded"
 				style={{ top: `${percent}%` }}
-			></div>
+			/>
 			{/*<div className="absolute left-0 h-[.1px] w-full bg-red-500 rounded" style={{ top: `0%` }}></div>*/}
 			{/* <p>{percent}</p> */}
 		</div>

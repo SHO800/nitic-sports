@@ -11,7 +11,7 @@ type Props =
 	| { eventIds: string; eventId?: undefined };
 
 const NowHot: React.FC<Props> = (props) => {
-	const [matchStatuses, setMatchStatuses] = useState<Record<number, Status>>(
+	const [matchStatuses, _setMatchStatuses] = useState<Record<number, Status>>(
 		{},
 	);
 
@@ -56,7 +56,7 @@ const NowHot: React.FC<Props> = (props) => {
 			}
 
 			// すでに結果がある場合はCompletedステータス
-			if (matchResults && matchResults[matchPlan.id]) {
+			if (matchResults?.[matchPlan.id]) {
 				return Status.Completed;
 			}
 
@@ -80,7 +80,7 @@ const NowHot: React.FC<Props> = (props) => {
 			<div className="flex flex-col min-w-[94vw] justify-center">
 				<div className="flex flex-col lg:mx-20 px-1 py-2 min-h-[30vh] bg-gray-100 rounded overflow-auto">
 					{NowhotThree?.map((item) => {
-						const status = getMatchStatus(item);
+						const _status = getMatchStatus(item);
 
 						return (
 							<div className="flex justify-center bg-gray-100 px-10 rounded">

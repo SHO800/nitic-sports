@@ -123,28 +123,28 @@ export const useData = () => {
 
 					// トーナメント形式の処理
 					if (variableTeamIdData.type === "T") {
-						const matchPlan = matchPlans!.find(
+						const matchPlan = matchPlans?.find(
 							(mp) => mp.id === variableTeamIdData.matchId,
 						);
 						if (!matchPlan) return "";
 
 						const matchName = matchPlan.matchName;
 						const expectedResult = variableTeamIdData.condition;
-						const matchResult = matchResults![variableTeamIdData.matchId];
+						const matchResult = matchResults?.[variableTeamIdData.matchId];
 
 						// 試合結果が存在しない場合
 						if (!matchResult)
 							return `${matchName}${expectedResult === "W" ? "勝者" : "敗者"}`;
 
 						if (expectedResult === "W") {
-							const team = teams!.find(
+							const team = teams?.find(
 								(t) => t.id === matchResult.winnerTeamId,
 							);
 							return team ? `${team.name} ` : "";
 						}
 
 						if (expectedResult === "L") {
-							const team = teams!.find((t) => t.id === matchResult.loserTeamId);
+							const team = teams?.find((t) => t.id === matchResult.loserTeamId);
 							return team ? `${team.name} ` : `${matchName}敗者`;
 						}
 					}
@@ -155,7 +155,7 @@ export const useData = () => {
 						if (variableTeamIdData.eventId === 1)
 							planStr = `${variableTeamIdData.blockName.charCodeAt(0) - "A".charCodeAt(0) + 1}年の${variableTeamIdData.expectedRank}位`;
 
-						const event = events!.find(
+						const event = events?.find(
 							(e) => e.id === variableTeamIdData.eventId,
 						);
 						if (!event) return planStr;
@@ -179,7 +179,7 @@ export const useData = () => {
 						);
 						if (!blockTeam) return planStr;
 
-						const team = teams!.find(
+						const team = teams?.find(
 							(t) => t.id.toString() === blockTeam.teamId,
 						);
 						return team ? `${team.name} ` : "";
@@ -216,12 +216,12 @@ export const useData = () => {
 				if (!variableTeamIdData) return null;
 
 				if (variableTeamIdData.type === "T") {
-					const matchPlan = matchPlans!.find(
+					const matchPlan = matchPlans?.find(
 						(mp) => mp.id === variableTeamIdData.matchId,
 					);
 					if (!matchPlan) return null;
 
-					const matchResult = matchResults![variableTeamIdData.matchId];
+					const matchResult = matchResults?.[variableTeamIdData.matchId];
 					if (!matchResult) return null;
 
 					return variableTeamIdData.condition === "W"
@@ -230,7 +230,7 @@ export const useData = () => {
 				}
 
 				if (variableTeamIdData.type === "L") {
-					const event = events!.find(
+					const event = events?.find(
 						(e) => e.id === variableTeamIdData.eventId,
 					);
 					if (!event) return null;
@@ -279,7 +279,7 @@ export const useData = () => {
 			return memoize(cacheKey, () => {
 				// 指定された種目において, 指定されたteamIdsの配列に含まれるチーム同士の戦いを取得する
 				const sortedTeamIds = block.map((team) => team.teamId).sort();
-				const matchPlansForEvent = matchPlans!.filter(
+				const matchPlansForEvent = matchPlans?.filter(
 					(matchPlan) => matchPlan.eventId === eventId,
 				);
 				const matchPlansForBlock = matchPlansForEvent.filter((matchPlan) => {
@@ -299,7 +299,7 @@ export const useData = () => {
 			if (!hasRequiredData()) return false;
 
 			return memoize(`isFixedMatch-${matchId}`, () => {
-				const matchResult = matchResults![matchId];
+				const matchResult = matchResults?.[matchId];
 				return !!matchResult && matchResult.winnerTeamId !== null;
 			});
 		},
@@ -317,15 +317,15 @@ export const useData = () => {
 
 				if (variableTeamIdData.type === "T") {
 					const matchId = variableTeamIdData.matchId;
-					const matchPlan = matchPlans!.find((mp) => mp.id === matchId);
+					const matchPlan = matchPlans?.find((mp) => mp.id === matchId);
 					if (!matchPlan) return false;
 
-					const matchResult = matchResults![matchId];
+					const matchResult = matchResults?.[matchId];
 					return !!matchResult && matchResult.winnerTeamId !== null;
 				}
 
 				if (variableTeamIdData.type === "L") {
-					const event = events!.find(
+					const event = events?.find(
 						(e) => e.id === variableTeamIdData.eventId,
 					);
 					if (!event) return false;
@@ -361,7 +361,7 @@ export const useData = () => {
 				if (!variableTeamIdData || variableTeamIdData.type !== "T") return null;
 
 				const matchId = variableTeamIdData.matchId;
-				return matchPlans!.find((mp) => mp.id === matchId) || null;
+				return matchPlans?.find((mp) => mp.id === matchId) || null;
 			});
 		},
 		[matchPlans, hasRequiredData],
@@ -376,7 +376,7 @@ export const useData = () => {
 				const variableTeamIdData = analyzeVariableTeamId(variableId);
 				if (!variableTeamIdData || variableTeamIdData.type !== "L") return null;
 
-				const event = events!.find((e) => e.id === variableTeamIdData.eventId);
+				const event = events?.find((e) => e.id === variableTeamIdData.eventId);
 				if (!event) return null;
 
 				const jsonData = event.teamData[variableTeamIdData.teamDataIndex];
@@ -396,7 +396,7 @@ export const useData = () => {
 				return null;
 
 			return memoize(`matchResultById-${matchId}`, () => {
-				return matchResults![matchId] || null;
+				return matchResults?.[matchId] || null;
 			});
 		},
 		[matchResults, hasRequiredData],

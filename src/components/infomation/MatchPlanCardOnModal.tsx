@@ -24,7 +24,7 @@ const MatchPlanCardOnMaodal = ({
 	status,
 	getMatchDisplayStr,
 }: Props) => {
-	const [matchStatuses, setMatchStatuses] = useState<Record<number, Status>>(
+	const [matchStatuses, _setMatchStatuses] = useState<Record<number, Status>>(
 		{},
 	);
 	// const {formatTimeDifference} = useCurrentTime();
@@ -32,14 +32,14 @@ const MatchPlanCardOnMaodal = ({
 
 	const { matchPlans, matchResults } = useDataContext();
 
-	const getMatchStatus = (matchPlan: MatchPlanType): Status => {
+	const _getMatchStatus = (matchPlan: MatchPlanType): Status => {
 		// すでにローカル状態にステータスがある場合はそれを返す
 		if (matchStatuses[matchPlan.id] !== undefined) {
 			return matchStatuses[matchPlan.id];
 		}
 
 		// すでに結果がある場合はCompletedステータス
-		if (matchResults && matchResults[matchPlan.id]) {
+		if (matchResults?.[matchPlan.id]) {
 			return Status.Completed;
 		}
 
@@ -65,7 +65,7 @@ const MatchPlanCardOnMaodal = ({
 
 							{(status === Status.Waiting || status === Status.Preparing) && (
 								<>
-									<div className="relative bg-black h-[0.5px] mx-3 mt-0.5"></div>
+									<div className="relative bg-black h-[0.5px] mx-3 mt-0.5" />
 
 									<p className="flex bg-white text-black px-1 rounded text-2xl justify-center">
 										<MatchCountdownForReader

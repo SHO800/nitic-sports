@@ -128,7 +128,7 @@ const MatchCell = memo(
 				cellClassName += " animate-pulse";
 				content = `(${matchStr})`;
 				break;
-			case "Completed":
+			case "Completed": {
 				// 試合結果がある場合はスコアを表示
 				const matchResult = matchResults?.[match.id];
 				if (matchResult) {
@@ -144,6 +144,7 @@ const MatchCell = memo(
 					}
 				}
 				break;
+			}
 			default:
 				content = `(${matchStr})`;
 		}

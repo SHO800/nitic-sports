@@ -35,7 +35,7 @@ const TotalScore = () => {
 				{totalScoreByTeam &&
 					Object.entries(totalScoreByTeam).map(([key, value]) => {
 						return (
-							<div key={"total-score-" + key}>
+							<div key={`total-score-${key}`}>
 								{getMatchDisplayStr(key)}: {value}点
 							</div>
 						);

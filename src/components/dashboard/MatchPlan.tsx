@@ -16,7 +16,7 @@ const MatchPlan = () => {
 	} = useDataContext();
 
 	// 各試合のタイマー状態を管理
-	const [matchTimers, setMatchTimers] = useState<Record<number, boolean>>({});
+	const [_matchTimers, setMatchTimers] = useState<Record<number, boolean>>({});
 
 	// 各試合のステータスを管理（実際のAPIから取得する代わりのローカル状態）
 	const [matchStatuses, setMatchStatuses] = useState<Record<number, Status>>(
@@ -57,11 +57,11 @@ const MatchPlan = () => {
 	};
 
 	// タイマーの開始（Playing状態に移行）
-	const handleStartTimer = (matchId: number) => {
+	const _handleStartTimer = (matchId: number) => {
 		updateMatchStatus(matchId, Status.Playing);
 	};
 	// タイマーの停止（Finished状態に移行）
-	const handleStopTimer = (matchId: number) => {
+	const _handleStopTimer = (matchId: number) => {
 		updateMatchStatus(matchId, Status.Finished);
 	};
 
@@ -73,7 +73,7 @@ const MatchPlan = () => {
 		}
 
 		// すでに結果がある場合はCompletedステータス
-		if (matchResults && matchResults[matchPlan.id]) {
+		if (matchResults?.[matchPlan.id]) {
 			return Status.Completed;
 		}
 

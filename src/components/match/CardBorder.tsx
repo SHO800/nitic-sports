@@ -21,11 +21,14 @@ const CardBorder = memo(function CardBorder({
 		) {
 			// 5分以内に開始する
 			return "card-blue";
-		} else if (status === Status.Playing) {
+		}
+		if (status === Status.Playing) {
 			return "card-green";
-		} else if (status === Status.Finished) {
+		}
+		if (status === Status.Finished) {
 			return "card-yellow ";
-		} else if (status === Status.Completed || status === Status.Cancelled) {
+		}
+		if (status === Status.Completed || status === Status.Cancelled) {
 			return "card-gray";
 		}
 		return "";
@@ -33,10 +36,7 @@ const CardBorder = memo(function CardBorder({
 
 	return (
 		<div
-			className={
-				"w-full  px-4 py-2 outline-2 outline-offset-4 outline-gray-400 rounded-xs " +
-				frameClass
-			}
+			className={`w-full  px-4 py-2 outline-2 outline-offset-4 outline-gray-400 rounded-xs ${frameClass}`}
 		>
 			{children}
 		</div>

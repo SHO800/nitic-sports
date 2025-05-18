@@ -12,7 +12,7 @@ const Teams = () => {
 						className="flex items-center justify-between bg-gray-200 p-2 rounded mb-2"
 					>
 						<div className="flex items-center">
-							<p className={`text-black `}>
+							<p className={"text-black "}>
 								{team.id} {team.name}
 							</p>
 						</div>

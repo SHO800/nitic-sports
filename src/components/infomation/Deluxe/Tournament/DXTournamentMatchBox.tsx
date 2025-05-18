@@ -36,7 +36,7 @@ const DXTournamentMatchBox = ({
 		endY: 0,
 		type: "H" as "H" | "V" | "LT" | "RT" | "LB" | "RB",
 	});
-	const [diffs, setDiffs] = useState({
+	const [_diffs, setDiffs] = useState({
 		rowDiff: 0,
 		colDiff: 0,
 	});

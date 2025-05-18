@@ -70,7 +70,7 @@ const DXTournamentTable = ({
 	if (eventLoading || matchPlanLoading || teamLoading) {
 		return (
 			<div className="flex justify-center items-center h-40">
-				<div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
+				<div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500" />
 			</div>
 		);
 	}
@@ -100,7 +100,7 @@ const DXTournamentTable = ({
 				{tournamentData.nodes.map((match) => {
 					return (
 						<div
-							key={"node-" + match.nodeId}
+							key={`node-${match.nodeId}`}
 							style={{
 								gridColumn: match.column,
 								gridRow: match.row,
@@ -117,9 +117,7 @@ const DXTournamentTable = ({
 								<DXTournamentMatchBox
 									match={match}
 									boxStyle={{}}
-									matchResult={
-										matchResults && matchResults[match.matchId.toString()]
-									}
+									matchResult={matchResults?.[match.matchId.toString()]}
 									rowWidth={rowWidth}
 									rowHeight={rowHeight}
 									teamIds={teamIds}

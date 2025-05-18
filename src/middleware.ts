@@ -6,7 +6,7 @@ export async function middleware(request: NextRequest) {
 		const cookieStore = await cookies();
 		const session = cookieStore.get("sess");
 
-		const res = await fetch(new URL(`/api/auth/cookie/check`, request.url), {
+		const res = await fetch(new URL("/api/auth/cookie/check", request.url), {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
