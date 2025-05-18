@@ -42,11 +42,11 @@ const MatchDashboard = () => {
 	}, [events, scores]);
 
 	return (
-		<div className={"relative w-screen h-[calc(100vh-130px)] overflow-hidden"}>
+		<div className={"relative w-full h-[calc(100vh-130px)] overflow-hidden"}>
 			<div className={"h-fit py-2 flex justify-center items-center relative"}>
 				<Clock />
 
-				<div className={"absolute bottom-[calc(50%-1em)] right-0"}>
+				<div className={"absolute bottom-[calc(50%-1em)] right-0 "}>
 					<input
 						type={"checkbox"}
 						onChange={(e) =>
@@ -69,7 +69,7 @@ const MatchDashboard = () => {
 			/>
 			<div
 				className={
-					"flex flex-row justify-center w-screen h-full px-4 overflow-y-scroll hidden-scrollbar"
+					"flex flex-row justify-center w-screen h-full px-0 overflow-y-scroll hidden-scrollbar"
 				}
 			>
 				{locations &&
