@@ -81,8 +81,8 @@ const NowHot: React.FC<Props> = (props) => {
 						const _status = getMatchStatus(item);
 
 						return (
-							<div key={"nowHotCard-"+item.id} cla
-								  v ssName="flex justify-center bg-background px-10 rounded">
+							<div key={"nowHotCard-"+item.id} 
+								 className="flex justify-center bg-background px-10 rounded">
 								<div
 									className="flex flex-col bg-background mb-1 border rounded"
 								>
