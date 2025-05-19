@@ -1,15 +1,16 @@
 import Link from "next/link";
 import Informations from "@/components/top/Information";
 
+
 export default async function Home() {
     return (
-        <div className="min-h-screen">
+        <div className={"min-h-screen"}>
             <p className={"hidden lg:block text-center"}>本サイトはスマホでの閲覧を推奨しております.</p>
             {/*<MatchesWrapper title={"進行中の試合"}>*/}
             {/* <p>a</p> */}
             {/*<NowHot eventId={"all"} />*/}
             {/*</MatchesWrapper>*/}
-            
+
             <p className="flex justify-center mt-4">＼ 次は何の競技だ！／</p>
             <Link
                 href={"/schedule"}

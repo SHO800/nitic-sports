@@ -19,8 +19,10 @@ const notoSansJp = Noto_Sans_JP({
     fallback: ["Hiragino Sans", "Hiragino Kaku Gothic ProN", "sans-serif"],
 });
 
+
+
 export const metadata: Metadata = {
-    
+
     title: "一関 - 体育大会2025",
     description: "一関高専校内体育大会の試合結果をリアルタイムでお届けします！",
 };
@@ -31,9 +33,9 @@ export default async function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="ja" className={`${notoSansJp.variable}`}>
+        <html lang="ja" className={"font-noto-sans-jp"}>
         <body
-            className={`antialiased text-lg bg-gray-200`}
+            className={`antialiased text-lg bg-gray-200 `}
         >
         <CurrentTimeContextProvider>
             <Header/>

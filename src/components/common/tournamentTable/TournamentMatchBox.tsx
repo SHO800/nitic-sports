@@ -75,7 +75,7 @@ const TournamentMatchBox = ({
 		if (!isCurrentTeamMatch) return "";
 
 		if (match.tournamentMatchNode.matchPlan.status === "Playing") {
-			return "bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-md shadow-lg transition-all duration-300 transform hover:scale-105";
+			return "bg-gradient-to-r from-green-500 to-green-600 text-white rounded-md shadow-lg transition-all duration-300 transform hover:scale-105";
 		}
 
 		return "bg-gradient-to-r from-blue-400 to-blue-600 text-white rounded-md shadow-md transition-all duration-300";

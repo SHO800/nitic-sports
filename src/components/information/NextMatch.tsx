@@ -2,10 +2,13 @@ import { useDataContext } from "@/contexts/dataContext";
 import { type MatchPlan as MatchPlanType, Status } from "@prisma/client";
 import { useState } from "react";
 import MatchInfoForReader from "../reader/MatchInfoForReader";
+import localFont from "next/font/local";
+import {yowaiFont} from "../../../public/fonts/fonts";
 
 type Props =
 	| { eventId: number | string | null; eventIds?: undefined }
 	| { eventIds: string; eventId?: undefined };
+
 
 const NextMatch: React.FC<Props> = (props) => {
 	const [matchStatuses] = useState<Record<number, Status>>({});
@@ -58,7 +61,7 @@ const NextMatch: React.FC<Props> = (props) => {
 		if (NextThree?.length === 0) {
 			return (
 				<div className="flex min-w-[94vw] justify-center">
-					<div className="flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[30vh] bg-gray-100 rounded overflow-auto">
+					<div className={"flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[30vh] bg-background rounded overflow-auto " + yowaiFont.className}>
 						{/* <div className="flex justify-center items-center h-full bg-gray-500 px-10 rounded"> */}
 						全試合終了しました
 						{/* </div> */}
@@ -69,10 +72,10 @@ const NextMatch: React.FC<Props> = (props) => {
 
 		return (
 			<div className="flex flex-col min-w-[94vw] justify-center">
-				<div className="flex flex-col lg:mx-20 px-1 py-2 min-h-[30vh] bg-gray-100 rounded overflow-auto">
+				<div className="flex flex-col lg:mx-20 px-1 py-2 min-h-[30vh]  rounded overflow-auto">
 					{NextThree?.map((item) => {
 						return (
-							<div key={"nextMatchCard-"+item.id} className="flex justify-center bg-gray-100 px-10 rounded">
+							<div key={"nextMatchCard-"+item.id} className="flex justify-center  px-10 rounded">
 								<div
 									className="flex flex-col bg-white mb-1 border rounded"
 								>
@@ -126,8 +129,8 @@ const NextMatch: React.FC<Props> = (props) => {
 		if (NextThree?.length === 0) {
 			return (
 				<div className="flex min-w-[94vw] justify-center">
-					<div className="flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[30vh] bg-gray-100 rounded overflow-auto">
-						{/* <div className="flex justify-center items-center bg-gray-100 px-10 rounded"> */}
+					<div className={"flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[30vh] bg-background rounded overflow-auto shadow-md "  + yowaiFont.className}>
+						{/* <div className="flex justify-center items-center bg-background px-10 rounded"> */}
 						全試合終了しました
 						{/* </div> */}
 					</div>
@@ -137,14 +140,14 @@ const NextMatch: React.FC<Props> = (props) => {
 
 		return (
 			<div className="flex flex-col min-w-[94vw] justify-center">
-				<div className="flex flex-col lg:mx-20 px-1 py-2 min-h-[30vh] bg-gray-100 rounded overflow-auto">
+				<div className="flex flex-col lg:mx-20 px-1 py-2 min-h-[30vh]  rounded overflow-auto">
 					{NextThree?.map((item) => {
 						// const status = getMatchStatus(item);
 
 						return (
 							<div
 								key={item.id}
-								className="flex justify-center bg-gray-100 px-10 rounded"
+								className="flex justify-center  px-10 rounded"
 							>
 								<div className="flex flex-col bg-white mb-1 border rounded">
 									<div className="flex justify-center w-[70vw] lg:w-[30vw] bg-white px-1 rounded">

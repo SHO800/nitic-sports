@@ -2,6 +2,7 @@ import { useDataContext } from "@/contexts/dataContext";
 import { useState } from "react";
 import Bracket from "../common/Bracket";
 import EventSwitch from "./EventSwitch";
+import {yowaiFont} from "../../../public/fonts/fonts";
 
 const ResultInfo = () => {
 	const { matchPlans } = useDataContext();
@@ -25,7 +26,7 @@ const ResultInfo = () => {
 							)}
 
 						{typeof selectedId === "string" && (
-							<div className="flex h-full justify-center items-center">
+							<div className={"flex h-full justify-center items-center" + yowaiFont.className}>
 								競技別の表示のみ対応しております
 							</div>
 						)}

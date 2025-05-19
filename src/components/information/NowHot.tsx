@@ -76,13 +76,13 @@ const NowHot: React.FC<Props> = (props) => {
 
 		return (
 			<div className="flex flex-col min-w-[94vw] justify-center">
-				<div className="flex flex-col lg:mx-20 px-1 py-2 min-h-[30vh] bg-background rounded overflow-auto ">
+				<div className="flex flex-col lg:mx-20 px-1 py-2 min-h-[30vh]  rounded overflow-auto ">
 					{NowhotThree?.map((item) => {
 						const _status = getMatchStatus(item);
 
 						return (
 							<div key={"nowHotCard-"+item.id} 
-								 className="flex justify-center bg-background px-10 rounded">
+								 className="flex justify-center px-10 rounded">
 								<div
 									className="flex flex-col bg-background mb-1 border rounded"
 								>
@@ -151,14 +151,14 @@ const NowHot: React.FC<Props> = (props) => {
 
 		return (
 			<div className="flex flex-col min-w-[94vw] justify-center">
-				<div className="flex flex-col lg:mx-20 px-1 py-2 min-h-[30vh] bg-background rounded overflow-auto">
+				<div className="flex flex-col lg:mx-20 px-1 py-2 min-h-[30vh]  rounded overflow-auto">
 					{NowhotThree?.map((item) => {
 						// const status = getMatchStatus(item);
 
 						return (
 							<div
 								key={item.id}
-								className="flex justify-center bg-background px-10 rounded"
+								className="flex justify-center px-10 rounded"
 							>
 								<div className="flex flex-col bg-background mb-1 border rounded">
 									<div className="flex justify-center w-[70vw] lg:w-[30vw] bg-background px-1 rounded">
