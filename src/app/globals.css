@@ -1,4 +1,8 @@
 @import "tailwindcss";
+@theme {
+	--color-black: #4d5156;
+	--color-background: #ffffff;
+}
 @layer utilities {
 	.hidden-scrollbar {
 		-ms-overflow-style: none; /* IE, Edge 対応 */
@@ -11,7 +15,9 @@
 }
 :root {
 	--background: #ffffff;
+	/*--background: black;*/
 	--foreground: #171717;
+	--text-color: #4d5156;
 	--font-noto-sans-jp: var(--font-noto-sans-jp);
 }
 

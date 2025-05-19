@@ -27,55 +27,60 @@ const Information = () => {
     return (
         <>
             {/* <div className="fixed z-100 w-full h-screen bg-black/30">null</div> */}
-
+            
             <div className="min-h-screen">
                 {/* <InfoModal /> */}
-
-                <div>
-                    <h1 className="flex justify-center mx-2 my-1 bg-amber-500 rounded">
-                        <p className="text-6xl text-white ">NOW HOT!!</p>
+                
+                <div className={"mt-16 border-green-400 border-2 rounded m-6"}>
+                    <h1 className="relative flex justify-center mx-2 my-1 rounded h-8 bg-background">
+                        <p className="absolute -top-8 text-3xl text-black bg-background px-4 tracking-wider">進行中の試合</p>
+                        <p className="absolute -top-0 text-lg text-black bg-background px-4 tracking-widest">NOW HOT!!</p>
                     </h1>
                     
-
-                    <EventSwitch selectedId={selectedNowId} setSelectedId={setNowId} />
+                    
+                    <EventSwitch selectedId={selectedNowId} setSelectedId={setNowId}/>
 
                     <div className="flex justify-center  mx-1 lg:mx-20 mb-2 p-1 rounded">
-                        <NowHot eventId={selectedNowId} />
+                        <NowHot eventId={selectedNowId}/>
                     </div>
                 </div>
 
-                <div>
-                    <div className="flex justify-center mx-2 mb-1 bg-amber-500 rounded">
-                        <p className="text-4xl text-white ">NEXT MATCH!!</p>
-                    </div>
 
-                    <EventSwitch selectedId={selectedNextId} setSelectedId={setNextId} />
-
+                <div className={"mt-14 border-blue-500 border-2 rounded m-6"}>
+                    <h1 className="relative flex justify-center mx-2 my-1 rounded h-8 bg-background">
+                        <p className="absolute -top-8 text-3xl text-black bg-background px-4 tracking-wider">次の試合</p>
+                        <p className="absolute -top-0 text-lg text-black bg-background px-4 tracking-widest">NEXT MATCH!!</p>
+                    </h1>
+                    
+                    <EventSwitch selectedId={selectedNextId} setSelectedId={setNextId}/>
+                    
                     <div className="flex justify-center  mx-1 lg:mx-20 mb-2 p-1 rounded">
-                        <NextMatch eventId={selectedNextId} />
+                        <NextMatch eventId={selectedNextId}/>
                     </div>
                 </div>
 
-                <div>
-                    <div className="flex justify-center mx-2 mb-1 bg-red-500 rounded">
-                        <p className="text-4xl text-white ">遅延情報</p>
-                    </div>
-
+                <div className={"mt-14 border-red-500 border-2 rounded m-6"}>
+                    <h1 className="relative flex justify-center mx-2 my-1 rounded h-8 bg-background">
+                        <p className="absolute -top-8 text-3xl text-black bg-background px-4 tracking-wider">遅延情報</p>
+                        <p className="absolute -top-0 text-lg text-black bg-background px-4 tracking-widest">DELAYING!!</p>
+                    </h1>
+                    
                     <EventSwitch
                         selectedId={selectedDelayId}
                         setSelectedId={setDelayId}
                     />
 
                     <div className="flex justify-center  mx-1 lg:mx-20 mb-2 p-1 rounded">
-                        <DelayInfo eventId={selectedDelayId} />
+                        <DelayInfo eventId={selectedDelayId}/>
                     </div>
                 </div>
 
-                <div>
-                    <div className="flex justify-center mx-2 mb-1 bg-lime-600 rounded">
-                        <p className="text-4xl text-white ">対戦表 試合結果</p>
-                    </div>
-                    <ResultInfo />
+                <div className={"mt-14 border-black border-2 rounded m-6"}>
+                    <h1 className="relative flex justify-center mx-2 my-1 rounded h-8 bg-background">
+                        <p className="absolute -top-8 text-3xl text-black bg-background px-4 tracking-wider">対戦表</p>
+                        <p className="absolute -top-0 text-lg text-black bg-background px-4 tracking-widest">+ 試合結果</p>
+                    </h1>
+                    <ResultInfo/>
                 </div>
             </div>
         </>

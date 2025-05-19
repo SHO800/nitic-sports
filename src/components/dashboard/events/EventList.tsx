@@ -10,7 +10,7 @@ const EventList = () => {
 			{events?.map((event) => (
 				<div
 					key={event.id}
-					className={"flex flex-col w-full justify-start bg-gray-200"}
+					className={"flex flex-col w-full justify-start shadow-md"}
 				>
 					<div className="flex items-center justify-between  p-2 rounded mb-2">
 						<div className="flex items-center">

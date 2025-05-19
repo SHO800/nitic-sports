@@ -10,7 +10,7 @@ export default async function Home() {
             {/*<NowHot eventId={"all"} />*/}
             {/*</MatchesWrapper>*/}
             
-            <p className="flex justify-center mt-4">\ 次は何の競技だ！ /</p>
+            <p className="flex justify-center mt-4">＼ 次は何の競技だ！／</p>
             <Link
                 href={"/schedule"}
                 className={
@@ -20,7 +20,7 @@ export default async function Home() {
                 競技日程表
             </Link>
 
-            <p className="flex justify-center mt-4">\ 高専は広いから気をつけろ！ /</p>
+            <p className="flex justify-center mt-4">＼ 高専は広いから気をつけろ！／</p>
             <Link
                 href={"/map"}
                 className={
@@ -30,7 +30,7 @@ export default async function Home() {
                 マップ
             </Link>
 
-            <p className="flex justify-center mt-4">\ 高専一熱い場所はここだ！！ /</p>
+            <p className="flex justify-center mt-4">＼ 高専一熱い場所はここだ！！／</p>
             <Link
                 href={"/infomation"}
                 className={
@@ -40,7 +40,7 @@ export default async function Home() {
                 試合情報
             </Link>
 
-            <p className="flex justify-center mt-4">\ すべての情報はこちら！ /</p>
+            <p className="flex justify-center mt-4">＼ すべての情報はこちら！／</p>
             <Link
                 href={"/dashboard"}
                 className={

@@ -66,11 +66,9 @@ const NowHot: React.FC<Props> = (props) => {
 
 		if (NowhotThree?.length === 0) {
 			return (
-				<div className="flex min-w-[94vw] justify-center">
-					<div className="flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[30vh] bg-gray-100 rounded overflow-auto">
-						{/* <div className="flex justify-center items-center h-full bg-gray-100 px-10 rounded"> */}
+				<div className="flex min-w-[94vw] justify-center ">
+					<div className="flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[30vh] bg-background rounded overflow-auto shadow-md">
 						進行中の試合はありません
-						{/* </div> */}
 					</div>
 				</div>
 			);
@@ -78,16 +76,17 @@ const NowHot: React.FC<Props> = (props) => {
 
 		return (
 			<div className="flex flex-col min-w-[94vw] justify-center">
-				<div className="flex flex-col lg:mx-20 px-1 py-2 min-h-[30vh] bg-gray-100 rounded overflow-auto">
+				<div className="flex flex-col lg:mx-20 px-1 py-2 min-h-[30vh] bg-background rounded overflow-auto ">
 					{NowhotThree?.map((item) => {
 						const _status = getMatchStatus(item);
 
 						return (
-							<div key={"nowHotCard-"+item.id} className="flex justify-center bg-gray-100 px-10 rounded">
+							<div key={"nowHotCard-"+item.id} cla
+								  v ssName="flex justify-center bg-background px-10 rounded">
 								<div
-									className="flex flex-col bg-white mb-1 border rounded"
+									className="flex flex-col bg-background mb-1 border rounded"
 								>
-									<div className="flex justify-center w-[70vw] lg:w-[30vw] bg-white px-1 rounded text-2xl">
+									<div className="flex justify-center w-[70vw] lg:w-[30vw] bg-background px-1 rounded text-2xl">
 										<MatchInfoForReader
 											matchPlan={item}
 											events={events}
@@ -96,7 +95,7 @@ const NowHot: React.FC<Props> = (props) => {
 										/>
 									</div>
 									{/*
-                                <p  className="flex justify-center bg-white text-black px-1 rounded text-2xl">
+                                <p  className="flex justify-center bg-background text-black px-1 rounded text-2xl">
                                     {(status === Status.Waiting || status === Status.Preparing) && (
                                         <MatchCountdownForReader scheduledStartTime={item.scheduledStartTime}/>
                                     )}
@@ -141,8 +140,8 @@ const NowHot: React.FC<Props> = (props) => {
 		if (NowhotThree?.length === 0) {
 			return (
 				<div className="flex min-w-[94vw] justify-center">
-					<div className="flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[30vh] bg-gray-100 rounded overflow-auto">
-						{/* <div className="flex justify-center items-center bg-gray-100 px-10 rounded"> */}
+					<div className="flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[30vh]  rounded overflow-auto shadow-md">
+						{/* <div className="flex justify-center items-center bg-background px-10 rounded"> */}
 						進行中の試合はありません
 						{/* </div> */}
 					</div>
@@ -152,17 +151,17 @@ const NowHot: React.FC<Props> = (props) => {
 
 		return (
 			<div className="flex flex-col min-w-[94vw] justify-center">
-				<div className="flex flex-col lg:mx-20 px-1 py-2 min-h-[30vh] bg-gray-100 rounded overflow-auto">
+				<div className="flex flex-col lg:mx-20 px-1 py-2 min-h-[30vh] bg-background rounded overflow-auto">
 					{NowhotThree?.map((item) => {
 						// const status = getMatchStatus(item);
 
 						return (
 							<div
 								key={item.id}
-								className="flex justify-center bg-gray-100 px-10 rounded"
+								className="flex justify-center bg-background px-10 rounded"
 							>
-								<div className="flex flex-col bg-white mb-1 border rounded">
-									<div className="flex justify-center w-[70vw] lg:w-[30vw] bg-white px-1 rounded">
+								<div className="flex flex-col bg-background mb-1 border rounded">
+									<div className="flex justify-center w-[70vw] lg:w-[30vw] bg-background px-1 rounded">
 										<MatchInfoForReader
 											matchPlan={item}
 											events={events}
@@ -171,7 +170,7 @@ const NowHot: React.FC<Props> = (props) => {
 										/>
 									</div>
 									{/*
-                                    <p  className="flex justify-center bg-white text-black px-1 rounded text-2xl">
+                                    <p  className="flex justify-center bg-background text-black px-1 rounded text-2xl">
                                         {(status === Status.Waiting || status === Status.Preparing) && (
                                             <MatchCountdownForReader scheduledStartTime={item.scheduledStartTime} />
                                         )}

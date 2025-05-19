@@ -93,11 +93,11 @@ const TabButtons = memo(
 		finalType: "tournament" | "league" | null;
 		setIsFinal: (value: boolean) => void;
 	}) => (
-		<div className="mb-8">
+		<div className="mb-2 ">
 			<div className="flex space-x-4">
 				{hasPreliminary && (
 					<button
-						className={`px-6 py-2 rounded-lg transition-colors ${
+						className={`px-6 py-2 rounded-lg transition-colors shadow-md  ${
 							!isFinal
 								? "bg-blue-600 text-white"
 								: "bg-gray-200 text-gray-700 hover:bg-gray-300"
@@ -110,7 +110,7 @@ const TabButtons = memo(
 				)}
 				{hasFinal && (
 					<button
-						className={`px-6 py-2 rounded-lg transition-colors ${
+						className={`px-6 py-2 rounded-lg transition-colors shadow-md ${
 							isFinal
 								? "bg-blue-600 text-white"
 								: "bg-gray-200 text-gray-700 hover:bg-gray-300"
@@ -232,9 +232,9 @@ const Bracket = ({
 	}
 
 	return (
-		<div className="container mx-auto px-4 py-8">
-			<h1 className="text-2xl font-bold mb-6 text-gray-800">
-				{eventName} - 対戦表
+		<div className="mx-auto px-4 py-4 flex flex-col items-center w-full border-gray-500 border-2 rounded shadow-lg ">
+			<h1 className="text-2xl font-bold mb-4 text-gray-800">
+				{eventName}
 			</h1>
 
 			{/* タブボタン */}
@@ -251,7 +251,7 @@ const Bracket = ({
 
 			{/* 対戦表コンテンツ */}
 			{hasPreliminary || hasFinal ? (
-				<div className="bg-white rounded-lg shadow-md p-6 overflow-hidden">
+				<div className="bg-background rounded-lg  p-6 pt-2 overflow-x-scroll w-full">
 					<Suspense
 						fallback={
 							<div className="h-40 flex items-center justify-center">
@@ -280,7 +280,7 @@ const Bracket = ({
 					</Suspense>
 				</div>
 			) : (
-				<div className="bg-white rounded-lg shadow-md p-8 text-center">
+				<div className="bg-background rounded-lg  p-8 text-center">
 					<p className="text-gray-500">
 						この種目には対戦表データがありません。
 					</p>
