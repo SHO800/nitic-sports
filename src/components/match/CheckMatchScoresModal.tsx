@@ -105,7 +105,7 @@ const ModalEventContainer = ({
 		await createScores(unsettledEvent.id, mergedScore);
 		await mutateScores();
 		setIsOpen(false);
-	}, [mutateScores, setIsOpen, unsettledEvent.id]); // 無限再呼び出しに陥るので依存関係を更新してはならない
+	}, [mutateScores, setIsOpen, unsettledEvent.id, mergedScore]); // 無限再呼び出しに陥るので依存関係を更新してはならない
 
 	return (
 		<div
