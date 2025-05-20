@@ -14,7 +14,7 @@ const ResultInfo = () => {
 
 	return (
 		<>
-			<EventSwitch selectedId={selectedId} setSelectedId={setId} />
+			<EventSwitch selectedId={selectedId} setSelectedId={setId} isAllDay={true}/>
 
 			<div className="flex justify-center mx-1 lg:mx-20 mb-2 p-1 rounded max-w-full">
 				<div className="flex flex-col max-w-full w-full justify-center">
