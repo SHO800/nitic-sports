@@ -51,9 +51,7 @@ export default function Header() {
                     {/* メニュー（PC用） */}
                     <div className="hidden md:flex gap-4">
                         <Link href="/">Home</Link>
-                        <Link href="/dashboard">Dashboard</Link>
                         <Link href="/schedule">Schedule</Link>
-                        <Link href="/infomation">Infomation</Link>
                         <Link href="/map">Map</Link>
                     </div>
                 </div>
@@ -74,13 +72,13 @@ export default function Header() {
                             Home
                         </Link>
                         <div className="h-0.5 bg-gray-400"/>
-                        <Link
-                            href="/dashboard"
-                            onClick={() => setIsOpen(!isOpen)}
-                            className="pl-2"
-                        >
-                            Dashboard
-                        </Link>
+                        {/*<Link*/}
+                        {/*    href="/dashboard"*/}
+                        {/*    onClick={() => setIsOpen(!isOpen)}*/}
+                        {/*    className="pl-2"*/}
+                        {/*>*/}
+                        {/*    Dashboard*/}
+                        {/*</Link>*/}
                         <div className="h-0.5 bg-gray-400"/>
                         <Link
                             href="/schedule"
@@ -90,13 +88,13 @@ export default function Header() {
                             Schedule
                         </Link>
                         <div className="h-0.5 bg-gray-400"/>
-                        <Link
-                            href="/infomation"
-                            onClick={() => setIsOpen(!isOpen)}
-                            className="pl-2"
-                        >
-                            Infomation
-                        </Link>
+                        {/*<Link*/}
+                        {/*    href="/infomation"*/}
+                        {/*    onClick={() => setIsOpen(!isOpen)}*/}
+                        {/*    className="pl-2"*/}
+                        {/*>*/}
+                        {/*    Infomation*/}
+                        {/*</Link>*/}
                         <div className="h-0.5 bg-gray-400"/>
                         <Link
                             href="/map"
