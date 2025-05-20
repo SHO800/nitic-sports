@@ -66,7 +66,7 @@ const ClassSelector = ({ groupedData, callback, isShowVariableId = false}: Class
 	return (
 		<div
 			className={
-				"absolute top-24 left-0 w-fit h-fit px-1 bg-gray-800 bg-opacity-50 z-50 flex flex-col items-center justify-between"
+				"relative top-24 left-0 w-fit h-fit px-1 bg-gray-800 bg-opacity-50 z-50 flex flex-col items-center justify-between"
 			}
 		>
 			{groupedData ? (

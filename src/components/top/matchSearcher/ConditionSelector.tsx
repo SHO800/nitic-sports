@@ -61,10 +61,12 @@ const ConditionSelector = ({setConditionCallback}: { setConditionCallback: (cond
     return (
         
         <div className={"flex flex-col space-y-2"}>
-            <div className={"w-full flex flex-col items-center"}>
+            <div className={"w-full flex flex-col items-center relative"}>
                 <p className={"text-xl w-full text-center"}>参加チームで絞り込む</p>
                 {isShowClassSelector && 
-                    <ClassSelector groupedData={groupedTeams} isShowVariableId={false} callback={selectClassCallback}/>
+                    <div className={"absolute left-1/2 top-1/2 z-20 w-fit h-fit"} style={{transform: "translate(-50%, -50%)"}}>
+                        <ClassSelector groupedData={groupedTeams} isShowVariableId={false} callback={selectClassCallback}/>
+                    </div>
                 }
                 {
                     searchCondition.attendTeam && 
