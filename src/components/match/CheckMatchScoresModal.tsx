@@ -19,7 +19,7 @@ const CheckMatchScoresModal = ({
 				onScroll={(e) => e.preventDefault()}
 			>
 				<div
-					className="flex flex-col items-start justify-center w-fit h-[calc(100%-12em)] pt-72 overflow-y-scroll m-24 mx-auto px-12 bg-white "
+					className="flex flex-col items-start justify-start w-fit h-[calc(100%-12em)] py-12 overflow-y-scroll m-24 mx-auto px-12 bg-white "
 					onClick={(e) => e.stopPropagation()}
 				>
 					{unSettledEvents.map((event) => (
@@ -72,7 +72,6 @@ const ModalEventContainer = ({
 		RankWithEventScore[][]
 	>([]);
 	const [mergedScore, setMergedScore] = useState<RankWithEventScore[]>([]);
-	const [isConfirming, _setIsConfirming] = useState<boolean>(false);
 
 	useEffect(() => {
 		if (!matchPlans || !matchResults) return;
@@ -109,7 +108,7 @@ const ModalEventContainer = ({
 
 	return (
 		<div
-			className={"flex flex-col w-full h-full bg-gray-200 rounded-lg p-4 mb-4"}
+			className={"flex flex-col justify-start w-full bg-gray-200 rounded-lg p-4 mb-4 h-auto overflow-y-visible"}
 		>
 			<p className={"text-2xl mb-4"}>{unsettledEvent.name}</p>
 			<div
@@ -177,7 +176,7 @@ const ModalEventContainer = ({
 					type={"button"}
 					onClick={confirmEventScores}
 					className={"bg-green-500 hover:bg-green-400 rounded w-32 h-8 block z-50  "}
-					disabled={isConfirming}
+					disabled={false}
 				>
 					確定
 				</LoadingButton>
