@@ -11,7 +11,8 @@ async function getTeams(): Promise<OrganizedTeams> {
 		// ビルド時にはダミーデータを返す（process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE === 'phase-production-build'）
 		if (
 			process.env.NODE_ENV === "development" ||
-			process.env.IS_PREVIEW === "true"
+			process.env.IS_PREVIEW === "true" || 
+			(process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE === 'phase-production-build')
 		) {
 			const teams = await prisma.team.findMany();
 			return groupTeams(teams);
@@ -19,6 +20,10 @@ async function getTeams(): Promise<OrganizedTeams> {
 		// APIエンドポイント経由でデータを取得
 		const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/team`, {
 			cache: "force-cache",
+			next: {
+				tags: ["teams"],
+				revalidate: 60000
+			},
 		});
 		if (!res.ok) {
 			throw new Error("Failed to fetch data");
@@ -35,12 +40,17 @@ async function getLocations() {
 	try {
 		if (
 			process.env.NODE_ENV === "development" ||
-			process.env.IS_PREVIEW === "true"
+			process.env.IS_PREVIEW === "true" ||
+			(process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE === 'phase-production-build')
 		) {
 			return await prisma.location.findMany();
 		}
 		const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/location`, {
 			cache: "force-cache",
+			next: {
+				tags: ["locations"],
+				revalidate: 60000
+			},
 		});
 		if (!res.ok) {
 			throw new Error("Failed to fetch data");
@@ -56,12 +66,17 @@ async function getMatchPlans() {
 	try {
 		if (
 			process.env.NODE_ENV === "development" ||
-			process.env.IS_PREVIEW === "true"
+			process.env.IS_PREVIEW === "true" ||
+			(process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE === 'phase-production-build')
 		) {
 			return await prisma.matchPlan.findMany();
 		}
 		const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/match-plan`, {
 			cache: "default",
+			next: {
+				tags: ["matchPlans"],
+				revalidate: 15
+			},
 		});
 		if (!res.ok) {
 			throw new Error("Failed to fetch data");
@@ -77,7 +92,8 @@ async function getMatchResults() {
 	try {
 		if (
 			process.env.NODE_ENV === "development" ||
-			process.env.IS_PREVIEW === "true"
+			process.env.IS_PREVIEW === "true" ||
+			(process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE === 'phase-production-build')
 		) {
 			const results = await prisma.matchResult.findMany();
 			// matchResultsをidをキーとしたオブジェクトに変換
@@ -91,6 +107,10 @@ async function getMatchResults() {
 		}
 		const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/match-result`, {
 			cache: "default",
+			next: {
+				tags: ["matchResults"],
+				revalidate: 15
+			},
 		});
 		if (!res.ok) {
 			throw new Error("Failed to fetch data");
