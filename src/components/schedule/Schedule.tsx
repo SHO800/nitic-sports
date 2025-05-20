@@ -7,10 +7,10 @@ const Schedule = async () => {
 
     return (
         <div className="flex flex-col items-center min-h-screen bg-gray-100">
-            <h1 className="flex justify-center mx-2 my-1 font-bold text-4xl ">
+            <h1 className="flex justify-center mx-2 my-1 font-bold text-4xl mt-8">
                 体育大会スケジュール
             </h1>
-            <h2 className="flex justify-center mx-2 mt-8 mb-4  text-2xl ">
+            <h2 className="flex justify-center mx-2 mt-6 mb-4  text-2xl ">
                 1日目 (2025/05/22)
             </h2>
             <div

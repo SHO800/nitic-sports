@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Informations from "@/components/top/Information";
+import MatchSearcher from "@/components/top/matchSearcher/MatchSearcher";
 
 
 export default async function Home() {
@@ -18,7 +19,7 @@ export default async function Home() {
                     "flex justify-center bg-blue-600 hover:bg-blue-500 text-white shadow-md mx-6 mt-0.5 mb-2 py-2 rounded-full"
                 }
             >
-                競技日程表
+                競技スケジュール
             </Link>
 
             <p className="flex justify-center mt-4">＼ 高専は広いから気をつけろ！／</p>
@@ -31,27 +32,27 @@ export default async function Home() {
                 マップ
             </Link>
 
-            <p className="flex justify-center mt-4">＼ 高専一熱い場所はここだ！！／</p>
-            <Link
-                href={"/infomation"}
-                className={
-                    "flex justify-center bg-blue-600 hover:bg-blue-500 text-white shadow-md mx-6 mt-0.5 mb-2 py-2 rounded-full"
-                }
-            >
-                試合情報
-            </Link>
+            {/*<p className="flex justify-center mt-4">＼ 高専一熱い場所はここだ！！／</p>*/}
+            {/*<Link*/}
+            {/*    href={"/infomation"}*/}
+            {/*    className={*/}
+            {/*        "flex justify-center bg-blue-600 hover:bg-blue-500 text-white shadow-md mx-6 mt-0.5 mb-2 py-2 rounded-full"*/}
+            {/*    }*/}
+            {/*>*/}
+            {/*    試合情報*/}
+            {/*</Link>*/}
 
-            <p className="flex justify-center mt-4">＼ すべての情報はこちら！／</p>
-            <Link
-                href={"/dashboard"}
-                className={
-                    "flex justify-center bg-blue-600 hover:bg-blue-500 text-white shadow-md mx-6 mt-0.5 mb-2 py-2 rounded-full"
-                }
-            >
-                情報
-            </Link>
+            {/*<p className="flex justify-center mt-4">＼ すべての情報はこちら！／</p>*/}
+            {/*<Link*/}
+            {/*    href={"/dashboard"}*/}
+            {/*    className={*/}
+            {/*        "flex justify-center bg-blue-600 hover:bg-blue-500 text-white shadow-md mx-6 mt-0.5 mb-2 py-2 rounded-full"*/}
+            {/*    }*/}
+            {/*>*/}
+            {/*    情報*/}
+            {/*</Link>*/}
 
-
+            <MatchSearcher />
             <Informations/>
         </div>
     );

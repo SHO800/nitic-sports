@@ -32,6 +32,8 @@ const MapZoom = ({ locationId }: Props) => {
 		if (placeId === 14) return "テニスコートB";
 		if (placeId === 15) return "テニスコートC";
 		if (placeId === 16) return "テニスコートD";
+		if (placeId === 17) return "陸上グラウンド";
+		
 	};
 
 	return (
@@ -51,7 +53,6 @@ const MapZoom = ({ locationId }: Props) => {
 				<div>
 					<p className="mt-2 ml-4">会場: {locationJudge(locationId)}</p>
 					<div className="relative">
-						{locationId}
 						<MapContainer tag={1} />
 						<MapPin location={locationJudge(locationId)} />
 					</div>

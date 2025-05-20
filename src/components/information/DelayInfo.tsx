@@ -1,6 +1,7 @@
 import {useDataContext} from "@/contexts/dataContext";
 import {useCurrentTime} from "@/hooks/currentTime";
 import MatchInfoForReader from "../reader/MatchInfoForReader";
+import {yowaiFont} from "../../../public/fonts/fonts";
 
 type Props = {
     eventId: number | string;
@@ -37,10 +38,8 @@ const DelayInfo = ({eventId}: Props) => {
             return (
                 <div className="flex min-w-[94vw] justify-center">
                     <div
-                        className="flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[30vh] bg-gray-100 rounded overflow-auto">
-                        {/* <div className="flex justify-center items-center h-full bg-gray-100 px-10 rounded"> */}
+                        className={"flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[10vh] rounded overflow-auto　" + yowaiFont.className}>
                         遅延なし！やったね！
-                        {/* </div> */}
                     </div>
                 </div>
             );
@@ -49,11 +48,11 @@ const DelayInfo = ({eventId}: Props) => {
         return (
             <>
                 <div className="flex flex-col min-w-[94vw] justify-center">
-                    <div className="flex flex-col lg:mx-20 px-1 py-2 h-[50vh] bg-gray-100 rounded overflow-auto">
+                    <div className="flex flex-col lg:mx-20 px-1 py-2 h-[50vh]  rounded overflow-auto">
                         {filteredByEvent?.map((item) => {
                             return (
                                 <div key={"delayInfoCard-" + item.id}
-                                     className="flex justify-center bg-gray-100 px-10 rounded">
+                                     className="flex justify-center  px-10 rounded">
                                     <div
 
                                         className=" relative flex flex-col bg-white mb-1 border rounded"
@@ -82,10 +81,8 @@ const DelayInfo = ({eventId}: Props) => {
             return (
                 <div className="flex min-w-[94vw] justify-center">
                     <div
-                        className="flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[30vh] bg-gray-100 rounded overflow-auto">
-                        {/* <div className="flex justify-center items-center h-full bg-gray-100 px-10 rounded"> */}
+                        className={"flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[10vh] rounded overflow-auto  " + yowaiFont.className}>
                         遅延なし！やったね！
-                        {/* </div> */}
                     </div>
                 </div>
             );
@@ -94,10 +91,10 @@ const DelayInfo = ({eventId}: Props) => {
         return (
             <>
                 <div className="flex flex-col min-w-[94vw] justify-center">
-                    <div className="flex flex-col lg:mx-20 px-1 py-2 h-[50vh] bg-gray-100 rounded overflow-auto">
+                    <div className="flex flex-col lg:mx-20 px-1 py-2 h-[50vh]  rounded overflow-auto">
                         {filteredItems?.map((item) => {
                             return (
-                                <div className="flex justify-center bg-gray-100 px-10 rounded">
+                                <div className="flex justify-center  px-10 rounded">
                                     <div
                                         key={item.id}
                                         className=" relative flex flex-col bg-white mb-1 border rounded"

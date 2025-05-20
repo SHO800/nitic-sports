@@ -61,10 +61,8 @@ const NextMatch: React.FC<Props> = (props) => {
 		if (NextThree?.length === 0) {
 			return (
 				<div className="flex min-w-[94vw] justify-center">
-					<div className={"flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[30vh] bg-background rounded overflow-auto " + yowaiFont.className}>
-						{/* <div className="flex justify-center items-center h-full bg-gray-500 px-10 rounded"> */}
+					<div className={"flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[10vh] rounded overflow-auto " + yowaiFont.className}>
 						全試合終了しました
-						{/* </div> */}
 					</div>
 				</div>
 			);
@@ -129,10 +127,8 @@ const NextMatch: React.FC<Props> = (props) => {
 		if (NextThree?.length === 0) {
 			return (
 				<div className="flex min-w-[94vw] justify-center">
-					<div className={"flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[30vh] bg-background rounded overflow-auto shadow-md "  + yowaiFont.className}>
-						{/* <div className="flex justify-center items-center bg-background px-10 rounded"> */}
+					<div className={"flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[10vh]  rounded overflow-auto "  + yowaiFont.className}>
 						全試合終了しました
-						{/* </div> */}
 					</div>
 				</div>
 			);

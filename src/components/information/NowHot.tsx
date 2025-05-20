@@ -67,7 +67,7 @@ const NowHot: React.FC<Props> = (props) => {
 		if (NowhotThree?.length === 0) {
 			return (
 				<div className="flex min-w-[94vw] justify-center ">
-					<div className="flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[30vh] bg-background rounded overflow-auto shadow-md">
+					<div className="flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[10vh]  rounded overflow-auto ">
 						進行中の試合はありません
 					</div>
 				</div>
@@ -140,10 +140,8 @@ const NowHot: React.FC<Props> = (props) => {
 		if (NowhotThree?.length === 0) {
 			return (
 				<div className="flex min-w-[94vw] justify-center">
-					<div className="flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[30vh]  rounded overflow-auto shadow-md">
-						{/* <div className="flex justify-center items-center bg-background px-10 rounded"> */}
+					<div className="flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[10vh]  rounded overflow-auto ">
 						進行中の試合はありません
-						{/* </div> */}
 					</div>
 				</div>
 			);

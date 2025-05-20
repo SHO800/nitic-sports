@@ -31,15 +31,28 @@ const TotalScore = () => {
 	return (
 		<>
 			{/*総合スコア*/}
+			{/*<div className="flex flex-col items-start justify-between bg-gray-200 p-2 rounded mb-2">*/}
+			{/*	{totalScoreByTeam &&*/}
+			{/*		Object.entries(totalScoreByTeam).map(([key, value]) => {*/}
+			{/*			return (*/}
+			{/*				<div key={`total-score-${key}`}>*/}
+			{/*					{getMatchDisplayStr(key)}: {value}点*/}
+			{/*				</div>*/}
+			{/*			);*/}
+			{/*		})}*/}
+			{/*</div>*/}
+			{/*総合スコア-順位順*/}
 			<div className="flex flex-col items-start justify-between bg-gray-200 p-2 rounded mb-2">
 				{totalScoreByTeam &&
-					Object.entries(totalScoreByTeam).map(([key, value]) => {
-						return (
-							<div key={`total-score-${key}`}>
-								{getMatchDisplayStr(key)}: {value}点
-							</div>
-						);
-					})}
+					Object.entries(totalScoreByTeam)
+						.sort((a, b) => b[1] - a[1])
+						.map(([key, value]) => {
+							return (
+								<div key={`total-score-${key}`}>
+									{getMatchDisplayStr(key)}: {value}点
+								</div>
+							);
+						})}
 			</div>
 			{/*各スコア*/}
 			<div className="flex items-center justify-between bg-gray-200 p-2 rounded mb-2">

@@ -28,8 +28,14 @@ const EventModal = ({ placeId, isOpen, closeModal }: Props) => {
 	} = useDataContext();
 
 	return (
-		<div className="flex flex-col fixed inset-0 z-80 w-full  h-screen bg-black/30 justify-center items-center">
-			<div className="flex flex-col lg:w-[60vw] px-1 pb-4 bg-gray-300 rounded">
+		<div className="flex flex-col fixed inset-0 z-80 w-full  h-screen bg-black/30 justify-center items-center" onClick={(e) => {
+			e.preventDefault()
+			closeModal()
+		}}>
+			<div className="flex flex-col lg:w-[60vw] px-1 pb-4 bg-background rounded" onClick={(e) => {
+				e.preventDefault()
+				e.stopPropagation()
+			}}>
 				<button
 					onClick={closeModal}
 					className="flex mr-1 ml-auto my-1 px-2 py-1 bg-red-400 hover:bg-red-300 rounded text-white float-right"
