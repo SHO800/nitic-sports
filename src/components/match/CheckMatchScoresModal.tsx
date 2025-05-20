@@ -82,7 +82,7 @@ const ModalEventContainer = ({
 			Object.values(matchResults),
 		);
 		setCalculatedScore(separatedScore);
-		const mergedScore = structuredClone(calculatedScore)
+		const mergedScore = structuredClone(separatedScore)
 			.flat()
 			.reduce((acc: RankWithEventScore[], curr: RankWithEventScore) => {
 				// idが同じものを結合
