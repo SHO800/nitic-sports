@@ -64,6 +64,7 @@ const MatchSearcher = () => {
                             )
                         })}
                     </div>
+                    <p className={"ml-auto mr-8 mt-6 text-gray-600 "}>※対戦チームが確定していない試合は検索対象外</p>
                 </div>
             </div>
         </details>
