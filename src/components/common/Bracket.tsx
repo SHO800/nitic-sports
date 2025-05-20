@@ -20,11 +20,17 @@ const TournamentSection = memo(
 		 isFinal,
 		 relatedMatchPlans,
 		 teamIds,
+		 isOnlyFinal,
+		 disableModalOpen = false,
+		 selectedMatchId,
 	 }: {
 		eventId: number;
 		isFinal: boolean;
 		relatedMatchPlans: MatchPlan[];
 		teamIds?: string[];
+		isOnlyFinal?: boolean;
+		disableModalOpen?: boolean;
+		selectedMatchId?: number;
 	}) => (
 		<TournamentTable
 			key={`bracket-tournament-${eventId}-${isFinal}`}
@@ -32,6 +38,9 @@ const TournamentSection = memo(
 			isFinal={isFinal}
 			relatedMatchPlans={relatedMatchPlans}
 			teamIds={teamIds}
+			isOnlyFinal={isOnlyFinal}
+			disableModalOpen={disableModalOpen}
+			selectedMatchId={selectedMatchId}
 		/>
 	),
 );
@@ -44,10 +53,14 @@ const LeagueSection = memo(
 		 eventId,
 		 teamData,
 		 teamIds,
+		 disableModalOpen = false,
+		 selectedMatchId,
 	 }: {
 		eventId: number;
 		teamData: LeagueTeamData;
 		teamIds?: string[];
+		disableModalOpen?: boolean;
+		selectedMatchId?: number;
 	}) => {
 		const blockNames = useMemo(
 			() => Object.keys(teamData.blocks),
@@ -66,6 +79,8 @@ const LeagueSection = memo(
 							blockName={blockName}
 							block={teamData.blocks[blockName]}
 							receivedTeamIds={teamIds}
+							disableModalOpen={disableModalOpen}
+							selectedMatchId={selectedMatchId}
 						/>
 					</div>
 				))}
@@ -132,12 +147,20 @@ const Bracket = ({
 					 eventId,
 					 matchPlans,
 					 teamIds,
+					 disableModalOpen = false,
+					 initialIsFinal = false,
+					 initialType = null,
+					 selectedMatchId: selectedMatchIdProp = null,
 				 }: {
 	eventId: number;
 	matchPlans: MatchPlan[];
 	teamIds?: string[];
+	disableModalOpen?: boolean;
+	initialIsFinal?: boolean;
+	initialType?: "tournament" | "league" | null;
+	selectedMatchId?: number | null;
 }) => {
-	const [isFinal, setIsFinal] = useState(false);
+	const [isFinal, setIsFinal] = useState(initialIsFinal);
 	const { events, eventLoading } = useDataContext();
 
 	const [hasPreliminary, setHasPreliminary] = useState(false);
@@ -150,6 +173,7 @@ const Bracket = ({
 		null,
 	);
 	const [relatedMatchPlans, setRelatedMatchPlans] = useState<MatchPlan[]>([]);
+	const [selectedMatchId, setSelectedMatchId] = useState<number | null>(selectedMatchIdProp);
 
 	// 現在選択されている大会の形式を取得
 	const getCurrentType = useCallback(() => {
@@ -171,6 +195,13 @@ const Bracket = ({
 
 		return isFinal && teamData.length > 1 ? teamData[1] : teamData[0];
 	}, [currentEvent, isFinal]);
+
+	// 本選しかないかどうか
+	const isOnlyFinal = useMemo(() => {
+		if (!currentEvent) return false;
+		const teamData = currentEvent.teamData as unknown as TeamData[];
+		return Array.isArray(teamData) && teamData.length === 1;
+	}, [currentEvent]);
 
 	const currentType = getCurrentType();
 
@@ -238,6 +269,10 @@ const Bracket = ({
 				{eventName}
 			</h1>
 
+			<div className="w-full flex justify-start mb-2">
+				<span className="text-xs text-gray-500">試合名をタップで詳細を表示</span>
+			</div>
+
 			{/* タブボタン */}
 			{(hasPreliminary || hasFinal) && (
 				<TabButtons
@@ -266,6 +301,9 @@ const Bracket = ({
 								isFinal={isFinal}
 								relatedMatchPlans={relatedMatchPlans}
 								teamIds={teamIds}
+								isOnlyFinal={isOnlyFinal}
+								disableModalOpen={disableModalOpen}
+								selectedMatchId={selectedMatchId}
 							/>
 						)}
 
@@ -276,6 +314,10 @@ const Bracket = ({
 									eventId={eventId}
 									teamData={teamData}
 									teamIds={teamIds}
+									disableModalOpen={disableModalOpen}
+									selectedMatchId={selectedMatchId}
+									isFinal={isFinal}
+									type={"league"}
 								/>
 							)}
 					</Suspense>
@@ -292,3 +334,4 @@ const Bracket = ({
 };
 
 export default memo(Bracket);
+

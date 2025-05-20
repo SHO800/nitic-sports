@@ -10,6 +10,7 @@ const LeagueTableCell = ({
                              block,
                              referredMatches,
                              teamIds,
+                             onMatchClick,
                          }: {
     i_key: string;
     row: number;
@@ -18,6 +19,7 @@ const LeagueTableCell = ({
     block: { teamId: string; rank?: number }[];
     referredMatches: MatchPlan[];
     teamIds?: string[];
+    onMatchClick?: (match: MatchPlan) => void;
 }) => {
     const {getMatchDisplayStr, matchResults} = useDataContext();
 
@@ -73,7 +75,12 @@ const LeagueTableCell = ({
 
     if (match.status === "Waiting" || match.status === "Preparing") {
         return (
-            <div key={i_key} className={`text-sm p-2 ${highlightClass}`}>
+            <div
+                key={i_key}
+                className={`text-sm p-2 ${highlightClass}`}
+                onClick={onMatchClick ? () => onMatchClick(match) : undefined}
+                style={{ cursor: onMatchClick ? "pointer" : undefined }}
+            >
                 <p className={`text-sm ${textClass}`}>
                     ({matchStr})
                 </p>
@@ -83,8 +90,12 @@ const LeagueTableCell = ({
 
     if (match.status === "Playing") {
         return (
-            <div key={i_key}
-                 className={`text-sm p-2 arrow-flowing-bg ${isCurrentTeamMatch ? "bg-amber-500" : "bg-[rgba(200,255,200,.3)]"}`}>
+            <div
+                key={i_key}
+                className={`text-sm p-2 arrow-flowing-bg ${isCurrentTeamMatch ? "bg-amber-500" : "bg-[rgba(200,255,200,.3)]"}`}
+                onClick={onMatchClick ? () => onMatchClick(match) : undefined}
+                style={{ cursor: onMatchClick ? "pointer" : undefined }}
+            >
                 <p className={`text-sm ${textClass}`}>
                     ({matchStr})
                 </p>
@@ -94,7 +105,12 @@ const LeagueTableCell = ({
 
     if (match.status === "Finished") {
         return (
-            <div key={i_key} className={`text-sm p-2 ${highlightClass}`}>
+            <div
+                key={i_key}
+                className={`text-sm p-2 ${highlightClass}`}
+                onClick={onMatchClick ? () => onMatchClick(match) : undefined}
+                style={{ cursor: onMatchClick ? "pointer" : undefined }}
+            >
                 <p className={`text-sm ${textClass}`}>
                     ({matchStr})
                 </p>
@@ -132,3 +148,4 @@ const LeagueTableCell = ({
 };
 
 export default memo(LeagueTableCell);
+

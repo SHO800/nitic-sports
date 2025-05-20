@@ -163,6 +163,8 @@ const MatchInfoForReader = ({
 				getMatchDisplayStr={getMatchDisplayStr}
 				isOpen={isOpen}
 				closeModal={CloseModal}
+				initialIsFinal={false}
+				initialType={null}
 			/>
 		</div>
 	);

@@ -12,6 +12,8 @@ const TournamentMatchBox = ({
 								rowWidth,
 								rowHeight,
 								teamIds,
+								onMatchClick,
+								isHighlighted = false,
 							}: {
 	match: TournamentNodeMatch;
 	boxStyle: CSSProperties;
@@ -19,6 +21,8 @@ const TournamentMatchBox = ({
 	rowWidth: number;
 	rowHeight: number;
 	teamIds?: string[];
+	onMatchClick?: (matchPlan: any) => void;
+	isHighlighted?: boolean;
 }) => {
 	const { matchResults } = useDataContext();
 
@@ -82,52 +86,66 @@ const TournamentMatchBox = ({
 	}, [isCurrentTeamMatch, match.tournamentMatchNode.matchPlan.status]);
 
 	return (
-		<div className={"h-full relative w-full "} style={boxStyle}>
-			{!!match.matchId && (
-				<div className="text-md text-gray-500 pr-2 absolute h-full w-full flex justify-end items-center bg-transparent">
-					<p
-						className={`${matchStatusColor} font-bold text-[1.2em] ${highlightStyle} px-2 py-1`}
-					>
-						{isCurrentTeamMatch ? (
-							<span className="relative">
-                <span className="relative z-10 text-nowrap">
-                  {match.tournamentMatchNode.matchPlan.matchName}
-                </span>
-                <span className="absolute inset-0 bg-white opacity-20 rounded-full blur-sm animate-ping"></span>
-              </span>
-						) : (
-							<span className={"text-nowrap"}>
-							{match.tournamentMatchNode.matchPlan.matchName}
-							</span>
-						)}
-					</p>
-				</div>
-			)}
+				<div
+					className={"h-full relative w-full"}
+					style={boxStyle}
+				>
+					{!!match.matchId && (
+							<div
+								className={`absolute h-full w-full flex justify-end items-center bg-transparent z-50`}
+								style={onMatchClick ? { cursor: "pointer" } : {}}
+								onClick={onMatchClick ? (e) => {
+									e.stopPropagation();
+									onMatchClick(match.tournamentMatchNode.matchPlan);
+								} : undefined}
+							>
+								<div className="w-full flex justify-end">
+									<p
+										className={`${matchStatusColor} font-bold text-[1.2em] ${highlightStyle} px-2 py-1`}
+										style={{ pointerEvents: "none" }}
+									>
+										{isCurrentTeamMatch ? (
+											<span className="relative">
+												<span className="relative z-10 text-nowrap">
+													{match.tournamentMatchNode.matchPlan.matchName}
+												</span>
+												<span className="absolute inset-0 bg-white opacity-20 rounded-full blur-sm animate-ping"></span>
+											</span>
+										) : (
+											<span className={"text-nowrap"}>
+												{match.tournamentMatchNode.matchPlan.matchName}
+											</span>
+										)}
+									</p>
+								</div>
+							</div>
+					)}
 
-			<div className="relative h-full" ref={boxRef}>
-				<TournamentLine
-					key={`match-${match.matchId}-line-${(
-						match.tournamentMatchNode.matchPlan.status === Status.Completed
-					).toString()}`}
-					startX={lineCoords.startX}
-					startY={lineCoords.startY}
-					endX={lineCoords.endX}
-					endY={lineCoords.endY}
-					type={lineCoords.type}
-					color1={
-						match.tournamentMatchNode.matchPlan.status === Status.Completed
-							? "rgb(255,0,0)"
-							: "rgba(156, 163, 175, 0.8)"
-					}
-					color2={isWonInNextNode ? "rgb(255,0,0)" : "rgba(156, 163, 175, 0.8)"}
-					thickness={4}
-					animationTimingFunction={"linear"}
-					duration={200}
-					timeout={match.column * 200 + 200}
-				/>
-			</div>
-		</div>
+					<div className="relative h-full" ref={boxRef}>
+						<TournamentLine
+							key={`match-${match.matchId}-line-${(
+								match.tournamentMatchNode.matchPlan.status === Status.Completed
+							).toString()}`}
+							startX={lineCoords.startX}
+							startY={lineCoords.startY}
+							endX={lineCoords.endX}
+							endY={lineCoords.endY}
+							type={lineCoords.type}
+							color1={
+								match.tournamentMatchNode.matchPlan.status === Status.Completed
+									? "rgb(255,0,0)"
+									: "rgba(156, 163, 175, 0.8)"
+							}
+							color2={isWonInNextNode ? "rgb(255,0,0)" : "rgba(156, 163, 175, 0.8)"}
+							thickness={4}
+							animationTimingFunction={"linear"}
+							duration={200}
+							timeout={match.column * 200 + 200}
+						/>
+					</div>
+				</div>
 	);
 };
 
 export default React.memo(TournamentMatchBox);
+

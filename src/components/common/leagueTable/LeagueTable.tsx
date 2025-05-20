@@ -1,6 +1,8 @@
 "use client";
 
 import LeagueTableCell from "@/components/common/leagueTable/LeagueTableCell";
+import InfoModal from "@/components/information/InfoModal";
+import MatchPlanCardOnMaodal from "@/components/information/MatchPlanCardOnModal";
 import { useDataContext } from "@/contexts/dataContext";
 import type { MatchPlan } from "@prisma/client";
 import { memo, useEffect, useRef, useState } from "react";
@@ -11,6 +13,10 @@ const LeagueTable = ({
                          blockName,
                          block,
                          receivedTeamIds,
+                         disableModalOpen = false,
+                         selectedMatchId = null,
+                         isFinal = false,
+                         type = "league",
                      }: {
     i_key: string;
     eventId: number;
@@ -20,11 +26,17 @@ const LeagueTable = ({
         rank?: number;
     }[];
     receivedTeamIds?: string[];
+    disableModalOpen?: boolean;
+    selectedMatchId?: number | null;
+    isFinal?: boolean;
+    type?: "tournament" | "league";
 }) => {
     const { getBlockMatches } = useDataContext();
 
     const teamIds = block.map((team) => team.teamId);
     const [referredMatches, setReferredMatches] = useState<MatchPlan[]>([]);
+    const [selectedMatch, setSelectedMatch] = useState<MatchPlan | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     // チーム数+1の配列を作成（-1はヘッダー用）
     const teamIdsLengthArray = [-1, ...[...Array(teamIds.length).keys()]];
@@ -66,6 +78,22 @@ const LeagueTable = ({
 
     return (
         <div className="relative">
+            {/* InfoModalの設置 */}
+            <InfoModal
+                matchPlan={selectedMatch as MatchPlan}
+                events={undefined}
+                locations={undefined}
+                getMatchDisplayStr={() => ""}
+                isOpen={isModalOpen}
+                closeModal={() => {
+                    setIsModalOpen(false);
+                    setSelectedMatch(null);
+                }}
+                fromTournamentTable={false}
+                disableModalOpen={disableModalOpen}
+                initialIsFinal={isFinal}
+                initialType={type}
+            />
             <div
                 className="h-[1px] bg-slate-300 absolute bottom-0 right-0 origin-bottom-right"
                 ref={lineRef}
@@ -93,6 +121,11 @@ const LeagueTable = ({
                                     block={block}
                                     referredMatches={referredMatches}
                                     teamIds={receivedTeamIds}
+                                    onMatchClick={disableModalOpen ? undefined : (match) => {
+                                        setSelectedMatch(match);
+                                        setIsModalOpen(true);
+                                    }}
+                                    isHighlighted={selectedMatchId === (referredMatches.find(m => m.teamIds.includes(block[i]?.teamId) && m.teamIds.includes(block[j]?.teamId))?.id)}
                                 />
                             </td>
                         ))}
@@ -105,3 +138,4 @@ const LeagueTable = ({
 };
 
 export default memo(LeagueTable);
+

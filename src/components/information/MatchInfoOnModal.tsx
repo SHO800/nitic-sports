@@ -65,7 +65,10 @@ const MatchInfoOnModal = ({
 					.map((teamId, index) => {
 						let result = getMatchDisplayStr(teamId);
 						if (result === "") return "";
-						if (matchPlan.teamNotes[index]) {
+						if (
+							matchPlan.teamNotes[index] &&
+							matchPlan.teamNotes[index] !== result
+						) {
 							result += `(${matchPlan.teamNotes[index]})`;
 						}
 						return result;

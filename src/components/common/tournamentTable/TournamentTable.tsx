@@ -1,6 +1,8 @@
 import TournamentLine from "@/components/common/tournamentTable/TournamentLine";
 import TournamentMatchBox from "@/components/common/tournamentTable/TournamentMatchBox";
 import TournamentTeamBox from "@/components/common/tournamentTable/TournamentTeamBox";
+import InfoModal from "@/components/information/InfoModal";
+import MatchPlanCardOnMaodal from "@/components/information/MatchPlanCardOnModal";
 import { useDataContext } from "@/contexts/dataContext";
 import batchMemoNodes from "@/utils/memoBatchRendering";
 import {
@@ -8,13 +10,16 @@ import {
 	buildTournamentBracket,
 } from "@/utils/tournamentUtils";
 import type { MatchPlan } from "@prisma/client";
-import React, { memo, useMemo } from "react";
+import React, { memo, useMemo, useState } from "react";
 
 interface TournamentBracketProps {
 	eventId: number;
 	isFinal: boolean;
 	relatedMatchPlans: MatchPlan[];
 	teamIds?: string[];
+	isOnlyFinal?: boolean;
+	disableModalOpen?: boolean;
+	selectedMatchId?: number | null;
 }
 
 const TournamentTable = ({
@@ -22,6 +27,9 @@ const TournamentTable = ({
 							 isFinal,
 							 relatedMatchPlans,
 							 teamIds,
+							 isOnlyFinal,
+							 disableModalOpen = false,
+							 selectedMatchId = null,
 						 }: Readonly<TournamentBracketProps>) => {
 	const {
 		events,
@@ -33,6 +41,9 @@ const TournamentTable = ({
 		teams,
 		teamLoading,
 	} = useDataContext();
+
+	const [selectedMatch, setSelectedMatch] = useState<MatchPlan | null>(null);
+	const [isModalOpen, setIsModalOpen] = useState(false);
 
 	const firstRowWidth = 100;
 	const rowWidth = 70;
@@ -103,6 +114,11 @@ const TournamentTable = ({
 							rowWidth={rowWidth}
 							rowHeight={rowHeight}
 							teamIds={teamIds}
+							onMatchClick={disableModalOpen ? undefined : (matchPlan) => {
+								setSelectedMatch(matchPlan);
+								setIsModalOpen(true);
+							 }}
+							isHighlighted={selectedMatchId === node.matchId}
 						/>
 					)}
 				</div>
@@ -111,7 +127,7 @@ const TournamentTable = ({
 			(node) =>
 				`node-${node.nodeId}-event-${eventId}-id-${node.type === "team" ? node.teamId : node.matchId}`,
 		);
-	}, [tournamentData, rowWidth, rowHeight, matchResults, eventId, teamIds]);
+	}, [tournamentData, rowWidth, rowHeight, matchResults, eventId, teamIds, disableModalOpen, selectedMatchId]);
 
 	// 特殊ノードの描画とその線 - 常に実行される
 	const specialNodes = useMemo(() => {
@@ -124,7 +140,12 @@ const TournamentTable = ({
 					return null;
 
 				let text = "";
-				if (isFinal) {
+				if (isOnlyFinal) {
+					text = "優勝";
+					if (lastNode.tournamentMatchNode.matchPlan.is3rdPlaceMatch) {
+						text = "3位";
+					}
+				} else if (isFinal) {
 					text = "優勝";
 					if (lastNode.tournamentMatchNode.matchPlan.is3rdPlaceMatch) {
 						text = "3位";
@@ -186,7 +207,7 @@ const TournamentTable = ({
 					</React.Fragment>
 				);
 			});
-	}, [tournamentData, eventId, isFinal, rowWidth, rowHeight]);
+	}, [tournamentData, eventId, isFinal, isOnlyFinal, rowWidth, rowHeight]);
 
 	// テンプレートカラムの設定 - 常に実行される
 	const gridTemplateColumns = useMemo(() => {
@@ -220,19 +241,37 @@ const TournamentTable = ({
 	}
 
 	return (
-		<div className="w-full overflow-x-auto">
-			<div
-				className="grid min-w-[250px] relative"
-				style={{
-					gridTemplateColumns,
-					gridTemplateRows,
+		<div className="relative">
+			<InfoModal
+				matchPlan={selectedMatch as MatchPlan}
+				events={events}
+				locations={undefined}
+				getMatchDisplayStr={() => ""}
+				isOpen={isModalOpen}
+				closeModal={() => {
+					setIsModalOpen(false);
+					setSelectedMatch(null);
 				}}
-			>
-				{renderNodes}
-				{specialNodes}
+				fromTournamentTable={true}
+				disableModalOpen={disableModalOpen}
+				initialIsFinal={isFinal}
+				initialType={"tournament"}
+			/>
+			<div className="w-full overflow-x-auto">
+				<div
+					className="grid min-w-[250px] relative"
+					style={{
+						gridTemplateColumns,
+						gridTemplateRows,
+					}}
+				>
+					{renderNodes}
+					{specialNodes}
+				</div>
 			</div>
 		</div>
 	);
 };
 
 export default memo(TournamentTable);
+
