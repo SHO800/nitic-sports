@@ -160,10 +160,11 @@ const MatchInfoForReader = ({
 				matchPlan={matchPlan}
 				events={events}
 				locations={locations}
-				getMatchDisplayStr={getMatchDisplayStr}
 				isOpen={isOpen}
 				closeModal={CloseModal}
-				initialIsFinal={false}
+				fromTournamentTable={false}
+				disableModalOpen={false}
+				initialIsFinal={undefined}
 				initialType={null}
 			/>
 		</div>

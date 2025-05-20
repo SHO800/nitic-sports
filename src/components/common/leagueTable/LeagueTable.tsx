@@ -2,7 +2,6 @@
 
 import LeagueTableCell from "@/components/common/leagueTable/LeagueTableCell";
 import InfoModal from "@/components/information/InfoModal";
-import MatchPlanCardOnMaodal from "@/components/information/MatchPlanCardOnModal";
 import { useDataContext } from "@/contexts/dataContext";
 import type { MatchPlan } from "@prisma/client";
 import { memo, useEffect, useRef, useState } from "react";
@@ -14,7 +13,6 @@ const LeagueTable = ({
                          block,
                          receivedTeamIds,
                          disableModalOpen = false,
-                         selectedMatchId = null,
                          isFinal = false,
                          type = "league",
                      }: {
@@ -27,7 +25,6 @@ const LeagueTable = ({
     }[];
     receivedTeamIds?: string[];
     disableModalOpen?: boolean;
-    selectedMatchId?: number | null;
     isFinal?: boolean;
     type?: "tournament" | "league";
 }) => {
@@ -83,7 +80,6 @@ const LeagueTable = ({
                 matchPlan={selectedMatch as MatchPlan}
                 events={undefined}
                 locations={undefined}
-                getMatchDisplayStr={() => ""}
                 isOpen={isModalOpen}
                 closeModal={() => {
                     setIsModalOpen(false);
@@ -125,7 +121,6 @@ const LeagueTable = ({
                                         setSelectedMatch(match);
                                         setIsModalOpen(true);
                                     }}
-                                    isHighlighted={selectedMatchId === (referredMatches.find(m => m.teamIds.includes(block[i]?.teamId) && m.teamIds.includes(block[j]?.teamId))?.id)}
                                 />
                             </td>
                         ))}

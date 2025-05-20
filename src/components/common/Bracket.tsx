@@ -54,13 +54,11 @@ const LeagueSection = memo(
 		 teamData,
 		 teamIds,
 		 disableModalOpen = false,
-		 selectedMatchId,
 	 }: {
 		eventId: number;
 		teamData: LeagueTeamData;
 		teamIds?: string[];
 		disableModalOpen?: boolean;
-		selectedMatchId?: number;
 	}) => {
 		const blockNames = useMemo(
 			() => Object.keys(teamData.blocks),
@@ -80,7 +78,6 @@ const LeagueSection = memo(
 							block={teamData.blocks[blockName]}
 							receivedTeamIds={teamIds}
 							disableModalOpen={disableModalOpen}
-							selectedMatchId={selectedMatchId}
 						/>
 					</div>
 				))}
@@ -149,7 +146,6 @@ const Bracket = ({
 					 teamIds,
 					 disableModalOpen = false,
 					 initialIsFinal = false,
-					 initialType = null,
 					 selectedMatchId: selectedMatchIdProp = null,
 				 }: {
 	eventId: number;
@@ -157,7 +153,6 @@ const Bracket = ({
 	teamIds?: string[];
 	disableModalOpen?: boolean;
 	initialIsFinal?: boolean;
-	initialType?: "tournament" | "league" | null;
 	selectedMatchId?: number | null;
 }) => {
 	const [isFinal, setIsFinal] = useState(initialIsFinal);
@@ -173,7 +168,7 @@ const Bracket = ({
 		null,
 	);
 	const [relatedMatchPlans, setRelatedMatchPlans] = useState<MatchPlan[]>([]);
-	const [selectedMatchId, setSelectedMatchId] = useState<number | null>(selectedMatchIdProp);
+	const [selectedMatchId] = useState<number | null>(selectedMatchIdProp);
 
 	// 現在選択されている大会の形式を取得
 	const getCurrentType = useCallback(() => {
@@ -303,7 +298,7 @@ const Bracket = ({
 								teamIds={teamIds}
 								isOnlyFinal={isOnlyFinal}
 								disableModalOpen={disableModalOpen}
-								selectedMatchId={selectedMatchId}
+								selectedMatchId={selectedMatchId ?? undefined}
 							/>
 						)}
 
@@ -315,9 +310,6 @@ const Bracket = ({
 									teamData={teamData}
 									teamIds={teamIds}
 									disableModalOpen={disableModalOpen}
-									selectedMatchId={selectedMatchId}
-									isFinal={isFinal}
-									type={"league"}
 								/>
 							)}
 					</Suspense>
@@ -325,7 +317,7 @@ const Bracket = ({
 			) : (
 				<div className="bg-background rounded-lg  p-8 text-center">
 					<p className="text-gray-500">
-						この種目には対戦表データがありません。
+						ロード中 ∨ この種目には対戦表データがありません。
 					</p>
 				</div>
 			)}

@@ -70,7 +70,6 @@ const InfoModal = ({
                             disableModalOpen={true} // モーダル内の表から再度モーダルを開けないように
                             selectedMatchId={matchPlan.id}
                             initialIsFinal={initialIsFinal}
-                            initialType={initialType}
                         />
                     </div>
                 )}

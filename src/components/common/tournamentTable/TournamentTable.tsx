@@ -2,7 +2,6 @@ import TournamentLine from "@/components/common/tournamentTable/TournamentLine";
 import TournamentMatchBox from "@/components/common/tournamentTable/TournamentMatchBox";
 import TournamentTeamBox from "@/components/common/tournamentTable/TournamentTeamBox";
 import InfoModal from "@/components/information/InfoModal";
-import MatchPlanCardOnMaodal from "@/components/information/MatchPlanCardOnModal";
 import { useDataContext } from "@/contexts/dataContext";
 import batchMemoNodes from "@/utils/memoBatchRendering";
 import {
@@ -19,7 +18,7 @@ interface TournamentBracketProps {
 	teamIds?: string[];
 	isOnlyFinal?: boolean;
 	disableModalOpen?: boolean;
-	selectedMatchId?: number | null;
+	selectedMatchId?: number;
 }
 
 const TournamentTable = ({
@@ -29,7 +28,7 @@ const TournamentTable = ({
 							 teamIds,
 							 isOnlyFinal,
 							 disableModalOpen = false,
-							 selectedMatchId = null,
+							 selectedMatchId,
 						 }: Readonly<TournamentBracketProps>) => {
 	const {
 		events,
@@ -244,9 +243,8 @@ const TournamentTable = ({
 		<div className="relative">
 			<InfoModal
 				matchPlan={selectedMatch as MatchPlan}
-				events={events}
+				events={undefined}
 				locations={undefined}
-				getMatchDisplayStr={() => ""}
 				isOpen={isModalOpen}
 				closeModal={() => {
 					setIsModalOpen(false);
