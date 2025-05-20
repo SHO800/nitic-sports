@@ -38,7 +38,7 @@ const DelayInfo = ({eventId}: Props) => {
             return (
                 <div className="flex min-w-[94vw] justify-center">
                     <div
-                        className={"flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[10vh] rounded overflow-auto　" + yowaiFont.className}>
+                        className={"flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[10vh] rounded overflow-auto　"}>
                         遅延なし！やったね！
                     </div>
                 </div>
@@ -48,7 +48,7 @@ const DelayInfo = ({eventId}: Props) => {
         return (
             <>
                 <div className="flex flex-col min-w-[94vw] justify-center">
-                    <div className="flex flex-col lg:mx-20 px-1 py-2 h-[50vh]  rounded overflow-auto">
+                    <div className="flex flex-col lg:mx-20 px-1 py-2 h-[50vh]  rounded overflow-auto space-y-4">
                         {filteredByEvent?.map((item) => {
                             return (
                                 <div key={"delayInfoCard-" + item.id}
@@ -71,6 +71,7 @@ const DelayInfo = ({eventId}: Props) => {
                             );
                         })}
                     </div>
+                    <p className={"ml-auto mr-8 text-gray-600"}>直近3件以内を表示中</p>
                 </div>
             </>
         );
@@ -81,7 +82,7 @@ const DelayInfo = ({eventId}: Props) => {
             return (
                 <div className="flex min-w-[94vw] justify-center">
                     <div
-                        className={"flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[10vh] rounded overflow-auto  " + yowaiFont.className}>
+                        className={"flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[10vh] rounded overflow-auto  "}>
                         遅延なし！やったね！
                     </div>
                 </div>
@@ -94,9 +95,9 @@ const DelayInfo = ({eventId}: Props) => {
                     <div className="flex flex-col lg:mx-20 px-1 py-2 h-[50vh]  rounded overflow-auto">
                         {filteredItems?.map((item) => {
                             return (
-                                <div className="flex justify-center  px-10 rounded">
+                                <div key={item.id} className="flex justify-center  px-10 rounded">
                                     <div
-                                        key={item.id}
+                                        
                                         className=" relative flex flex-col bg-white mb-1 border rounded"
                                     >
                                         <div
@@ -113,6 +114,7 @@ const DelayInfo = ({eventId}: Props) => {
                             );
                         })}
                     </div>
+                    <p className={"ml-auto mr-8 text-gray-600"}>直近3件以内を表示中</p>
                 </div>
             </>
         );

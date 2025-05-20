@@ -6,12 +6,27 @@ import ClassSelector from "@/components/common/ClassSelector";
 import {useDataContext} from "@/contexts/dataContext";
 import EventSwitch from "@/components/information/EventSwitch";
 
+const MATCH_STATUS_LABELS = [
+  { value: "waiting", label: "開始前" },
+  { value: "preparing", label: "開始前" },
+  { value: "playing", label: "進行中" },
+  { value: "completed", label: "終了済" },
+  { value: "finished", label: "終了済" },
+];
+
+const STATUS_GROUPS = [
+  { group: "開始前", values: ["waiting", "preparing"] },
+  { group: "進行中", values: ["playing"] },
+  { group: "終了済", values: ["completed", "finished"] },
+];
+
 const ConditionSelector = ({setConditionCallback}: { setConditionCallback: (condition: SearchCondition) => void }) => {
     const {groupedTeams} = useDataContext()
     const [searchCondition, setSearchCondition] = useState<SearchCondition>({
         statuses: []
     })
     const [isShowClassSelector, setIsShowClassSelector] = useState<boolean>(false)
+    const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
 
     const selectClassCallback = useCallback((id: string, name: string) => {
         const after: SearchCondition = {
@@ -22,7 +37,7 @@ const ConditionSelector = ({setConditionCallback}: { setConditionCallback: (cond
         setSearchCondition(after)
         setConditionCallback(after)
         setIsShowClassSelector(false)
-    }, [searchCondition])
+    }, [searchCondition.eventId, searchCondition.statuses, setConditionCallback])
     const clearClass = useCallback(() => {
         const after: SearchCondition = {
             eventId: searchCondition.eventId,
@@ -30,10 +45,10 @@ const ConditionSelector = ({setConditionCallback}: { setConditionCallback: (cond
         }
         setSearchCondition(after)
         setConditionCallback(after)
-    }, [searchCondition])
+    }, [searchCondition.eventId, searchCondition.statuses, setConditionCallback])
     
     const setEventId = useCallback((eventId: number | "all") => {
-        let expandedEventId: number | undefined  = eventId === "all" ? undefined: eventId
+        const expandedEventId: number | undefined  = eventId === "all" ? undefined: eventId
         const after: SearchCondition = {
             eventId: expandedEventId,
             statuses: searchCondition.statuses,
@@ -41,12 +56,11 @@ const ConditionSelector = ({setConditionCallback}: { setConditionCallback: (cond
         }
         setSearchCondition(after)
         setConditionCallback(after)
-    }, [searchCondition])
+    }, [searchCondition.attendTeam, searchCondition.statuses, setConditionCallback])
 
     return (
         
-        <div className={"flex flex-col"}>
-            
+        <div className={"flex flex-col space-y-2"}>
             <div className={"w-full flex flex-col items-center"}>
                 <p className={"text-xl w-full text-center"}>参加チームで絞り込む</p>
                 {isShowClassSelector && 
@@ -57,7 +71,7 @@ const ConditionSelector = ({setConditionCallback}: { setConditionCallback: (cond
                     <div className={"flex flex-col items-center"}>
                         <p>選択中のチーム</p>
                          <p className={"text-xl"}>{searchCondition.attendTeam[1]}</p>
-                        <button className={""}
+                        <button className={"bg-gray-200 hover:bg-gray-300 rounded px-2 py-1"}
                                 onClick={e => {
                                     e.preventDefault()
                                     clearClass()
@@ -70,7 +84,7 @@ const ConditionSelector = ({setConditionCallback}: { setConditionCallback: (cond
                 {
                  !searchCondition.attendTeam &&   
                 <button
-                    className={""}
+                    className={"bg-gray-200 hover:bg-gray-300 rounded px-2 py-1"}
                     onClick={e => {
                         e.preventDefault()
                         setIsShowClassSelector(true)
@@ -87,8 +101,22 @@ const ConditionSelector = ({setConditionCallback}: { setConditionCallback: (cond
                     <EventSwitch selectedId={!searchCondition.eventId ? "all": searchCondition.eventId} setSelectedId={setEventId} isAllDay={true} />
                 </div>
             </div>
-            <div>
-                
+            <div className="w-full flex flex-col items-center mt-4">
+                <label className="flex items-center space-x-2">
+                    <input
+                        type="checkbox"
+                        checked={searchCondition.includeFinished ?? false}
+                        onChange={e => {
+                            const after = {
+                                ...searchCondition,
+                                includeFinished: e.target.checked
+                            };
+                            setSearchCondition(after);
+                            setConditionCallback(after);
+                        }}
+                    />
+                    <span>終了した試合も含める</span>
+                </label>
             </div>
         </div>
     )
@@ -97,3 +125,4 @@ const ConditionSelector = ({setConditionCallback}: { setConditionCallback: (cond
 
 
 export default memo(ConditionSelector)
+

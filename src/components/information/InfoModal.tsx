@@ -30,11 +30,11 @@ const InfoModal = ({
     // const CloseModal = () => isOpen = false;
 
     return (
-        <div className="flex fixed inset-0 z-100 w-full  h-screen bg-[rgba(0,0,0,.8)] justify-center items-center"onClick={(e) => {
+        <div className="flex fixed inset-0 z-100 w-full  h-screen bg-[rgba(0,0,0,.8)] justify-center items-center" onClick={(e) => {
             e.preventDefault()
             closeModal()
         }}>
-                <div className="flex flex-col max-h-[80vh] px-1 pb-4 bg-[rgba(255,255,255,.9)] rounded item-center overflow-auto hidden-scrollbar"onClick={(e) => {
+                <div className="flex flex-col max-h-[80vh] px-1 pb-4 bg-[rgba(255,255,255,.99)] rounded item-center overflow-auto hidden-scrollbar" onClick={(e) => {
                     e.preventDefault()
                     e.stopPropagation()
                 }}>

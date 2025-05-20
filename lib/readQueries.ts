@@ -1,26 +1,19 @@
 "use cache";
-import type {
-	Event,
-	Location,
-	MatchPlan,
-	MatchResult,
-	Score,
-	Team,
-} from "@prisma/client";
-import { cacheLife } from "next/dist/server/use-cache/cache-life";
-import { cacheTag } from "next/dist/server/use-cache/cache-tag";
-import { prisma } from "./prisma";
+import type {Event, Location, MatchPlan, MatchResult, Score, Team,} from "@prisma/client";
+import {cacheLife} from "next/dist/server/use-cache/cache-life";
+import {cacheTag} from "next/dist/server/use-cache/cache-tag";
+import {prisma} from "./prisma";
 
 export async function getAllEvents(): Promise<Event[]> {
 	cacheTag("events");
-	cacheLife("minutes");
+	cacheLife("seconds");
 	const rawEvents: Event[] = await prisma.event.findMany();
 	return rawEvents.sort((a, b) => a.id - b.id);
 }
 
 export async function getEventById(eventId: number): Promise<Event | null> {
 	cacheTag("events");
-	cacheLife("minutes");
+	cacheLife("seconds");
 	const event: Event | null = await prisma.event.findUnique({
 		where: { id: eventId },
 	});
@@ -46,8 +39,8 @@ export async function getMatchThatDependsOn(
 	matchId: number,
 ): Promise<MatchPlan[]> {
 	cacheTag("matchPlans");
-	cacheLife("minutes");
-	const dependsOnMatchPlans: MatchPlan[] = await prisma.matchPlan.findMany({
+	cacheLife("seconds");
+	return await prisma.matchPlan.findMany({
 		where: {
 			eventId,
 			status: "Waiting",
@@ -56,7 +49,6 @@ export async function getMatchThatDependsOn(
 			},
 		},
 	});
-	return dependsOnMatchPlans;
 }
 
 export async function getAllMatchResults(): Promise<
@@ -75,7 +67,7 @@ export async function getAllMatchResults(): Promise<
 
 export async function getAllScores(): Promise<Score[]> {
 	cacheTag("scores");
-	cacheLife("minutes");
+	cacheLife("seconds");
 	const scores: Score[] = await prisma.score.findMany();
 	return scores.sort((a, b) => a.id - b.id);
 }

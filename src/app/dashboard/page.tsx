@@ -22,7 +22,7 @@ const Dashboard = () => {
 				{/*	<Teams />*/}
 				{/*</details>*/}
 
-				<details className="container mx-auto p-4" open>
+				<details className="container mx-auto p-4" >
 					<summary className="text-3xl font-bold mb-4 px-3 py-2 rounded-2xl bg-blue-900  text-white">
 						種目毎対戦表
 					</summary>

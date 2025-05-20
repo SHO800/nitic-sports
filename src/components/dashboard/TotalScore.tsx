@@ -56,7 +56,7 @@ const TotalScore = () => {
 			</div>
 			{/*各スコア*/}
 			<div className="flex items-center justify-between bg-gray-200 p-2 rounded mb-2">
-				{JSON.stringify(scores)}
+				{/*{JSON.stringify(scores)}*/}
 				{/*{scores && scores.toSorted().map(score => {*/}
 				{/*    */}
 				{/*    <div key={"score-"+score.id} className={`text-black `}>*/}

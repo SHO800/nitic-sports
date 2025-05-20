@@ -76,15 +76,14 @@ const NowHot: React.FC<Props> = (props) => {
 
 		return (
 			<div className="flex flex-col min-w-[94vw] justify-center">
-				<div className="flex flex-col lg:mx-20 px-1 py-2 min-h-[30vh]  rounded overflow-auto ">
+				<div className="flex flex-col lg:mx-20 px-1 py-2 min-h-[30vh]  rounded overflow-auto space-y-4">
 					{NowhotThree?.map((item) => {
-						const _status = getMatchStatus(item);
 
 						return (
 							<div key={"nowHotCard-"+item.id} 
 								 className="flex justify-center px-10 rounded">
 								<div
-									className="flex flex-col bg-background mb-1 border rounded"
+									className="flex flex-col bg-background mb-1 border rounded "
 								>
 									<div className="flex justify-center w-[70vw] lg:w-[30vw] bg-background px-1 rounded text-2xl">
 										<MatchInfoForReader
@@ -95,12 +94,7 @@ const NowHot: React.FC<Props> = (props) => {
 										/>
 									</div>
 									{/*
-                                <p  className="flex justify-center bg-background text-black px-1 rounded text-2xl">
-                                    {(status === Status.Waiting || status === Status.Preparing) && (
-                                        <MatchCountdownForReader scheduledStartTime={item.scheduledStartTime}/>
-                                    )}
-                                </p>
-                                */}
+                               
 								</div>
 							</div>
 						);
@@ -179,6 +173,7 @@ const NowHot: React.FC<Props> = (props) => {
 						);
 					})}
 				</div>
+				<p className={"ml-auto mr-8 text-gray-600"}>直近3件以内を表示中</p>
 			</div>
 		);
 	}

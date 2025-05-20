@@ -8,9 +8,9 @@ import ResultInfo from "@/components/information/ResulteInfo";
 import {memo, useState} from "react";
 
 const Information = () => {
-    const [selectedNowId, setSelectedNowId] = useState<number | "all">(1);
-    const [selectedNextId, setSelectedNextId] = useState<number | "all">(1);
-    const [selectedDelayId, setSelectedDelayId] = useState<number | "all">(1);
+    const [selectedNowId, setSelectedNowId] = useState<number | "all">("all");
+    const [selectedNextId, setSelectedNextId] = useState<number | "all">("all");
+    const [selectedDelayId, setSelectedDelayId] = useState<number | "all">("all");
 
     const setNowId = (id: number | "all") => {
         setSelectedNowId(id);

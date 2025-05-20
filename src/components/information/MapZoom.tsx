@@ -58,7 +58,7 @@ const MapZoom = ({ locationId }: Props) => {
 					</div>
 				</div>
 			)}
-			{MapId === 0 && <div>制作者の怠慢によりマップがないようです</div>}
+			{/*{MapId === 0 && <div>制作者の怠慢によりマップがないようです</div>}*/}
 		</>
 	);
 };

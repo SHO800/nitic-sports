@@ -90,13 +90,15 @@ const TournamentMatchBox = ({
 					>
 						{isCurrentTeamMatch ? (
 							<span className="relative">
-                <span className="relative z-10 nowra">
+                <span className="relative z-10 text-nowrap">
                   {match.tournamentMatchNode.matchPlan.matchName}
                 </span>
                 <span className="absolute inset-0 bg-white opacity-20 rounded-full blur-sm animate-ping"></span>
               </span>
 						) : (
-							match.tournamentMatchNode.matchPlan.matchName
+							<span className={"text-nowrap"}>
+							{match.tournamentMatchNode.matchPlan.matchName}
+							</span>
 						)}
 					</p>
 				</div>

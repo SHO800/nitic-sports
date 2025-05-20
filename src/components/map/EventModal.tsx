@@ -28,7 +28,7 @@ const EventModal = ({ placeId, isOpen, closeModal }: Props) => {
 	} = useDataContext();
 
 	return (
-		<div className="flex flex-col fixed inset-0 z-80 w-full  h-screen bg-black/30 justify-center items-center" onClick={(e) => {
+		<div className="flex flex-col fixed inset-0 z-80 w-full  h-screen bg-black/30 Djustify-center items-center" onClick={(e) => {
 			e.preventDefault()
 			closeModal()
 		}}>

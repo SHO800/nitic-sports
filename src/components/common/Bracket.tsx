@@ -187,6 +187,7 @@ const Bracket = ({
 			} else {
 				setHasPreliminary(false);
 				setPreliminaryType(null);
+				setIsFinal(true);
 			}
 
 			if (Array.isArray(teamData) && teamData.length > 1) {

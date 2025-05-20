@@ -113,7 +113,8 @@ export const useCurrentTime = () => {
 			}
 
 			return {
-				str: `${daysStr}${hoursStr}${minutesStr}${seconds}秒`,
+				// str: `${daysStr}${hoursStr}${minutesStr}${seconds}秒`,
+				str: `${daysStr}${hoursStr}${minutesStr}`,
 				diff: diff,
 				isPast,
 				waiting: false,
