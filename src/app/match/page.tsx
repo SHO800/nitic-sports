@@ -7,9 +7,11 @@ import MatchesByLocation from "@/components/match/MatchesByLocation";
 import { useDataContext } from "@/contexts/dataContext";
 import type { Event } from "@prisma/client";
 import { useEffect, useRef, useState } from "react";
+import LoadingButton from "@/components/common/LoadingButton";
+import {mutateServerData} from "@/app/actions/data";
 
 const MatchDashboard = () => {
-	const { events, locations, scores } = useDataContext();
+	const { events, locations, scores, mutateMatchData } = useDataContext();
 	const [selectedLocation, setSelectedLocation] = useState<string[]>([]);
 	const [isShowSelector, setIsShowSelector] = useState<boolean>(true);
 	const [isSyncScroll, _setIsSyncScroll] = useState<boolean>(true);
@@ -40,10 +42,27 @@ const MatchDashboard = () => {
 		);
 		setScoreUnsettledEvents(unsettledEvents as unknown as Event[]);
 	}, [events, scores]);
+	
+	const forceReload = async() => {
+		await mutateServerData()
+		await mutateMatchData()
+	}
+	
 
 	return (
 		<div className={"relative w-full h-[calc(100vh-130px)] overflow-hidden"}>
 			<div className={"h-fit py-2 flex justify-center items-center relative"}>
+				<div className={"absolute bottom-[calc(50%-1em)] left-8 "}>
+					<LoadingButton 
+						className={"bg-blue-500 rounded w-24 h-10"}
+						onClick={forceReload}
+						type={"button"}
+						disabled={false}
+						>
+						強制更新
+					</LoadingButton>
+				</div>
+				
 				<Clock />
 
 				<div className={"absolute bottom-[calc(50%-1em)] right-0 "}>

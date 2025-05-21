@@ -17,6 +17,13 @@ export const isAllMatchFinished = async (eventId: number) => {
 	);
 };
 
+export async function mutateServerData(){
+	revalidateTag("matchPlans");
+	revalidateTag("events");
+	revalidateTag("matchResults");
+	revalidateTag("scores");
+}
+
 export async function createMatchPlan(
 	eventId: number,
 	teamIds: string[] | number[],

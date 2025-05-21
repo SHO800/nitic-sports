@@ -11,4 +11,3 @@ export async function GET() {
     ]);
     return Response.json({ matchPlans, matchResults, scores, events });
 }
-
