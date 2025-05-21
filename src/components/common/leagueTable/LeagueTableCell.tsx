@@ -35,14 +35,14 @@ const LeagueTableCell = ({
 
     if (row === -1 && col > -1)
         return (
-            <p key={i_key}>
+            <p key={i_key} className="font-bold">
                 {getMatchDisplayStr(block[col]?.teamId)}
             </p>
         );
 
     if (col === -1 && row > -1)
         return (
-            <p key={i_key} className="text-sm">
+            <p key={i_key} className="text-sm font-bold">
                 {getMatchDisplayStr(block[row]?.teamId)}
             </p>
         );
@@ -132,7 +132,10 @@ const LeagueTableCell = ({
         const scoreStr = `${leftSideTeamScore} - ${rightSideTeamScore}`;
 
         return (
-            <div key={i_key} className={`text-sm p-2 ${highlightClass}`}>
+            <div key={i_key} className={`text-sm p-2 ${highlightClass}`}
+                 onClick={onMatchClick ? () => onMatchClick(match) : undefined}
+                 style={{ cursor: onMatchClick ? "pointer" : undefined }}
+            >
                 <p className={`text-sm ${textClass}`}>
                     {scoreStr}
                 </p>

@@ -1,7 +1,6 @@
 import {useDataContext} from "@/contexts/dataContext";
 import {useCurrentTime} from "@/hooks/currentTime";
 import MatchInfoForReader from "../reader/MatchInfoForReader";
-import {yowaiFont} from "../../../public/fonts/fonts";
 
 type Props = {
     eventId: number | string;
@@ -92,16 +91,16 @@ const DelayInfo = ({eventId}: Props) => {
         return (
             <>
                 <div className="flex flex-col min-w-[94vw] justify-center">
-                    <div className="flex flex-col lg:mx-20 px-1 py-2 h-[50vh]  rounded overflow-auto">
+                    <div className="flex flex-col lg:mx-20 px-1 py-2 h-[50vh]  rounded overflow-auto space-y-4">
                         {filteredItems?.map((item) => {
                             return (
                                 <div key={item.id} className="flex justify-center  px-10 rounded">
                                     <div
-                                        
-                                        className=" relative flex flex-col bg-white mb-1 border rounded"
+
+                                        className=" relative flex flex-col bg-white mb-1 border-2 rounded"
                                     >
                                         <div
-                                            className="flex justify-center w-[70vw] lg:w-[30vw] bg-white text-black px-1 rounded text-2xl">
+                                            className="flex justify-center w-[70vw] lg:w-[30vw] bg-white text-black p-1 rounded text-2xl">
                                             <MatchInfoForReader
                                                 matchPlan={item}
                                                 events={events}
@@ -114,7 +113,6 @@ const DelayInfo = ({eventId}: Props) => {
                             );
                         })}
                     </div>
-                    <p className={"ml-auto mr-8 text-gray-600"}>直近3件以内を表示中</p>
                 </div>
             </>
         );

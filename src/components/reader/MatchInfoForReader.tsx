@@ -6,6 +6,7 @@ import type { MatchPlan as MatchPlanType } from "@prisma/client";
 import clsx from "clsx";
 import {useEffect, useRef, useState} from "react";
 import InfoModal from "@/components/information/InfoModal";
+import StatusBadge from "@/components/dashboard/matchPlan/StatusBadge";
 
 type MatchInfoProps = {
 	matchPlan: MatchPlanType;
@@ -72,11 +73,15 @@ const MatchInfoForReader = ({
 
 	return (
 		<div className="w-full text-black">
-			<div
+			<div 
 				onClick={() => OpenModal()}
-				className="flex w-full bg-white text-[17px] justify-between items-center"
-			>
-				<p className="ml-2">#{matchPlan.id}</p>
+				className="flex w-full bg-white text-[17px] justify-between items-center">
+				<p className="ml-2">
+					<span className={"text-md"}>#{matchPlan.id}</span>
+					<span className="text-xl font-bold mx-3">
+						{matchPlan.matchName || `#${matchPlan.id}`}
+					</span>
+				</p>
 				<p
 					className={`${matchPlan.matchNote?.trim() === "" || matchPlan.matchNote === null ? "" : "bg-amber-500 text-white mx-2 my-0.5 px-1 py-0.5 rounded"}`}
 				>
@@ -85,7 +90,11 @@ const MatchInfoForReader = ({
 				<p
 					className={`${matchPlan.matchNote?.trim() !== "" || matchPlan.matchNote === null ? "mr-2" : "mr-6"}`}
 				>
+					<StatusBadge status={matchPlan.status} />
+					<span className={"font-bold"}>
+						
 					{events?.find((event) => event.id === matchPlan.eventId)?.name}
+					</span>
 				</p>
 			</div>
 
@@ -158,8 +167,6 @@ const MatchInfoForReader = ({
 
 			<InfoModal
 				matchPlan={matchPlan}
-				events={events}
-				locations={locations}
 				isOpen={isOpen}
 				closeModal={CloseModal}
 				fromTournamentTable={false}

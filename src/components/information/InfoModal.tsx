@@ -1,15 +1,14 @@
 "use client";
 
 import {useDataContext} from "@/contexts/dataContext";
-import type {MatchPlan as MatchPlanType} from "@prisma/client";
+import {MatchPlan as MatchPlanType, Status} from "@prisma/client";
 import MapZoom from "./MapZoom";
-import MatchPlanCardOnMaodal from "./MatchPlanCardOnModal";
+import MatchPlanCardOnModal from "./MatchPlanCardOnModal";
 import Bracket from "@/components/common/Bracket";
+import MatchResultTable from "@/components/common/MatchResultTable";
 
 type Props = {
     matchPlan: MatchPlanType;
-    events: any[] | undefined;
-    locations: any[] | undefined;
     isOpen: boolean;
     closeModal: () => void;
     fromTournamentTable?: boolean;
@@ -19,41 +18,40 @@ type Props = {
 };
 
 const InfoModal = ({
-    matchPlan,
-    events,
-    locations,
-    isOpen,
-    closeModal,
-    fromTournamentTable = false,
-    disableModalOpen = false,
-    initialIsFinal = false,
-    initialType = null,
-}: Props) => {
-    const {matchPlans, getMatchDisplayStr} = useDataContext();
+                       matchPlan,
+    
+                       isOpen,
+                       closeModal,
+                       fromTournamentTable = false,
+                       disableModalOpen = false,
+                       initialIsFinal = false,
+                       initialType = null,
+                   }: Props) => {
+    const {matchPlans, getMatchDisplayStr, events, locations} = useDataContext();
 
     if (!isOpen) return null;
 
     return (
-        <div className="flex fixed inset-0 z-100 w-full  h-screen bg-[rgba(0,0,0,.8)] justify-center items-center" onClick={(e) => {
-            e.preventDefault()
-            closeModal()
-        }}>
-            <div className="flex flex-col max-h-[80vh] px-1 pb-4 bg-[rgba(255,255,255,.99)] rounded item-center overflow-auto hidden-scrollbar" onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-            }}>
+        <div className="flex fixed inset-0 z-100 w-full  h-screen bg-[rgba(0,0,0,.8)] justify-center items-center"
+             onClick={(e) => {
+                 e.preventDefault()
+                 closeModal()
+             }}>
+            <div
+                className="flex flex-col max-h-[80vh] px-1 pb-4 bg-[rgba(255,255,255,.99)] rounded item-center overflow-auto hidden-scrollbar"
+                onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                }}>
                 <button
                     onClick={() => closeModal()}
                     className="flex absolute z-50 right-0 mt-1 mr-6 px-2 py-1 bg-red-400 hover:bg-red-300 rounded text-white"
                 >
                     ×
                 </button>
-                <MatchPlanCardOnMaodal
+                <MatchPlanCardOnModal
                     matchPlan={matchPlan}
-                    events={events}
-                    locations={locations}
                     status={matchPlan.status}
-                    getMatchDisplayStr={getMatchDisplayStr}
                 />
                 <div className="relative z-0  mt-1 lg:mx-40 rounded [filter:chroma(color=#d5d5d5);]">
                     <div className="flex justify-center">

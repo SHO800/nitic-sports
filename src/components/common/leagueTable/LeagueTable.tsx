@@ -78,8 +78,6 @@ const LeagueTable = ({
             {/* InfoModalの設置 */}
             <InfoModal
                 matchPlan={selectedMatch as MatchPlan}
-                events={undefined}
-                locations={undefined}
                 isOpen={isModalOpen}
                 closeModal={() => {
                     setIsModalOpen(false);

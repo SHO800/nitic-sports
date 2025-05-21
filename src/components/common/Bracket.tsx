@@ -265,7 +265,7 @@ const Bracket = ({
 			</h1>
 
 			<div className="w-full flex justify-start mb-2">
-				<span className="text-xs text-gray-500">試合名をタップで詳細を表示</span>
+				<span className="text-xs text-gray-500">セルをタップで詳細を表示</span>
 			</div>
 
 			{/* タブボタン */}
@@ -317,7 +317,7 @@ const Bracket = ({
 			) : (
 				<div className="bg-background rounded-lg  p-8 text-center">
 					<p className="text-gray-500">
-						ロード中 ∨ この種目には対戦表データがありません。
+						ロード中∨この種目には対戦表データがありません。
 					</p>
 				</div>
 			)}

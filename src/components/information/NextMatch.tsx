@@ -146,8 +146,8 @@ const NextMatch: React.FC<Props> = (props) => {
 								key={item.id}
 								className="flex justify-center  px-10 rounded"
 							>
-								<div className="flex flex-col bg-white mb-1 border rounded ">
-									<div className="flex justify-center w-[70vw] lg:w-[30vw] bg-white px-1 rounded">
+								<div className="flex flex-col bg-white mb-1 border-2 rounded ">
+									<div className="flex justify-center w-[70vw] lg:w-[30vw] bg-white p-1 rounded ">
 										<MatchInfoForReader
 											matchPlan={item}
 											events={events}

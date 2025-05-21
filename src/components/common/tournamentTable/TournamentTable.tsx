@@ -243,8 +243,6 @@ const TournamentTable = ({
 		<div className="relative">
 			<InfoModal
 				matchPlan={selectedMatch as MatchPlan}
-				events={undefined}
-				locations={undefined}
 				isOpen={isModalOpen}
 				closeModal={() => {
 					setIsModalOpen(false);
