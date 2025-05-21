@@ -43,11 +43,9 @@ const NowHot: React.FC<Props> = (props) => {
 
 		const filteredByStatus = SortedByStartTime?.filter(
 			(item) =>
-				item.status === "Playing" &&
-				item.scheduledStartTime.getTime() + (item.matchTime * 2) / 3 >
-					currentTime.currentTime.getTime(),
+				item.status === "Playing"
 		);
-		const NowhotThree = filteredByStatus?.slice(0, 3);
+		// const NowhotThree = filteredByStatus?.slice(0, 3);
 
 		const getMatchStatus = (matchPlan: MatchPlanType): Status => {
 			// すでにローカル状態にステータスがある場合はそれを返す
@@ -64,7 +62,7 @@ const NowHot: React.FC<Props> = (props) => {
 			return matchPlan.status || Status.Preparing;
 		};
 
-		if (NowhotThree?.length === 0) {
+		if (filteredByStatus?.length === 0) {
 			return (
 				<div className="flex min-w-[94vw] justify-center ">
 					<div className="flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[10vh]  rounded overflow-auto ">
@@ -77,7 +75,7 @@ const NowHot: React.FC<Props> = (props) => {
 		return (
 			<div className="flex flex-col min-w-[94vw] justify-center">
 				<div className="flex flex-col lg:mx-20 px-1 py-2 min-h-[30vh]  rounded overflow-auto space-y-4">
-					{NowhotThree?.map((item) => {
+					{filteredByStatus?.map((item) => {
 
 						return (
 							<div key={"nowHotCard-"+item.id} 
@@ -93,7 +91,6 @@ const NowHot: React.FC<Props> = (props) => {
 											getMatchDisplayStr={getMatchDisplayStr}
 										/>
 									</div>
-									{/*
                                
 								</div>
 							</div>
@@ -123,15 +120,12 @@ const NowHot: React.FC<Props> = (props) => {
 
 		const filteredByStatus = SortedByStartTime?.filter(
 			(item) =>
-				item.status === "Playing" &&
-				item.scheduledStartTime.getTime() + (item.matchTime * 2) / 3 >
-					currentTime.currentTime.getTime(),
+				item.status === "Playing"
 		);
 
 		// 本番用
-		const NowhotThree = filteredByStatus?.slice(0, 3);
 
-		if (NowhotThree?.length === 0) {
+		if (filteredByStatus?.length === 0) {
 			return (
 				<div className="flex min-w-[94vw] justify-center">
 					<div className="flex justify-center items-center lg:mx-20 px-1 py-2 min-w-[80vw] lg:min-w-[30vw] min-h-[10vh]  rounded overflow-auto ">
@@ -144,8 +138,7 @@ const NowHot: React.FC<Props> = (props) => {
 		return (
 			<div className="flex flex-col min-w-[94vw] justify-center">
 				<div className="flex flex-col lg:mx-20 px-1 py-2 min-h-[30vh]  rounded overflow-auto">
-					{NowhotThree?.map((item) => {
-						// const status = getMatchStatus(item);
+					{filteredByStatus?.map((item) => {
 
 						return (
 							<div
@@ -161,19 +154,11 @@ const NowHot: React.FC<Props> = (props) => {
 											getMatchDisplayStr={getMatchDisplayStr}
 										/>
 									</div>
-									{/*
-                                    <p  className="flex justify-center bg-background text-black px-1 rounded text-2xl">
-                                        {(status === Status.Waiting || status === Status.Preparing) && (
-                                            <MatchCountdownForReader scheduledStartTime={item.scheduledStartTime} />
-                                        )}
-                                    </p>
-                                    */}
 								</div>
 							</div>
 						);
 					})}
 				</div>
-				<p className={"ml-auto mr-8 text-gray-600"}>直近3件以内を表示中</p>
 			</div>
 		);
 	}
