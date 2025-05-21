@@ -450,7 +450,6 @@ export const useData = (options?: { refreshInterval?: number }) => {
 		matchPlans,
 		matchResults,
 		locations,
-		mutateMatchData,
 		locationLoading,
 		mutateLocations,
 		scores,
@@ -458,6 +457,11 @@ export const useData = (options?: { refreshInterval?: number }) => {
 		isLoading,
 		hasErrors: Object.values(errors).some(Boolean),
 		errors,
+
+		// 追加: 既存互換のためのローディング状態
+		eventLoading: matchDataLoading,
+		matchPlanLoading: matchDataLoading,
+		matchResultLoading: matchDataLoading,
 
 		// 最適化したヘルパー関数
 		getBlockMatches,
@@ -468,5 +472,6 @@ export const useData = (options?: { refreshInterval?: number }) => {
 		searchMatchPlanByVariableId,
 		getMatchResultByMatchId,
 		getLeagueDataByVariableId,
+		mutateMatchData,
 	};
 };
