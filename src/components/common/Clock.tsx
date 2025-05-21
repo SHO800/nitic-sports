@@ -12,7 +12,7 @@ const Clock = () => {
 		>
 			{" "}
 			{/* Dateを使う都合上か必ずサーバーとずれるのでsuppressHydrationWarningで封じる */}
-			{currentTime.toLocaleTimeString()}
+			{currentTime.toLocaleTimeString("ja-JP")}
 		</div>
 	);
 };
