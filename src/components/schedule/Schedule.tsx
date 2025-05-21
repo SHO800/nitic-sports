@@ -27,7 +27,7 @@ const Schedule = async () => {
                     quality={100}
                     className="object-cover aspect-[0.5878481013] !h-full !w-auto"
                 />
-                <div className="absolute z-100 bottom-0  left-0 w-full h-[calc(100%-0.0263291139%)] ">
+                <div className="absolute z-80 bottom-0  left-0 w-full h-[calc(100%-0.0263291139%)] ">
                     <TimeLine startTime={"2025/05/22 09:29"} endTime={"2025/05/22 18:35"}/>
                 </div>
             </div>
@@ -48,7 +48,7 @@ const Schedule = async () => {
                     quality={100}
                     className="object-cover aspect-[0.5389884089] !h-full !w-auto"
                 />
-                <div className="absolute z-100 top-0 left-0 w-full h-full pt-[0.0273972603%] ">
+                <div className="absolute z-80 top-0 left-0 w-full h-full pt-[0.0273972603%] ">
                     <TimeLine startTime={"2025/05/23 09:00"} endTime={"2025/05/23 17:30"}/>
                 </div>
             </div>
