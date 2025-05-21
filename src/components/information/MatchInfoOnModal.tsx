@@ -82,10 +82,10 @@ const MatchInfoOnModal = ({
 					className={`${matchPlan.matchNote?.trim() !== "" || matchPlan.matchNote === null ? "mr-2" : "mr-6"}`}
 				>
 					<StatusBadge status={matchPlan.status} />
-					<span className={"font-bold"}>
+					<p className={"font-bold"}>
 						
 					{events?.find((event) => event.id === matchPlan.eventId)?.name}
-					</span>
+					</p>
 				</p>
 			</div>
 
