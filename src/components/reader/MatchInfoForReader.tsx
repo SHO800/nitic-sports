@@ -87,7 +87,7 @@ const MatchInfoForReader = ({
 				>
 					{matchPlan.matchNote}
 				</p>
-				<p
+				<div
 					className={`${matchPlan.matchNote?.trim() !== "" || matchPlan.matchNote === null ? "mr-2" : "mr-6"}`}
 				>
 					<StatusBadge status={matchPlan.status} />
@@ -95,7 +95,7 @@ const MatchInfoForReader = ({
 						
 					{events?.find((event) => event.id === matchPlan.eventId)?.name}
 					</p>
-				</p>
+				</div>
 			</div>
 
 			<div className="relative bg-black h-[0.5px] mx-2" />

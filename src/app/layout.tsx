@@ -2,7 +2,6 @@
 import type {Metadata} from "next";
 import {Noto_Sans_JP} from "next/font/google";
 import "./globals.css";
-import DataPreFetcher from "@/components/common/DataPreFetcher";
 import Footer from "@/components/layout/Footer/page";
 import Header from "@/components/layout/Header/page";
 import {CurrentTimeContextProvider} from "@/contexts/currentTimeContext";
@@ -39,9 +38,7 @@ export default async function RootLayout({
         >
         <CurrentTimeContextProvider>
             <Header/>
-            <DataPreFetcher>
-                <DataContextProvider>{children}</DataContextProvider>
-            </DataPreFetcher>
+            <DataContextProvider>{children}</DataContextProvider>
         </CurrentTimeContextProvider>
 
         <Analytics/>
