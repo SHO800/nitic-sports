@@ -43,7 +43,7 @@ const MatchResult = ({
 						eventIsTimeBased={event.isTimeBased}
 						matchTime={matchTime}
 						resultNote={matchResult.resultNote ?? undefined}
-					/>t
+					/>
 				</div>
 			) : null}
 			{matchPlan.status === "Finished" &&
