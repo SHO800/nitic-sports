@@ -17,7 +17,7 @@ const TeamDataInput = ({
 	addTournamentTeamsFromPlans,
 }: TeamDataInputProps) => {
 	const { getMatchDisplayStr } = useDataContext();
-	
+
 	if (eventType === "tournament") {
 		const teamDataJsonDraftElement = teamDataJsonDraft[index];
 		if (teamDataJsonDraftElement.type !== "tournament") return null;
