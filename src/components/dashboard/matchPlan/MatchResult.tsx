@@ -42,8 +42,8 @@ const MatchResult = ({
 						getMatchDisplayStr={getMatchDisplayStr}
 						eventIsTimeBased={event.isTimeBased}
 						matchTime={matchTime}
-						resultNote={matchResult.resultNote}
-					/>
+						resultNote={matchResult.resultNote ?? undefined}
+					/>t
 				</div>
 			) : null}
 			{matchPlan.status === "Finished" &&
