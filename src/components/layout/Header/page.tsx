@@ -13,11 +13,11 @@ export default function Header() {
         <>
             <nav className="fixed z-100 w-full bg-blue-900 text-white p-4 rounded-b-xl">
                 <div className="flex items-center justify-between">
-                    <Link href="/" className="text-lg font-bold">
+                    <Link href="/" className="text-lg font-bold grow block w-full">
                         2025年度体育大会
                     </Link>
 
-                    <div className={"scale-50 lg:fixed lg:top-1 lg:left-1/2 lg:-translate-x-1/2 "}>
+                    <div className={"scale-50 lg:fixed lg:top-1 lg:left-1/2 lg:-translate-x-1/2 shrink w-fit"}>
                         <Clock/>
                     </div>
 
@@ -79,7 +79,6 @@ export default function Header() {
                         {/*>*/}
                         {/*    Dashboard*/}
                         {/*</Link>*/}
-                        <div className="h-0.5 bg-gray-400"/>
                         <Link
                             href="/schedule"
                             onClick={() => setIsOpen(!isOpen)}
@@ -95,7 +94,6 @@ export default function Header() {
                         {/*>*/}
                         {/*    Infomation*/}
                         {/*</Link>*/}
-                        <div className="h-0.5 bg-gray-400"/>
                         <Link
                             href="/map"
                             onClick={() => setIsOpen(!isOpen)}

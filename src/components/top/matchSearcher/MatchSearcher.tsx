@@ -46,7 +46,7 @@ const MatchSearcher = () => {
         <details className={"mt-16 border-yello-400 border-2 rounded m-6 group"}>
             <summary className="relative flex justify-center mx-2 my-1 rounded h-12 bg-background cursor-pointer select-none py-2">
                 <span className="absolute left-8 top-1/2 -translate-y-1/2 text-2xl group-open:rotate-90 transition-transform">▶</span>
-                <span className="text-3xl text-black bg-background px-4 tracking-wider">試合を検索する</span>
+                <span className="text-2xl text-black bg-background px-4 tracking-wider">試合を検索する</span>
             </summary>
             <div className="flex justify-center flex-col mx-1 lg:mx-20 mb-2 p-1 rounded border-t-2 border-gray-400">
                 <p className="absolute -top-0 text-lg text-black bg-background px-4 tracking-widest">SEARCH!!</p>
