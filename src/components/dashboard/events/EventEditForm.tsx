@@ -11,7 +11,7 @@ const EventEditForm = ({
 	teamDataJsonDraft: TeamData[];
 	isTimeBased: boolean;
 }) => {
-	const { mutateEvents } = useDataContext();
+	const { mutateMatchData } = useDataContext();
 	const [isProcessing, setIsProcessing] = useState(false);
 
 	return (
@@ -30,7 +30,7 @@ const EventEditForm = ({
 						.value,
 					isTimeBased,
 				);
-				await mutateEvents();
+				await mutateMatchData();
 				setIsProcessing(false);
 			}}
 			className="flex items-center mt-4"

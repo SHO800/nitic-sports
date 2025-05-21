@@ -6,7 +6,7 @@ import LoadingButton from "@/components/common/LoadingButton";
 
 const AddMatchPlanForm = () => {
 	const [teamCount, setTeamCount] = useState(2);
-	const { events, groupedTeams, mutateMatchPlans } = useDataContext();
+	const { events, groupedTeams, mutateMatchData } = useDataContext();
 	const [isVisibleClassSelector, setIsVisibleClassSelector] = useState(false);
 	// 試合名の頭文字を自動でインクリメントするか
 	const [isIncrementMatchNameCapital, setIsIncrementMatchNameCapital] =
@@ -131,7 +131,7 @@ const AddMatchPlanForm = () => {
 						isFinal,
 						is3rdPlaceMatch,
 					);
-					await mutateMatchPlans();
+					await mutateMatchData();
 					// インクリメントする場合はインクリメント
 					if (isIncrementMatchNameCapital || isIncrementMatchNameNumber) {
 						increment();
@@ -461,7 +461,7 @@ const AddMatchPlanForm = () => {
 						isFinal,
 						is3rdPlaceMatch,
 					);
-					await mutateMatchPlans();
+					await mutateMatchData();
 					// インクリメントする場合はインクリメント
 					if (isIncrementMatchNameCapital || isIncrementMatchNameNumber) {
 						increment();

@@ -4,7 +4,7 @@ import {type MatchPlan, Status} from "@prisma/client";
 import LoadingButton from "@/components/common/LoadingButton";
 
 const MatchController = ({match}: { match: MatchPlan }) => {
-    const {mutateMatchPlans} = useDataContext();
+    const {mutateMatchData} = useDataContext();
 
     // ステータスを更新する関数
     const updateMatchStatus = async (matchId: number, status: Status) => {
@@ -19,7 +19,7 @@ const MatchController = ({match}: { match: MatchPlan }) => {
                 status === Status.Playing ? updateTime : undefined,
                 status === Status.Finished ? updateTime : undefined,
             );
-            await mutateMatchPlans();
+            await mutateMatchData();
         } catch (error) {
             console.error("ステータス更新エラー:", error);
         }

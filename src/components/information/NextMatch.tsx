@@ -77,7 +77,7 @@ const NextMatch: React.FC<Props> = (props) => {
 								<div
 									className="flex flex-col bg-white mb-1 border rounded "
 								>
-									<div className="flex justify-center w-[70vw] lg:w-[30vw] bg-white px-1 rounded text-2xl">
+									<div className="flex justify-center w-[70vw] lg:w-[30vw] bg-white p-1 rounded text-2xl">
 										<MatchInfoForReader
 											matchPlan={item}
 											events={events}

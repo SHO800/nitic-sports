@@ -7,7 +7,7 @@ import { useState } from "react";
 import LoadingButton from "@/components/common/LoadingButton";
 
 const EventForm = () => {
-	const { mutateEvents, matchPlans } = useDataContext();
+	const { mutateMatchData, matchPlans } = useDataContext();
 	const [isTwoStageCompetition, setIsTwoStageCompetition] = useState(false);
 	const [isTimeBased, setIsTimeBased] = useState(false);
 	const [eventType1, setEventType1] = useState<string | null>("tournament");
@@ -264,7 +264,7 @@ const EventForm = () => {
 								).value,
 								isTimeBased,
 							);
-							await mutateEvents();
+							await mutateMatchData();
 						}}
 						
 					>

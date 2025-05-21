@@ -16,9 +16,8 @@ export const MatchResultForm = ({
 }) => {
 	const {
 		matchPlans,
-		mutateMatchPlans,
+		mutateMatchData,
 		matchResults,
-		mutateMatchResults,
 		getMatchDisplayStr,
 		getLeagueDataByVariableId,
 		isFixedMatchResultOrBlockRankByVariableId,
@@ -156,8 +155,8 @@ export const MatchResultForm = ({
 							actualResultNote,
 							actualResultSecretNote,
 						);
-						await mutateMatchResults();
-						await mutateMatchPlans();
+						await mutateMatchData();
+						await mutateMatchData();
 						setCanInput(true);
 					}}
 				>

@@ -32,7 +32,7 @@ function memoize<T>(key: string, compute: () => T): T {
 	return value;
 }
 
-export const useData = () => {
+export const useData = (options?: { refreshInterval?: number }) => {
 	// APIのベースURLを一箇所に定義
 	const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
@@ -59,9 +59,8 @@ export const useData = () => {
 	
 
 	// SWRフック呼び出しを最適化
-	
-	// それぞれteams, locations, events, matchPlans, matchResults, scoresのtagをつけたい
-	
+
+	// teams, locationsは従来通り個別取得
 	const {
 		data: teams,
 		error: teamError,
@@ -84,49 +83,32 @@ export const useData = () => {
 		swrConfigLong,
 	);
 
+	// match-dataエンドポイントで一括取得
 	const {
-		data: events,
-		error: eventError,
-		isLoading: eventLoading,
-		mutate: mutateEvents,
-	} = useSWR<Event[]>(
-		`${API_BASE}/event`,
-		(url) => fetcher(url, { next: { tags: ["events"] } }),
-		swrConfigShort,
+		data: matchData,
+		error: matchDataError,
+		isLoading: matchDataLoading,
+		mutate: mutateMatchData,
+	} = useSWR<{
+		matchPlans: MatchPlan[];
+		matchResults: { [key: string]: MatchResult };
+		scores: Score[];
+		events: Event[];
+	}>(
+		`${API_BASE}/match-data`,
+		(url) => fetcher(url, { next: { tags: ["matchPlans", "matchResults", "scores", "events"] } }),
+		{
+			...swrConfigBase,
+			refreshInterval: options?.refreshInterval ?? 180000, // デフォルト3分、上書き可
+			revalidateOnFocus: false,
+		},
 	);
 
-	const {
-		data: matchPlans,
-		error: matchPlanError,
-		isLoading: matchPlanLoading,
-		mutate: mutateMatchPlans,
-	} = useSWR<MatchPlan[]>(
-		`${API_BASE}/match-plan`,
-		(url) => fetcher(url, { next: { tags: ["matchPlans"] } }),
-		swrConfigShort,
-	);
-
-	const {
-		data: matchResults,
-		error: matchResultError,
-		isLoading: matchResultLoading,
-		mutate: mutateMatchResults,
-	} = useSWR<{ [key: string]: MatchResult }>(
-		`${API_BASE}/match-result`,
-		(url) => fetcher(url, { next: { tags: ["matchResults"] } }),
-		swrConfigShort,
-	);
-
-	const {
-		data: scores,
-		error: scoreError,
-		isLoading: scoreLoading,
-		mutate: mutateScores,
-	} = useSWR<Score[]>(
-		`${API_BASE}/score`,
-		(url) => fetcher(url, { next: { tags: ["scores"] } }),
-		swrConfigShort,
-	);
+	// 取得データを分割
+	const matchPlans = matchData?.matchPlans;
+	const matchResults = matchData?.matchResults;
+	const scores = matchData?.scores;
+	const events = matchData?.events;
 
 	// グループ化されたチームをメモ化
 	const groupedTeams = useMemo(() => {
@@ -443,28 +425,19 @@ export const useData = () => {
 	const isLoading =
 		teamLoading ||
 		locationLoading ||
-		eventLoading ||
-		matchPlanLoading ||
-		matchResultLoading ||
-		scoreLoading;
+		matchDataLoading;
 
 	// データロードエラーを集約
 	const errors = useMemo(() => {
 		return {
 			teamError,
 			locationError,
-			eventError,
-			matchPlanError,
-			matchResultError,
-			scoreError,
+			matchDataError,
 		};
 	}, [
 		teamError,
 		locationError,
-		eventError,
-		matchPlanError,
-		matchResultError,
-		scoreError,
+		matchDataError,
 	]);
 
 	return {
@@ -474,20 +447,13 @@ export const useData = () => {
 		mutateTeams,
 		groupedTeams,
 		events,
-		eventLoading,
-		mutateEvents,
 		matchPlans,
-		matchPlanLoading,
-		mutateMatchPlans,
 		matchResults,
-		matchResultLoading,
-		mutateMatchResults,
 		locations,
+		mutateMatchData,
 		locationLoading,
 		mutateLocations,
 		scores,
-		scoreLoading,
-		mutateScores,
 		// 集約した状態
 		isLoading,
 		hasErrors: Object.values(errors).some(Boolean),

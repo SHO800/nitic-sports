@@ -22,7 +22,7 @@ const EventList = () => {
 						{/*    onClick={async (e) => {*/}
 						{/*        e.preventDefault()*/}
 						{/*        await deleteEvent(event.id);*/}
-						{/*        await mutateEvents()*/}
+						{/*        awaitmutateEvents()*/}
 						{/*    }}*/}
 						{/*    className='bg-red-500 hover:bg-red-600 text-black px-4 py-2 rounded'*/}
 						{/*>*/}

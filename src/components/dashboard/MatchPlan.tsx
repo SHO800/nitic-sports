@@ -9,11 +9,9 @@ import MatchCard from "@/components/match/MatchCard";
 const MatchPlan = () => {
 	const {
 		matchPlans,
-		locations,
 		matchResults,
 		events,
-		mutateMatchPlans,
-		getMatchDisplayStr,
+		mutateMatchData,
 	} = useDataContext();
 
 	// 各試合のタイマー状態を管理
@@ -33,7 +31,7 @@ const MatchPlan = () => {
 				status === Status.Playing ? new Date() : undefined,
 				status === Status.Finished ? new Date() : undefined,
 			);
-			await mutateMatchPlans();
+			await mutateMatchData();
 			// ローカルの状態を更新
 			setMatchStatuses((prev) => ({
 				...prev,
@@ -86,7 +84,7 @@ const MatchPlan = () => {
 	const handleDeleteMatch = async (matchId: number) => {
 		try {
 			await deleteMatchPlan(matchId);
-			await mutateMatchPlans();
+			await mutateMatchData();
 		} catch (error) {
 			console.error("試合削除エラー:", error);
 		}

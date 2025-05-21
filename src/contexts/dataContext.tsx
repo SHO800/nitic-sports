@@ -20,3 +20,12 @@ export const DataContextProvider = ({ children }: { children: ReactNode }) => {
 		<DataContext.Provider value={useData()}>{children}</DataContext.Provider>
 	);
 };
+
+export const DataContextProviderWithRefresh = ({ children, refreshInterval }: { children: React.ReactNode, refreshInterval: number }) => {
+	return (
+		<DataContext.Provider value={useData({ refreshInterval })}>
+			{children}
+		</DataContext.Provider>
+	);
+};
+

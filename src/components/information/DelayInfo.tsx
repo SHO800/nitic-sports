@@ -57,7 +57,7 @@ const DelayInfo = ({eventId}: Props) => {
                                         className=" relative flex flex-col bg-white mb-1 border rounded"
                                     >
                                         <div
-                                            className="flex justify-center w-[70vw] lg:w-[30vw] bg-white text-black px-1 rounded text-2xl">
+                                            className="flex justify-center w-[70vw] lg:w-[30vw] bg-white text-black p-1 rounded text-2xl">
                                             <MatchInfoForReader
                                                 matchPlan={item}
                                                 events={events}

@@ -146,7 +146,7 @@ const NowHot: React.FC<Props> = (props) => {
 								className="flex justify-center px-10 rounded"
 							>
 								<div className="flex flex-col bg-background mb-1 border rounded">
-									<div className="flex justify-center w-[70vw] lg:w-[30vw] bg-background px-1 rounded">
+									<div className="flex justify-center w-[70vw] lg:w-[30vw] bg-background p-1 rounded">
 										<MatchInfoForReader
 											matchPlan={item}
 											events={events}

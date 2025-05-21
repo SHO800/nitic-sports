@@ -66,7 +66,7 @@ const ModalEventContainer = ({
 	unsettledEvent: Event;
 	setIsOpen: (state: boolean) => void;
 }) => {
-	const { matchPlans, matchResults, getMatchDisplayStr, scores, mutateScores } =
+	const { matchPlans, matchResults, getMatchDisplayStr, scores, mutateMatchData } =
 		useDataContext();
 	const [calculatedScore, setCalculatedScore] = useState<
 		RankWithEventScore[][]
@@ -102,9 +102,9 @@ const ModalEventContainer = ({
 
 	const confirmEventScores = useCallback(async () => {
 		await createScores(unsettledEvent.id, mergedScore);
-		await mutateScores();
+		await mutateMatchData();
 		setIsOpen(false);
-	}, [mutateScores, setIsOpen, unsettledEvent.id, mergedScore]); // 無限再呼び出しに陥るので依存関係を更新してはならない
+	}, [mutateMatchData, setIsOpen, unsettledEvent.id, mergedScore]); // 無限再呼び出しに陥るので依存関係を更新してはならない
 
 	return (
 		<div
