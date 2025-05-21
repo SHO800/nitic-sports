@@ -3,17 +3,14 @@ import { deleteMatchPlan, updateMatchPlanStatus } from "@/app/actions/data";
 import { useDataContext } from "@/contexts/dataContext";
 import { type MatchPlan as MatchPlanType, Status, Event } from "@prisma/client";
 import { Fragment, useState } from "react";
-import AddMatchPlanForm from "@/components/dashboard/AddMatchPlanForm";
 import MatchCard from "@/components/match/MatchCard";
 
 const MatchPlan = () => {
 	const {
 		matchPlans,
-		locations,
 		matchResults,
 		events,
 		mutateMatchPlans,
-		getMatchDisplayStr,
 	} = useDataContext();
 
 	// 各試合のタイマー状態を管理
@@ -109,12 +106,7 @@ const MatchPlan = () => {
 								match={matchPlan}
 								eventsById={eventsById}
 								canChangeState={false}
-								// status={status}
-								// events={events}
-								// locations={locations}
 								matchResults={matchResults}
-								// getMatchDisplayStr={getMatchDisplayStr}
-								// handleDeleteMatch={handleDeleteMatch}
 							/>
 						</div>
 					);

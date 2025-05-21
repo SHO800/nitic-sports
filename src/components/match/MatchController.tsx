@@ -2,6 +2,7 @@ import {updateMatchPlanStatus} from "@/app/actions/data";
 import {useDataContext} from "@/contexts/dataContext";
 import {type MatchPlan, Status} from "@prisma/client";
 import LoadingButton from "@/components/common/LoadingButton";
+import {memo} from "react";
 
 const MatchController = ({match}: { match: MatchPlan }) => {
     const {mutateMatchPlans} = useDataContext();
@@ -54,4 +55,4 @@ const MatchController = ({match}: { match: MatchPlan }) => {
     );
 };
 
-export default MatchController;
+export default memo(MatchController);

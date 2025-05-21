@@ -2,10 +2,10 @@ import { createMatchResult } from "@/app/actions/data";
 import { useDataContext } from "@/contexts/dataContext";
 import analyzeVariableTeamId from "@/utils/analyzeVariableTeamId";
 import type { MatchPlan, MatchResult } from "@prisma/client";
-import { useEffect, useState } from "react";
+import {memo, useEffect, useState} from "react";
 import LoadingButton from "@/components/common/LoadingButton";
 
-export const MatchResultForm = ({
+const MatchResultForm = ({
 	matchPlan,
 	matchResult,
 	isTimeBased = false,
@@ -346,3 +346,5 @@ export const MatchResultForm = ({
 		</div>
 	);
 };
+
+export default memo(MatchResultForm)

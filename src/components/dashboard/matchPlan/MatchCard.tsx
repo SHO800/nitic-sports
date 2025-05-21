@@ -11,6 +11,7 @@ import {
 import MatchCountdown from "./MatchCountdown";
 import MatchInfo from "./MatchInfo";
 import StatusBadge from "./StatusBadge";
+import {memo} from "react";
 
 type MatchCardProps = {
 	matchPlan: MatchPlanType;
@@ -73,4 +74,4 @@ const MatchCard = ({
 	);
 };
 
-export default MatchCard;
+export default memo(MatchCard);

@@ -1,5 +1,6 @@
 "use client";
 import type { MatchPlan as MatchPlanType } from "@prisma/client";
+import {memo} from "react";
 
 type MatchInfoProps = {
 	matchPlan: MatchPlanType;
@@ -50,4 +51,4 @@ const MatchInfo = ({
 	);
 };
 
-export default MatchInfo;
+export default memo(MatchInfo);

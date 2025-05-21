@@ -4,7 +4,7 @@ import { useCurrentTime } from "@/hooks/currentTime";
 import { judgeDay12String } from "@/utils/judgeDay12";
 import type { MatchPlan as MatchPlanType } from "@prisma/client";
 import clsx from "clsx";
-import {useEffect, useRef, useState} from "react";
+import {memo, useEffect, useRef, useState} from "react";
 import InfoModal from "@/components/information/InfoModal";
 import StatusBadge from "@/components/dashboard/matchPlan/StatusBadge";
 
@@ -178,4 +178,4 @@ const MatchInfoForReader = ({
 	);
 };
 
-export default MatchInfoForReader;
+export default memo(MatchInfoForReader);
