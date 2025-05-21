@@ -7,15 +7,15 @@ type Props = {
 
 const MapZoom = ({ locationId }: Props) => {
 	const mapIdJudge = (placeId: number | null) => {
-		if (placeId === null || placeId > 16) return 0;
-		if (1 <= placeId && placeId <= 9) return 1;
-		if (10 <= placeId && placeId <= 16) return 2;
+		if (placeId === null || placeId > 17) return 0;
+		if (1 <= placeId && placeId <= 10 || placeId === 17) return 1;
+		if (11 <= placeId && placeId <= 16) return 2;
 	};
 
 	const MapId = mapIdJudge(locationId);
 
 	const locationJudge = (placeId: number | null) => {
-		if (placeId === null || placeId > 16) return "地球";
+		if (placeId === null || placeId > 17) return "地球";
 		if (placeId === 1) return "第1体育館 Aコート";
 		if (placeId === 2) return "第1体育館 Bコート";
 		if (placeId === 3) return "第1体育館 Cコート";
