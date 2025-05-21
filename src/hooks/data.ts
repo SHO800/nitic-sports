@@ -99,7 +99,7 @@ export const useData = (options?: { refreshInterval?: number }) => {
 		(url) => fetcher(url, { next: { tags: ["matchPlans", "matchResults", "scores", "events"] } }),
 		{
 			...swrConfigBase,
-			refreshInterval: options?.refreshInterval ?? 180000, // デフォルト3分、上書き可
+			refreshInterval: options?.refreshInterval ?? 60000, // デフォルト1分
 			revalidateOnFocus: false,
 		},
 	);
