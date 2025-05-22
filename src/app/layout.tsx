@@ -42,7 +42,7 @@ export default async function RootLayout({
         </CurrentTimeContextProvider>
 
         <Analytics/>
-        <SpeedInsights/>
+        {/*<SpeedInsights/>*/}
         <Footer/>
         </body>
         </html>
