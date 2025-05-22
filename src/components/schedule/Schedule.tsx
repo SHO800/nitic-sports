@@ -28,7 +28,7 @@ const Schedule = async () => {
                     className="object-cover aspect-[0.5878481013] !h-full !w-auto"
                 />
                 <div className="absolute z-80 bottom-0  left-0 w-full h-[calc(100%-0.0263291139%)] ">
-                    <TimeLine startTime={"2025/05/22 09:29"} endTime={"2025/05/22 18:35"}/>
+                    <TimeLine startTime={"2025/05/22 08:29"} endTime={"2025/05/22 17:35"}/>
                 </div>
             </div>
             <h2 className="flex justify-center mx-2 mt-8 mb-4  text-2xl ">
