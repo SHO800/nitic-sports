@@ -317,7 +317,7 @@ const Bracket = ({
 			) : (
 				<div className="bg-background rounded-lg  p-8 text-center">
 					<p className="text-gray-500">
-						ロード中∨この種目には対戦表データがありません。
+						この種目には対戦表データがありません。<br />屋外競技は交流戦となりました。
 					</p>
 				</div>
 			)}

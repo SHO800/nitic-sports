@@ -27,17 +27,17 @@ const Schedule = async () => {
                     quality={100}
                     className="object-cover aspect-[0.5878481013] !h-full !w-auto"
                 />
-                <div className="absolute z-80 bottom-0  left-0 w-full h-[calc(100%-0.0263291139%)] ">
-                    <TimeLine startTime={"2025/05/22 08:16"} endTime={"2025/05/22 17:22"}/> 
-                {/*    -15分*/}
-                </div>
+                {/*<div className="absolute z-80 bottom-0  left-0 w-full h-[calc(100%-0.0263291139%)] ">*/}
+                {/*    <TimeLine startTime={"2025/05/22 08:16"} endTime={"2025/05/22 17:22"}/> */}
+                {/*/!*    -15分*!/*/}
+                {/*</div>*/}
             </div>
             <h2 className="flex justify-center mx-2 mt-8 mb-4  text-2xl ">
-                2日目 (2025/05/23)
+                2日目 (2025/05/23) 変更後
             </h2>
             <div
                 className={
-                    "relative  max-w-[1024px] w-full h-auto  aspect-[0.5389884089] "
+                    "relative  max-w-[1024px] w-full h-auto  aspect-[0.5748155954] "
                 }
             >
                 <Image
@@ -47,10 +47,10 @@ const Schedule = async () => {
                     priority={true}
                     sizes="1024px"
                     quality={100}
-                    className="object-cover aspect-[0.5389884089] !h-full !w-auto"
+                    className="object-cover aspect-[0.5748155954] !h-full !w-auto"
                 />
                 <div className="absolute z-80 top-0 left-0 w-full h-full pt-[0.0273972603%] ">
-                    <TimeLine startTime={"2025/05/23 08:45"} endTime={"2025/05/23 17:15"}/>
+                    <TimeLine startTime={"2025/05/23 09:00"} endTime={"2025/05/23 17:00"}/>
                 {/*    -15分*/}
                 </div>
             </div>
