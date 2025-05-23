@@ -28,7 +28,7 @@ const MatchResultTable: React.FC<MatchResultTableProps> = ({
             所属
           </th>
           <th scope={"col"} className={"w-1/3 "}>
-            {eventIsTimeBased ? " " : "スコア"} 
+            {eventIsTimeBased ? "着順" : "スコア"} 
           {/*  タイムはなしに*/}
           </th>
           <th scope={"col"} className={"w-1/3 "}>

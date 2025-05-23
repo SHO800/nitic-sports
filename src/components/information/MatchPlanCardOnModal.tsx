@@ -48,7 +48,7 @@ const MatchPlanCardOnModal = ({
                                                       matchScores={matchResults[matchPlan.id].matchScores}
                                                       winnerTeamId={matchResults[matchPlan.id].winnerTeamId}
                                                       getMatchDisplayStr={getMatchDisplayStr}
-                                                      eventIsTimeBased={!events.find(event => event.id === matchPlan.eventId)}
+                                                      eventIsTimeBased={!!(events.find(event => event.id === matchPlan.eventId)?.isTimeBased)}
                                                       matchTime={new Date(matchPlan.endedAt).getTime() - new Date(matchPlan.startedAt).getTime()}/>
                                 </div>
                             }
