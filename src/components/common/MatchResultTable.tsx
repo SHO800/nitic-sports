@@ -47,7 +47,7 @@ const MatchResultTable: React.FC<MatchResultTableProps> = ({
             </td>
             <td>
               {/*@ts-ignore*/}
-              <p className={"text-center"}>{ eventIsTimeBased ? (matchScores[index].toString())[0]+"位" : matchScores[index]}</p>
+              <p className={"text-center"}>{ eventIsTimeBased ? (matchScores[index].toString())[1]+"位" : matchScores[index]}</p>
             </td>
             <td>
               <p className={"text-center"}>
