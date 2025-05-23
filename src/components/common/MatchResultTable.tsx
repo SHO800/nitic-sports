@@ -28,7 +28,8 @@ const MatchResultTable: React.FC<MatchResultTableProps> = ({
             所属
           </th>
           <th scope={"col"} className={"w-1/3 "}>
-            {eventIsTimeBased ? "タイム" : "スコア"}
+            {eventIsTimeBased ? " " : "スコア"} 
+          {/*  タイムはなしに*/}
           </th>
           <th scope={"col"} className={"w-1/3 "}>
             勝利
@@ -45,7 +46,8 @@ const MatchResultTable: React.FC<MatchResultTableProps> = ({
               <p className={"text-center"}>{getMatchDisplayStr(teamId.toString())}</p>
             </td>
             <td>
-              <p className={"text-center"}>{matchScores[index]}</p>
+              {/*@ts-ignore*/}
+              <p className={"text-center"}>{ eventIsTimeBased ? (matchScores[index].toString())[0]+"位" : matchScores[index]}</p>
             </td>
             <td>
               <p className={"text-center"}>

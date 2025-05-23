@@ -169,7 +169,7 @@ export const MatchResultForm = ({
 									所属
 								</th>
 								<th scope={"col"} className={"w-2/3"}>
-									{isTimeBased ? "タイム" : "スコア"}
+									{isTimeBased ? "順位" : "スコア"}
 								</th>
 								<th scope={"col"} className={"w-1/6"}>
 									勝者
