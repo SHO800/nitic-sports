@@ -6,9 +6,9 @@ const nextConfig: NextConfig = {
 	// experimental: {
 	//     ppr: true,
 	// },
-	experimental: {
-		dynamicIO: true,
-	},
+    experimental: {
+        useCache: true
+    },
 
 	eslint: {
 		// Warning: This allows production builds to successfully complete even if
