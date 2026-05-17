@@ -23,7 +23,7 @@ const notoSansJp = Noto_Sans_JP({
 
 export const metadata: Metadata = {
 
-    title: "一関 - 体育大会2025",
+    title: "一関 - 体育大会2026",
     description: "一関高専校内体育大会の試合結果をリアルタイムでお届けします！",
 };
 
