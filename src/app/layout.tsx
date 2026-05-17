@@ -8,6 +8,7 @@ import {CurrentTimeContextProvider} from "@/contexts/currentTimeContext";
 import {DataContextProvider} from "@/contexts/dataContext";
 import {Analytics} from "@vercel/analytics/react";
 import {SpeedInsights} from "@vercel/speed-insights/next";
+import {ComingSoon} from "@/app/ComingSoon";
 
 const notoSansJp = Noto_Sans_JP({
     subsets: ["latin"],
@@ -36,14 +37,14 @@ export default async function RootLayout({
         <body
             className={`antialiased text-lg bg-gray-200 `}
         >
-        <CurrentTimeContextProvider>
-            <Header/>
-            <DataContextProvider>{children}</DataContextProvider>
-        </CurrentTimeContextProvider>
-
+        {/*<CurrentTimeContextProvider>*/}
+        {/*    <Header/>*/}
+        {/*    <DataContextProvider>{children}</DataContextProvider>*/}
+        {/*</CurrentTimeContextProvider>*/}
+        <ComingSoon />
         <Analytics/>
         {/*<SpeedInsights/>*/}
-        <Footer/>
+        {/*<Footer/>*/}
         </body>
         </html>
     );
